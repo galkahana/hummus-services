@@ -1,0 +1,32 @@
+{
+	"externals": {
+		"fbLogo": "http://pdfrendering.herokuapp.com/profileImage.jpg"
+	},
+	"pages": [
+		{
+			"width": 595,
+			"height": 842,
+			"boxes": [
+				{
+					"bottom": 500,
+					"left": 10,
+					"text": {
+						"text": "hello world",
+						"options": {
+							"fontPath": "./arial.ttf",
+							"size": 40,
+							"color": "pink"
+						}
+					}
+				},
+				{
+					"bottom": 600,
+					"left": 10,
+					"image": {
+						"external": "fbLogo"
+					}
+				}
+			]
+		}
+	]
+}

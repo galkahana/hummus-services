@@ -1,0 +1,306 @@
+var hummus = require('hummus'),
+	bidi = require('icu-bidi'),
+	_ = require('lodash'),
+	logger = require('../logger'),
+	NewPageDriver = require('./new-page-driver'),
+	ModifiedPageDriver = require('./modified-page-driver'),
+	StreamObjectComposer = require('./stream-object-composer'),
+	DocumentBoxMap = require('./document-box-map'),
+	FilesMap = require('./files-map'),
+	Measurements = require('./measurements'),
+	TextUtilities = require('./text-utilities')
+
+/*
+	PDF rendering method.
+	
+	inDocument - Document object, describing the document structure and content
+	inExternals - External file references mapping to local files
+	inTargetStream - Target stream to write PDF file content to
+	inOptions - PDF generation options
+	inCallback - callback to call when done (not commiting here on async, but that's the way to be notified about the end)
+*/
+module.exports.render = function(inDocument,inExternals,inTargetStream,inOptions,inCallback) {
+	var modifiedFileStream;
+	
+	var renderingHelpers = {};
+
+	// prepare rendering helpers in a convenient structure
+	renderingHelpers.documentBoxMap = new DocumentBoxMap(inDocument);
+	renderingHelpers.filesMap = new FilesMap(inExternals);
+	renderingHelpers.measurements = new Measurements(renderingHelpers.documentBoxMap,renderingHelpers.filesMap);
+
+	try
+	{
+		var writer;
+
+		if(inDocument.source)
+		{
+			modifiedFileStream = new hummus.PDFRStreamForFile(inDocument.source.path ? 
+																		inDocument.source.path : 
+																		renderingHelpers.filesMap.getLocalFile(inDocument.source.external));
+			writer = hummus.createWriterToModify(modifiedFileStream,inTargetStream,inOptions);
+		}
+		else
+			writer = hummus.createWriter(inTargetStream,inOptions);
+
+		renderDocument(inDocument,writer,renderingHelpers);
+
+		writer.end();	
+
+		if(inCallback)
+			inCallback();
+	}
+	catch(err)
+	{
+		inCallback(err);
+	}
+}
+
+function renderDocument(inDocument,inPDFWriter,inRenderingHelpers)
+{
+	var width;
+	var height;
+
+	// render pages
+	inDocument.pages.forEach(function(inPage)
+	{
+		
+		var thePageDriver;
+		if(inPage.modifiedFrom !== undefined)
+		{
+			thePageDriver = new ModifiedPageDriver(inPDFWriter,inPage.modifiedFrom);
+		}
+		else
+		{
+			// accumulate required properties [syntax test]
+			width = inPage.width || width;
+			height = inPage.height || height;
+			thePageDriver = new NewPageDriver(inPDFWriter,width,height);
+		}
+
+		thePageDriver.links = []; // save links on page object
+
+
+		// render boxes
+		if(inPage.boxes)
+		{
+			inPage.boxes.forEach(function(inBox)
+			{
+				renderBox(inBox,thePageDriver,inPDFWriter,inRenderingHelpers);
+			});
+		}
+
+		thePageDriver.writePage(thePageDriver.links);
+	});
+}
+
+function renderBox(inBox,inPDFPage,inPDFWriter,inRenderingHelpers)
+{
+	// render the box
+	if(inBox.items)
+	{
+		inBox.items.forEach(function(inItem)
+		{
+			renderItem(inBox,inItem,inPDFPage,inPDFWriter,inRenderingHelpers);
+		});
+	}
+	else if(inBox.image)
+		renderImageItem(inBox,inBox.image,inPDFPage,inPDFWriter,inRenderingHelpers);
+	else if(inBox.shape)
+		renderShapeItem(inBox,inBox.shape,inPDFPage,inPDFWriter,inRenderingHelpers);
+	else if(inBox.text)
+		renderTextItem(inBox,inBox.text,inPDFPage,inPDFWriter,inRenderingHelpers);
+	else if(inBox.stream)
+		renderStreamItem(inBox,inBox.stream,inPDFPage,inPDFWriter,inRenderingHelpers);
+
+	// collect box ID. collecting it after to allow reference in repeaters
+	// [meaning, allow a later ID to override this ID]
+	inRenderingHelpers.documentBoxMap.collectBoxId(inBox);
+}
+
+
+function renderItem(inBox,inItem,inPDFPage,inPDFWriter,inRenderingHelpers)
+{
+	switch(inItem.type)
+	{
+		case 'image': 
+			renderImageItem(inBox,inItem,inPDFPage,inPDFWriter,inRenderingHelpers);
+			break;
+		case 'shape':
+			renderShapeItem(inBox,inItem,inPDFPage,inPDFWriter,inRenderingHelpers);
+			break;
+		case 'text':
+			renderTextItem(inBox,inItem,inPDFPage,inPDFWriter,inRenderingHelpers);
+			break;
+		case 'stream':
+			renderStreamItem(inBox,inItem,inPDFPage,inPDFWriter,inRenderingHelpers);
+			break;
+	}
+
+}
+
+function renderImageItem(inBox,inItem,inPDFPage,inPDFWriter,inRenderingHelpers)
+{
+	var opts = {};
+
+	opts.index = inItem.index;
+	opts.transformation = inItem.transformation;
+	if(opts.transformation && !_.isArray(opts.transformation) &&
+		!opts.transformation.width &&
+		!opts.transformation.height)
+	{
+		opts.transformation.width = inBox.width;
+		opts.transformation.height = inBox.height;
+	}
+
+	var imageItemMeasures = inRenderingHelpers.measurements.getImageItemMeasures(inItem,inPDFWriter);
+
+	if(inBox.top !== undefined && inBox.bottom == undefined)
+	{
+		if(typeof(inBox.top) == 'object')
+			inRenderingHelpers.measurements.computeBoxTopFromAnchor(inBox,inPDFWriter);
+		inBox.bottom = inBox.top - (inBox.height !== undefined ? inBox.height:imageItemMeasures.height);
+	}
+
+	var left = getLeftForAlignment(inBox,inItem,inPDFWriter,inRenderingHelpers);
+	var imagePath = inRenderingHelpers.filesMap.getImageItemFilePath(inItem);
+	if(imagePath)
+		inPDFPage.startContentContext().drawImage(left,inBox.bottom,imagePath,opts);	
+
+	if(inItem.link)
+		inPDFPage.links.push({link:inItem.link,rect:[left,inBox.bottom,left+imageItemMeasures.width,inBox.bottom+imageItemMeasures.height]});
+
+}
+
+function getLeftForAlignment(inBox,inItem,inPDFWriter,inRenderingHelpers)
+{
+	if(!inBox.alignment || inBox.alginment == "left")
+		return inBox.left;
+	else if(inBox.alignment == "right")
+	{
+		return inBox.left + inBox.width - inRenderingHelpers.measurements.getItemMeasures(inItem,inBox,inPDFWriter).width;
+	}
+	else
+	{
+		// center
+		return inBox.left + (inBox.width - inRenderingHelpers.measurements.getItemMeasures(inItem,inBox,inPDFWriter).width)/2;
+	}
+}
+
+function renderShapeItem(inBox,inItem,inPDFPage,inPDFWriter,inRenderingHelpers)
+{
+
+	if(inBox.top !== undefined && inBox.bottom == undefined)
+	{
+		if(typeof(inBox.top) == 'object')
+			inRenderingHelpers.measurements.computeBoxTopFromAnchor(inBox,inPDFWriter);
+		inBox.bottom = inBox.top - (inBox.height !== undefined ? inBox.height:inRenderingHelpers.measurements.getShapeItemMeasures(inItem).height);
+	}
+
+	var left = getLeftForAlignment(inBox,inItem,inPDFWriter,inRenderingHelpers);
+
+	switch(inItem.method)
+	{
+		case 'rectangle':
+			inPDFPage.startContentContext().drawRectangle(left,inBox.bottom,inItem.width,inItem.height,inItem.options);
+			break;
+		case 'square':
+			inPDFPage.startContentContext().drawSquare(left,inBox.bottom,inItem.width,inItem.options);
+			break;
+		case 'circle':
+			// translate bottom/left to center
+			inPDFPage.startContentContext().drawCircle(left+inItem.radius,inBox.bottom+inItem.radius,inItem.radius,inItem.options);
+			break;
+		case 'path':
+			// translate bottom left to paths points
+			var args = inItem.points.slice();
+			for(var i=0;i<args.length;i+=2)
+			{
+				args[i]+=left;
+				args[i+1]+=inBox.bottom;
+			}
+			if(inItem.options)
+				args.push(inItem.options);
+			var cxt = inPDFPage.startContentContext();
+			cxt.drawPath.apply(cxt,args);
+			break;
+	}
+}
+
+function renderTextItem(inBox,inItem,inPDFPage,inPDFWriter,inRenderingHelpers)
+{
+	var theFont =  TextUtilities.getFont(inPDFWriter,inItem,inRenderingHelpers.filesMap);
+	if(!theFont)
+			return;
+	inItem.options.font = theFont;
+
+	var theText = TextUtilities.computeTextForItem(inItem);
+
+	if(inBox.top !== undefined && inBox.bottom == undefined)
+	{
+		if(typeof(inBox.top) == 'object')
+			inRenderingHelpers.measurements.computeBoxTopFromAnchor(inBox,inPDFWriter);
+		inBox.bottom = inBox.top - (inBox.height !== undefined ? inBox.height:inRenderingHelpers.measurements.getTextItemMeasures(inItem,inPDFWriter).height);
+	}
+
+	var left = getLeftForAlignment(inBox,inItem,inPDFWriter,inRenderingHelpers);
+
+	inPDFPage.startContentContext().writeText(theText,left,inBox.bottom,inItem.options);
+
+
+	if(inItem.link)
+	{
+		var measures = inRenderingHelpers.measurements.calculateTextDimensions(theFont,theText,inItem.options.size);
+		inPDFPage.links.push({link:inItem.link,rect:[left+measures.xMin,inBox.bottom+measures.yMin,left+measures.xMax,inBox.bottom+measures.yMax]});
+	}
+}
+		
+function renderStreamItem(inBox,inItem,inPDFPage,inPDFWriter,inRenderingHelpers)
+{
+	StreamObjectComposer.composeStreamItem(
+		inBox,
+		inItem,
+		inPDFWriter,
+		inRenderingHelpers.measurements,
+		inRenderingHelpers.filesMap,
+		function(inText,inStart,inLimit,inDirection,inStyle,inState) {
+			renderRun(inText,inStart,inLimit,inDirection,inStyle,inState,inPDFPage,inRenderingHelpers,inPDFWriter);
+		});
+}
+
+function renderRun(inText,inStart,inLimit,inDirection,inStyle,inState,inPDFPage,inRenderingHelpers,inPDFWriter)
+{
+	var itemMeasures;
+	if(inStyle.type !== undefined)
+	{
+		// regular item, place using regular method, with a new box stating it's position
+		var theItem;
+		if(inStyle.type == 'text')
+		{
+			theItem = _.clone(inStyle);
+			theItem.text = inText.substring(inStart,inLimit);
+		}
+		else
+		{
+			theItem = inStyle;
+		}
+		theItem.direction = inDirection;
+		var theBox = {left:inState.xOffset,bottom:inState.yOffset,items:[theItem]};
+		renderItem(theBox,theItem,inPDFPage,inPDFWriter,inRenderingHelpers);
+		itemMeasures = inRenderingHelpers.measurements.getItemMeasures(theItem,theBox,inPDFWriter);
+	}
+	else
+	{
+		// a box (inline frame). create a copy of the box, and replace the xOffset and yOffset
+		// ponder:replacing. should i add? right now will not support non-0 coordinates
+		// of box...oh well...we still have to figure out what its good for anyways
+		var newBox = _.clone(inStyle);
+		newBox.left = inState.xOffset;
+		newBox.bottom = inState.yOffset;
+		renderBox(newBox,inPDFPage,inPDFWriter,inRenderingHelpers);
+		itemMeasures = inRenderingHelpers.measurements.calculateBoxMeasures(newBox,inPDFWriter);
+	}	
+
+	inState.xOffset += itemMeasures.width;
+	inState.height = Math.max(inState.height,itemMeasures.height);
+}
