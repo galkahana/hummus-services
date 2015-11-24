@@ -8,41 +8,45 @@ var logger = require('../src/services/logger'),
 	
 logger.log('Starting Hummus Services');
 
-['simple','basicDocument','elementsWithTop','basicDocumentModification'].forEach(function(inDocFileName)
-{
-	fs.readFile('./' + inDocFileName + '.json', function (err, data) {
-		if (err) throw err;
-	
-		var theDocument = JSON.parse(data), 
-			options = {log:'./output/' + inDocFileName + '.log'},
-			outputStream = new PDFWStreamForFile('./output/' + inDocFileName  + '.pdf');
-	
-		async.waterfall([
-				function(callback) {
-					externalFilesDownloader.downloadExternals(theDocument.externals,callback);
-				},
-				function(externals, callback) {
-					documentRendering.render(
-						theDocument,
-						externals,
-						outputStream,
-						options,
-						function(err) {
-							callback(err,externals);
-						}
-					);
-				},
-				function(externals,callback) {
-					externalFilesDownloader.cleanExternals(externals);
-					callback();
-				}
-			], 
-			function (err) {
-				if(err) throw err;
+async.each(['simple','basicDocument','elementsWithTop','basicDocumentModification'],
+			function(inDocFileName,cb)
+			{
+				fs.readFile('./' + inDocFileName + '.json', function (err, data) {
+					if (err) throw err;
+				
+					var theDocument = JSON.parse(data), 
+						options = {log:'./output/' + inDocFileName + '.log'},
+						outputStream = new PDFWStreamForFile('./output/' + inDocFileName  + '.pdf');
+				
+					async.waterfall([
+							function(callback) {
+								externalFilesDownloader.downloadExternals(theDocument.externals,callback);
+							},
+							function(externals, callback) {
+								documentRendering.render(
+									theDocument,
+									externals,
+									outputStream,
+									options,
+									function(err) {
+										callback(err,externals);
+									}
+								);
+							},
+							function(externals,callback) {
+								externalFilesDownloader.cleanExternals(externals);
+								callback();
+							}
+						], 
+						function (err) {
+							cb(err);
+						});		
+				});
+			}, 
+			function(err) {
+				if(err) cb(err);
 				logger.log('Done Hummus Services');			
-			});		
-	});
-});
+			});
 
 
 
