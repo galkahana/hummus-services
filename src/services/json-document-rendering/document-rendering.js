@@ -8,7 +8,8 @@ var hummus = require('hummus'),
 	DocumentBoxMap = require('./document-box-map'),
 	FilesMap = require('./files-map'),
 	Measurements = require('./measurements'),
-	TextUtilities = require('./text-utilities')
+	TextUtilities = require('./text-utilities'),
+	PDFCopyingContexts = require('./pdf-copying-contexts');
 
 /*
 	PDF rendering method.
@@ -43,6 +44,9 @@ module.exports.render = function(inDocument,inExternals,inTargetStream,inOptions
 		else
 			writer = hummus.createWriter(inTargetStream,inOptions);
 
+		// one more for the helpers
+		renderingHelpers.pdfCopyingContexts = new PDFCopyingContexts(writer);
+
 		renderDocument(inDocument,writer,renderingHelpers);
 
 		writer.end();	
@@ -58,40 +62,83 @@ module.exports.render = function(inDocument,inExternals,inTargetStream,inOptions
 
 function renderDocument(inDocument,inPDFWriter,inRenderingHelpers)
 {
-	var width;
-	var height;
-
+	var accumulatedDims = {
+		width:null,
+		height:null
+	}
+	
 	// render pages
 	inDocument.pages.forEach(function(inPage)
 	{
-		
-		var thePageDriver;
-		if(inPage.modifiedFrom !== undefined)
-		{
-			thePageDriver = new ModifiedPageDriver(inPDFWriter,inPage.modifiedFrom);
-		}
+		if(inPage.appendedFrom)
+			appendPage(inPage.appendedFrom,inPDFWriter,inRenderingHelpers);
 		else
-		{
-			// accumulate required properties [syntax test]
-			width = inPage.width || width;
-			height = inPage.height || height;
-			thePageDriver = new NewPageDriver(inPDFWriter,width,height);
-		}
-
-		thePageDriver.links = []; // save links on page object
-
-
-		// render boxes
-		if(inPage.boxes)
-		{
-			inPage.boxes.forEach(function(inBox)
-			{
-				renderBox(inBox,thePageDriver,inPDFWriter,inRenderingHelpers);
-			});
-		}
-
-		thePageDriver.writePage(thePageDriver.links);
+			createPage(inPage,accumulatedDims,inPDFWriter,inRenderingHelpers);
 	});
+}
+
+function appendPage(inPageAppendData,inPDFWriter,inRenderingHelpers) {
+	var originPath = inRenderingHelpers.filesMap.getImageItemFilePath(inPageAppendData);
+	var originType = inPDFWriter.getImageType(originPath);
+	var allPages = (typeof inPageAppendData.index === 'undefined' || inPageAppendData.index == 'all') ;
+	var startIndex = allPages ?  0:inPageAppendData.index;
+	var endIndex;
+	
+	/*
+		Allow appending pages of PDF files or of TIFF images
+	*/
+	if(originType === 'PDF') {
+		var copyContext = inRenderingHelpers.pdfCopyingContexts.getContext(
+							inRenderingHelpers.filesMap.getImageItemFilePath(inPageAppendData));
+		endIndex = allPages ? 
+				(copyContext.getSourceDocumentParser().getPagesCount() - 1) : 
+						((typeof inPageAppendData.endIndex === 'undefined') ?  startIndex:inPageAppendData.endIndex);
+		for(var i=startIndex;i<=endIndex;++i)
+			copyContext.appendPDFPageFromPDF(i);
+	} 
+	else if(originType == 'TIFF') 
+	{
+		endIndex = allPages ? 
+				(inPDFWriter.getImagePagesCount(originPath)- 1) : 
+						((typeof inPageAppendData.endIndex === 'undefined') ?  startIndex:inPageAppendData.endIndex);
+						
+		for(var i=startIndex;i<=endIndex;++i) {
+			var imageDimensions = inPDFWriter.getImageDimensions(originPath,i);
+			var pdfPage = inPDFWriter.createPage(0,0,imageDimensions.width,imageDimensions.height);
+			var cxt = inPDFWriter.startPageContentContext(pdfPage);
+			cxt.drawImage(0,0,originPath);
+			inPDFWriter.writePage(pdfPage);
+		}
+	}
+}
+
+function createPage(inPage,inAccumulatedDims,inPDFWriter,inRenderingHelpers) {
+	var thePageDriver;
+	if(inPage.modifiedFrom !== undefined)
+	{
+		thePageDriver = new ModifiedPageDriver(inPDFWriter,inPage.modifiedFrom);
+	}
+	else
+	{
+		// accumulate required properties [syntax test]
+		inAccumulatedDims.width = inPage.width || inAccumulatedDims.width;
+		inAccumulatedDims.height = inPage.height || inAccumulatedDims.height;
+		thePageDriver = new NewPageDriver(inPDFWriter,inAccumulatedDims.width,inAccumulatedDims.height);
+	}
+
+	thePageDriver.links = []; // save links on page object
+
+
+	// render boxes
+	if(inPage.boxes)
+	{
+		inPage.boxes.forEach(function(inBox)
+		{
+			renderBox(inBox,thePageDriver,inPDFWriter,inRenderingHelpers);
+		});
+	}
+
+	thePageDriver.writePage(thePageDriver.links);	
 }
 
 function renderBox(inBox,inPDFPage,inPDFWriter,inRenderingHelpers)

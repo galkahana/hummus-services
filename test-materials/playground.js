@@ -8,7 +8,7 @@ var logger = require('../src/services/logger'),
 	
 logger.log('Starting Hummus Services');
 
-async.each(['simple','basicDocument','elementsWithTop','basicDocumentModification'],
+async.each(['appending','simple','basicDocument','elementsWithTop','basicDocumentModification'],
 			function(inDocFileName,cb)
 			{
 				fs.readFile('./' + inDocFileName + '.json', function (err, data) {
@@ -44,7 +44,7 @@ async.each(['simple','basicDocument','elementsWithTop','basicDocumentModificatio
 				});
 			}, 
 			function(err) {
-				if(err) cb(err);
+				if(err) throw err;
 				logger.log('Done Hummus Services');			
 			});
 
