@@ -1,0 +1,11 @@
+{
+	"externals": {
+		"fbLogo": "http://pdfrendering.herokuapp.com/profileImage.jpg"
+	},
+	"document" : {
+		"path" : "../documents/variableDocument.json"
+	},
+	"variableData" : {
+		"name": "george"
+	}
+}

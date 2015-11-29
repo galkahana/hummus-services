@@ -1,7 +1,4 @@
 {
-	"externals": {
-		"fbLogo": "http://pdfrendering.herokuapp.com/profileImage.jpg"
-	},
 	"pages": [
 		{
 			"width": 595,
@@ -11,9 +8,9 @@
 					"bottom": 500,
 					"left": 10,
 					"text": {
-						"text": "hello world",
+						"text": "I'm only a document",
 						"options": {
-							"fontPath": "./arial.ttf",
+							"fontPath": "../assets/arial.ttf",
 							"size": 40,
 							"color": "pink"
 						}

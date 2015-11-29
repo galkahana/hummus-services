@@ -14,6 +14,7 @@
     "icu-bidi": "^0.1.5",
     "lodash": "^3.10.1",
     "moment": "^2.10.6",
+    "mustache": "^2.2.0",
     "temporary": "0.0.8"
   }
 }

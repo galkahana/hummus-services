@@ -6,7 +6,7 @@ var hummus = require('hummus'),
 	ModifiedPageDriver = require('./modified-page-driver'),
 	StreamObjectComposer = require('./stream-object-composer'),
 	DocumentBoxMap = require('./document-box-map'),
-	FilesMap = require('./files-map'),
+	FilesMap = require('../files-map'),
 	Measurements = require('./measurements'),
 	TextUtilities = require('./text-utilities'),
 	PDFCopyingContexts = require('./pdf-copying-contexts');
@@ -17,7 +17,17 @@ var hummus = require('hummus'),
 	inDocument - Document object, describing the document structure and content
 	inExternals - External file references mapping to local files
 	inTargetStream - Target stream to write PDF file content to
-	inOptions - PDF generation options
+	inOptions - generation options :
+		{
+			pwd: XXXXXX
+			pdfWriter: {
+				.....
+			}
+		}
+		
+		pwd is quite important, it is the base for all relative file references in the document.
+		pdfWriter is an object with options specific to the hummus module. they are the options provided to pdfWriter on creation.
+			for example, you can setup a log file for the pdf generation via a log entry.
 	inCallback - callback to call when done (not commiting here on async, but that's the way to be notified about the end)
 */
 module.exports.render = function(inDocument,inExternals,inTargetStream,inOptions,inCallback) {
@@ -27,22 +37,23 @@ module.exports.render = function(inDocument,inExternals,inTargetStream,inOptions
 
 	// prepare rendering helpers in a convenient structure
 	renderingHelpers.documentBoxMap = new DocumentBoxMap(inDocument);
-	renderingHelpers.filesMap = new FilesMap(inExternals);
+	renderingHelpers.filesMap = new FilesMap(inOptions.pwd,inExternals);
 	renderingHelpers.measurements = new Measurements(renderingHelpers.documentBoxMap,renderingHelpers.filesMap);
 
 	try
 	{
 		var writer;
+		var pdfWriterOptions = inOptions ? inOptions.pdfWriter : undefined;
 
 		if(inDocument.source)
 		{
 			modifiedFileStream = new hummus.PDFRStreamForFile(inDocument.source.path ? 
-																		inDocument.source.path : 
-																		renderingHelpers.filesMap.getLocalFile(inDocument.source.external));
-			writer = hummus.createWriterToModify(modifiedFileStream,inTargetStream,inOptions);
+																		renderingHelpers.filesMap.getLocalPath(inDocument.source.path) : 
+																		renderingHelpers.filesMap.getExternalFilePath(inDocument.source.external));
+			writer = hummus.createWriterToModify(modifiedFileStream,inTargetStream,pdfWriterOptions);
 		}
 		else
-			writer = hummus.createWriter(inTargetStream,inOptions);
+			writer = hummus.createWriter(inTargetStream,pdfWriterOptions);
 
 		// one more for the helpers
 		renderingHelpers.pdfCopyingContexts = new PDFCopyingContexts(writer);
