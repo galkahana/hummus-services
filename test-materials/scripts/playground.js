@@ -23,7 +23,7 @@ function getDocument(jobDescriptor,callback,results) {
 	
 	if(filePath) {
 		fs.readFile(filePath,'utf8',function(err,data) {
-			if(err) return cb(err);
+			if(err) return callback(err);
 			callback(null,data);
 		});
 	} else {
