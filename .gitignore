@@ -29,3 +29,5 @@ node_modules
 
 /test-materials/output/*.pdf
 /test-materials/output/*.log
+
+.vscode/
