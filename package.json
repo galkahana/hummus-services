@@ -15,6 +15,7 @@
     "icu-bidi": "^0.1.5",
     "lodash": "^3.10.1",
     "moment": "^2.10.6",
+    "mongoose": "^4.3.1",
     "mustache": "^2.2.0",
     "node-uuid": "^1.4.7",
     "temporary": "0.0.8"

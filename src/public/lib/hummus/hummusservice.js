@@ -16,7 +16,7 @@ var hummusService = {
 			if(inData.status == 0)
 			{
 				ga('send', 'pageview',{'page':'/generated-files/id'}); // send tracking when done
-				successCB(inServiceURL + '/generated-files/' + inData.generatedFileID);
+				successCB(inServiceURL + '/generated-files/' + inData.generatedFile);
 			}
 			else if(inData.status == 2 && failureCB)
 			{
@@ -26,7 +26,7 @@ var hummusService = {
 			{
 				window.setTimeout(function()
 				{
-					$.get(inServiceURL + '/generation-jobs/' + inData.jobID,function( data ) {
+					$.get(inServiceURL + '/generation-jobs/' + inData._id,function( data ) {
 						openPDFWhenDone(inServiceURL,data,successCB,failureCB);
 					  }).fail(failureCB);
 				},1000);

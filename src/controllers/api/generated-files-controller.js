@@ -1,8 +1,5 @@
-var uuid = require('node-uuid'),
-	fs = require('fs');
-
-
-var readyFiles = {};
+var fs = require('fs'),
+    generatedFilesService = require('../../services/generated-files');
 
 function serveFile(res,filePath,inMime,inWithFileName) {
 	inMime = inMime || 'application/octet-stream';
@@ -27,23 +24,17 @@ function serveFile(res,filePath,inMime,inWithFileName) {
 
 function GeneratedFilesController() {
 	
-	this.createGeneratedFileEntry = function(inFilePath,inDownloadTitle) {
-		var id = uuid.v4();
-		
-		readyFiles[id] = {path:inFilePath,downloadTitle:inDownloadTitle};
-		return id;
-	}
-	
     this.download = function(req, res, next) {
         if (!req.params.id) {
             return res.badRequest('Missing tag id');
         }
+		
+        generatedFilesService.get(req.params.id, function(err, fileEntry) {
+            if (err) { return next(err); }
+			// can handle only locals anyways, right now, so assume that it is
+            serveFile(res,fileEntry.source.data.path,'application/pdf',fileEntry.downloadTitle);
+        });
 
-        var fileEntry = readyFiles[req.params.id];
-        if(fileEntry)
-            serveFile(res,fileEntry.path,'application/pdf',fileEntry.downloadTitle);
-        else
-            res.notFound('Not found file with ID',req.params.id);
     };
 }
 

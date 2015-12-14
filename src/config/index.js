@@ -1,8 +1,15 @@
 var fs = require('fs'),
 	async = require('async'),
-	path = require('path');
+	path = require('path'),
+    database = require('./database'),
+    settings = require('./settings');
     
 function Configuration() {
+    // db
+    var db = function(dbURL,callback) {
+        // connect to database
+        database.dbInit(dbURL,callback);
+    };    
 
 	// responses
     var responses = function(app,callback) {
@@ -28,6 +35,12 @@ function Configuration() {
      */
     this.config = function(app, onReady) {
         async.auto({
+            settings: function(callback) {
+                settings.load(callback);
+            },
+            db: ['settings',function(callback,results) {
+                db(results.settings.dbURL,callback);
+            }],            
             responses: function(callback) {
                 responses(app,callback);
             },
