@@ -7,11 +7,17 @@ var mongoose = require('mongoose'),
 
 var generatedFileSchema = new Schema({
     downloadTitle: String,
-    source: {
+    localSource: {
         sourceType: {
             type: Number,
-            enum: constants.ESourceTypes,
-            required: true
+            enum: constants.ESourceTypes
+        },
+        data: Schema.Types.Mixed
+    },
+    remoteSource: {
+        sourceType: {
+            type: Number,
+            enum: constants.ESourceTypes
         },
         data: Schema.Types.Mixed
     } 

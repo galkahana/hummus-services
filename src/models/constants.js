@@ -1,8 +1,9 @@
 var constants = {};
 
 // generated files types
-constants.eSourceLocal = 0
-constants.ESourceTypes = [constants.eSourceLocal];
+constants.eSourceLocal = 0;
+constants.eSourceS3 = 1;
+constants.ESourceTypes = [constants.eSourceLocal,constants.eSourceS3];
 
 // generated job statuses
 constants.eJobDone = 0;

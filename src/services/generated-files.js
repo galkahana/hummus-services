@@ -1,7 +1,8 @@
 'use strict';
 
 var generationFilesModel = require('../models/generated-files'),
-    mongoose = require('mongoose');
+    mongoose = require('mongoose'),
+    localFiles = {};
 
 function GeneratedFiles() {
 }
@@ -19,13 +20,26 @@ GeneratedFiles.prototype.getAll = function (callback) {
 GeneratedFiles.prototype.get = function (id, callback) {
     generationFilesModel
         .findOne({_id: id})
-        .exec(callback);
+        .exec(function(err, fileEntry) {
+            if (err) return callback(err);
+            // add auxiliery data about local path wharabouts if local
+            callback(null,fileEntry,localFiles[fileEntry._id]);
+        });
 
 };
 
 GeneratedFiles.prototype.create = function (data, callback) {
     generationFilesModel
-        .create(data, callback);
+        .create(data, function(err,generatedFileEntry) {
+            // when creating, register the local file reference, to optimize
+            // download. This assumes that the party creating the entry
+            // is also the one owning the local file
+            if(err) return callback(err);
+            
+            localFiles[generatedFileEntry._id] = generatedFileEntry.localSource.data.path;
+            
+            callback(err,generatedFileEntry);
+        });
 
 };
 

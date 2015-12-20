@@ -3,7 +3,34 @@
 var jobPipeline = require('../../services/job-pipeline'),
     generationJobsService = require('../../services/generation-jobs'),
     generatedFilesService = require('../../services/generated-files'),
-    constants = require('../../models/constants');
+    constants = require('../../models/constants'),
+    async = require('async'),
+    remoteStorageService = require('../../services/remote-storage-service');
+
+function createFileEntryAndUpdateJob(job,result,callback) {
+    generatedFilesService.create({
+        downloadTitle: result.outputTitle,
+        localSource: {
+            sourceType: constants.eSourceLocal,
+            data: {
+                path: result.outputPath
+            }
+        }                     
+    },function(err,generatedFileEntry) {
+            if(err)
+                job.status = constants.eJobFailed;
+            else 
+                job.generatedFile = generatedFileEntry._id;
+            generationJobsService.update(job._id,job,function(err){
+                callback(err,generatedFileEntry);
+            });
+        }
+    );                    
+}
+
+function uploadPDF(filePath,callback) {
+    remoteStorageService.uploadFile(filePath,callback);
+}
 
 function startGenerationJob(inJobTicket,callback)
 {
@@ -21,24 +48,41 @@ function startGenerationJob(inJobTicket,callback)
                 job.status = constants.eJobFailed;
                 generationJobsService.update(job._id,job,function(){});
             } else {
-                // succeeded. create generated file entry and update job entry
+                // succeeded. 
                 job.status = constants.eJobDone;
-                generatedFilesService.create({
-                    downloadTitle: result.outputTitle,
-                    source: {
-                        sourceType: constants.eSourceLocal,
-                        data: {
-                            path: result.outputPath
+                
+                /*
+                    Create a ready file entry and at the same time upload the prepared files.
+                    The ready file entry creation won't wait for upload so that immediate downloads
+                    that come to the same server can enjoy the local file download.
+                */
+                async.auto(
+                    {
+                        createFileEntryAndUpdateJob: function(callback) {
+                            // will put in results the generated file entry, so we can later update with
+                            // upload data
+                            createFileEntryAndUpdateJob(job,result,callback);
+                        },
+                        uploadPDF : function(callback) {
+                            // will return with upload data that can be used to update the generated file entry
+                            uploadPDF(result.outputPath,callback);
                         }
-                    }                     
-                },function(err,generatedFileEntry) {
-                        if(err)
-                            job.status = constants.eJobFailed;
-                        else 
-                            job.generatedFile = generatedFileEntry._id;
-                        generationJobsService.update(job._id,job,function(){});
+                    },
+                    function(err,results) {
+                        if(err) return;
+                        
+                        // when done, update generated file entry with the remote file information.
+                        // Note again that one does not wait for declaring the job finished
+                        // prior to uploading the data. In that case we still trust the local file to be around
+                        // to be retrieved directly with no required download
+                        var generatedFileEntry = results.createFileEntryAndUpdateJob;
+                        var remoteSourceData = results.uploadPDF;
+                        
+                        generatedFileEntry.remoteSource = remoteSourceData;
+                        
+                        generatedFilesService.update(generatedFileEntry._id,generatedFileEntry);
                     }
-                );                
+                );
             }
         });
         
