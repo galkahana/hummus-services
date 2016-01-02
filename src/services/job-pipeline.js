@@ -59,7 +59,10 @@ function computeDocument(jobDescriptor,callback,results) {
 	if(jobDescriptor.variableData) {
 		// document must be string data!
 		// use mustache to resolve, and return document
-		callback(null,JSON.parse(mustache.render(results.get_document,jobDescriptor.variableData)));
+        
+        // if document is embedded object, try to convert to string
+        var theDocumentString = typeof results.get_document == "string" ? results.get_document: JSON.stringify(results.get_document)
+        callback(null,JSON.parse(mustache.render(theDocumentString,jobDescriptor.variableData)));
 	} else {
 		if(jobDescriptor.document.embedded) {
 			// already a document, no need to parse
