@@ -49,12 +49,11 @@ function startGenerationJob(inJobTicket,callback)
                 generationJobsService.update(job._id,job,function(){});
             } else {
                 // succeeded. 
-                job.status = constants.eJobDone;
                 
                 /*
                     Create a ready file entry and at the same time upload the prepared files.
-                    The ready file entry creation won't wait for upload so that immediate downloads
-                    that come to the same server can enjoy the local file download.
+                    The ready file entry creation won't wait for upload, relying on job status change later to be the final judge
+                    for whether job is done.
                 */
                 async.auto(
                     {
@@ -71,7 +70,7 @@ function startGenerationJob(inJobTicket,callback)
                     function(err,results) {
                         if(err) return;
                         
-                        // when done, update generated file entry with the remote file information.
+                        // when done both upload an file entlry creation, update generated file entry with the remote file information.
                         // Note again that one does not wait for declaring the job finished
                         // prior to uploading the data. In that case we still trust the local file to be around
                         // to be retrieved directly with no required download
@@ -80,7 +79,11 @@ function startGenerationJob(inJobTicket,callback)
                         
                         generatedFileEntry.remoteSource = remoteSourceData;
                         
-                        generatedFilesService.update(generatedFileEntry._id,generatedFileEntry);
+                        generatedFilesService.update(generatedFileEntry._id,generatedFileEntry,function(err,fileEntry) {
+                            // on success, finally set the job status to done
+                            job.status = constants.eJobDone;
+                            generationJobsService.update(job._id,job);                            
+                        });
                     }
                 );
             }

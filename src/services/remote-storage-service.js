@@ -22,7 +22,7 @@ function uploadFile(localPath,callback) {
         }
     };
     var uploader = client.uploadFile(uploadParams);
-    logger.error('Starting upload of', localPath);
+    logger.log('Starting upload of', localPath);
     uploader.on('error', function(err) {
         logger.error('unable to upload:', err.stack);
         callback(err);

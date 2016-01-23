@@ -1,7 +1,3 @@
-/**
- * Created by asafam on 12/28/14.
- */
-
 'use strict';
 
 var mongoose = require('mongoose'),

@@ -10,9 +10,7 @@ var express = require('express'),
 // middlewarez
 	
 // body parsing
-app.use(bodyParser.urlencoded({
-  extended: true
-}));
+app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json());
 
 // cors handling

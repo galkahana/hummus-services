@@ -37,7 +37,6 @@ function GeneratedFilesController() {
 		
         generatedFilesService.get(req.params.id, function(err, fileEntry, localPath) {
             if (err) { return next(err); }
-			// can handle only locals anyways, right now, so assume that it is
             if(localPath) {
                 fs.exists(localPath,function(result) {
                     if(result) {
