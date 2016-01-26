@@ -1,5 +1,6 @@
 var logger = require('./logger'),
-	documentRendering = require('./json-document-rendering/document-rendering'),
+	jDocDocumentRendering = require('./json-document-rendering/document-rendering'),
+    htmlDocumentRendering = require('./html-document-rendering'),
 	externalFilesDownloader = require('./external-files-downloader'),
 	FilesMap = require('./files-map'),
 	fs = require('fs'),
@@ -21,20 +22,50 @@ function getDocument(jobDescriptor,callback,results) {
 	if(jobDescriptor.document.embedded)
 		return callback(null,jobDescriptor.document.embedded)
 	
-	var filesMap = new FilesMap(localResourcesPath,results.download_externals);
-	var filePath = filesMap.getItemFilePath(jobDescriptor.document);
-	
-	if(filePath) {
-		fs.readFile(filePath,'utf8',function(err,data) {
-			if(err) return callback(err);
-			callback(null,data);
-		});
-	} else {
-		callback(null,null);
-	}								
+    if(jobDescriptor.document.path || jobDescriptor.document.external) {
+        var filesMap = new FilesMap(localResourcesPath,results.download_externals);
+        var filePath = filesMap.getItemFilePath(jobDescriptor.document);
+        
+        if(filePath) {
+            fs.readFile(filePath,'utf8',function(err,data) {
+                if(err) return callback(err);
+                callback(null,data);
+            });
+        } else {
+            callback(null,null);
+        }
+    }
+    else
+        callback(null,null); // not embedded, path or external. So engine specific and will be taken care of by engine								
 }
 	
-function generatePDF(inDocFileName,callback,results) {
+function computeDocument(jobDescriptor,callback,results) {
+    if(!results.get_document)
+        return callback(null,null); // if didn't get document not need to compute. move on
+
+    // end result changes per engine. some want JSON, some want string
+    var toResult = getEngine().name == 'JDocToPDF' ? 
+                        function(value){return typeof value == "string" ? JSON.parse(value):value;} :
+                        function(value){return typeof value == "string" ? value:JSON.stringify(value);};
+    
+	if(jobDescriptor.variableData) {
+		// document must be string data!
+		// use mustache to resolve, and return document
+        
+        // if document is embedded object, try to convert to string
+        var theDocumentString = typeof results.get_document == "string" ? results.get_document: JSON.stringify(results.get_document)
+        callback(null,toResult(mustache.render(theDocumentString,jobDescriptor.variableData)));
+	} else {
+		if(jobDescriptor.document.embedded) {
+			// already a document, no need to parse
+			callback(null,toResult(results.get_document));
+		} else {
+			callback(null,toResult(results.get_document));
+		}
+	}
+}
+
+function renderJDocToPDF(jobDescriptor,callback,results) {
 	var options = 	{ 
 					pwd:path.resolve(localResourcesPath),
 					pdfWriter: {}  // tbd on log
@@ -42,7 +73,7 @@ function generatePDF(inDocFileName,callback,results) {
 		resultPath = new tmp.File().path,
 		outputStream = new PDFWStreamForFile(resultPath);								
 	
-	documentRendering.render(
+	jDocDocumentRendering.render(
 		results.compute_document,
 		results.download_externals,
 		outputStream,
@@ -52,25 +83,37 @@ function generatePDF(inDocFileName,callback,results) {
 				callback(err,resultPath);
 			});
 		}
-	);								
+	);	    
 }
 
-function computeDocument(jobDescriptor,callback,results) {
-	if(jobDescriptor.variableData) {
-		// document must be string data!
-		// use mustache to resolve, and return document
-        
-        // if document is embedded object, try to convert to string
-        var theDocumentString = typeof results.get_document == "string" ? results.get_document: JSON.stringify(results.get_document)
-        callback(null,JSON.parse(mustache.render(theDocumentString,jobDescriptor.variableData)));
-	} else {
-		if(jobDescriptor.document.embedded) {
-			// already a document, no need to parse
-			callback(null,results.get_document);
-		} else {
-			callback(null,JSON.parse(results.get_document));
-		}
-	}
+function renderHTMLToPDF(jobDescriptor,callback,results) {
+    htmlDocumentRendering.render(
+        jobDescriptor.document.link ? {link:jobDescriptor.document.link} : {raw:results.compute_document},
+        jobDescriptor.engine.options,
+        callback
+    );
+}
+
+function getEngine(jobDescriptor) {
+    return  jobDescriptor.engine || {name:'JDocToPDF'};
+}
+
+function generatePDF(jobDescriptor,callback,results) {
+    var engine = getEngine(jobDescriptor);
+
+    switch(engine.name) {
+        case 'JDocToPDF': {
+            renderJDocToPDF(jobDescriptor,callback,results);
+            break;
+        }
+        case 'HTMLToPDF': {
+            renderHTMLToPDF(jobDescriptor,callback,results);
+            break;
+        }
+        default: {
+            callback(new Error('Unknown PDF Engine: ' + engine.name),null);
+        }
+    }    
 }
 
 function cleanup(callback,results) {
