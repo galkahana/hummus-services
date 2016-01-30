@@ -44,7 +44,7 @@ function computeDocument(jobDescriptor,callback,results) {
         return callback(null,null); // if didn't get document not need to compute. move on
 
     // end result changes per engine. some want JSON, some want string
-    var toResult = getEngine().name == 'JDocToPDF' ? 
+    var toResult = getEngine(jobDescriptor).name == 'JDocToPDF' ? 
                         function(value){return typeof value == "string" ? JSON.parse(value):value;} :
                         function(value){return typeof value == "string" ? value:JSON.stringify(value);};
     
@@ -89,13 +89,13 @@ function renderJDocToPDF(jobDescriptor,callback,results) {
 function renderHTMLToPDF(jobDescriptor,callback,results) {
     htmlDocumentRendering.render(
         jobDescriptor.document.link ? {link:jobDescriptor.document.link} : {raw:results.compute_document},
-        jobDescriptor.engine.options,
+        jobDescriptor.document.engine.options,
         callback
     );
 }
 
 function getEngine(jobDescriptor) {
-    return  jobDescriptor.engine || {name:'JDocToPDF'};
+    return  jobDescriptor.document.engine || {name:'JDocToPDF'};
 }
 
 function generatePDF(jobDescriptor,callback,results) {

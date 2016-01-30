@@ -1,0 +1,12 @@
+{
+	"document" : {
+		"embedded" : "<html><body>Hello world!</body></html>",
+        "engine": {
+            "name": "HTMLToPDF",
+            "options": {
+                "pageWidth":842,
+                "pageHeight":595
+            }
+        }
+	}
+}
