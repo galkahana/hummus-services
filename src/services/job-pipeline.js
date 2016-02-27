@@ -68,7 +68,7 @@ function computeDocument(jobDescriptor,callback,results) {
 function renderJDocToPDF(jobDescriptor,callback,results) {
 	var options = 	{ 
 					pwd:path.resolve(localResourcesPath),
-					pdfWriter: {}  // tbd on log
+					pdfWriter: jobDescriptor.document.engine ? jobDescriptor.document.engine.options:null
 				},
 		resultPath = new tmp.File().path,
 		outputStream = new PDFWStreamForFile(resultPath);								
@@ -139,7 +139,10 @@ function runTicket(inTicket,cb) {
 			cleanup : ['download_externals','generate_pdf', cleanup]
 		},
 		function(err,results) {
-			if(err) return cb(err);
+			if(err) {
+                logger.error('Got error running job ticket',err);
+                return cb(err);
+            }
 			
 			cb(null,{outputPath:results.generate_pdf,outputTitle:inTicket.title});
 		}

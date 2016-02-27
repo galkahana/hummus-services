@@ -1,6 +1,7 @@
 var hummus = require('hummus'),
 	bidi = require('icu-bidi'),
 	_ = require('lodash'),
+    async = require('async'),
 	logger = require('../logger'),
 	NewPageDriver = require('./new-page-driver'),
 	ModifiedPageDriver = require('./modified-page-driver'),
@@ -58,20 +59,21 @@ module.exports.render = function(inDocument,inExternals,inTargetStream,inOptions
 		// one more for the helpers
 		renderingHelpers.pdfCopyingContexts = new PDFCopyingContexts(writer);
 
-		renderDocument(inDocument,writer,renderingHelpers);
-
-		writer.end();	
-
-		if(inCallback)
-			inCallback();
+		renderDocument(inDocument,writer,renderingHelpers,function(err) {
+            if(!err)
+                writer.end();	
+            inCallback(err);
+            
+        });
 	}
 	catch(err)
 	{
+        logger.error('error in PDF generation',err);
 		inCallback(err);
 	}
 }
 
-function renderDocument(inDocument,inPDFWriter,inRenderingHelpers)
+function renderDocument(inDocument,inPDFWriter,inRenderingHelpers,callback)
 {
 	var accumulatedDims = {
 		width:null,
@@ -79,17 +81,24 @@ function renderDocument(inDocument,inPDFWriter,inRenderingHelpers)
 	}
 	
 	// render pages
-	inDocument.pages.forEach(function(inPage)
-	{
-		if(inPage.appendedFrom)
-			appendPage(inPage.appendedFrom,inPDFWriter,inRenderingHelpers);
-		else
-			createPage(inPage,accumulatedDims,inPDFWriter,inRenderingHelpers);
-	});
+    async.eachSeries(inDocument.pages,
+        function(inPage,cb)
+        {
+            if(inPage.appendedFrom) {
+                appendPage(inPage.appendedFrom,inPDFWriter,inRenderingHelpers,cb);
+            } else {
+                createPage(inPage,accumulatedDims,inPDFWriter,inRenderingHelpers,cb);
+            }
+        },
+        callback);
 }
 
-function appendPage(inPageAppendData,inPDFWriter,inRenderingHelpers) {
-	var originPath = inRenderingHelpers.filesMap.getImageItemFilePath(inPageAppendData);
+function appendPage(inPageAppendData,inPDFWriter,inRenderingHelpers,cb) {
+   	var originPath = inRenderingHelpers.filesMap.getImageItemFilePath(inPageAppendData);
+    if(!originPath) {
+        return cb(new Error('No source path defined for appending pages'));
+    } 
+    
 	var originType = inPDFWriter.getImageType(originPath);
 	var allPages = (typeof inPageAppendData.index === 'undefined' || inPageAppendData.index == 'all') ;
 	var startIndex = allPages ?  0:inPageAppendData.index;
@@ -101,11 +110,19 @@ function appendPage(inPageAppendData,inPDFWriter,inRenderingHelpers) {
 	if(originType === 'PDF') {
 		var copyContext = inRenderingHelpers.pdfCopyingContexts.getContext(
 							inRenderingHelpers.filesMap.getImageItemFilePath(inPageAppendData));
-		endIndex = allPages ? 
+		if(!copyContext) {
+            return cb(new Error('Unable to create copying context for appended page'),inPageAppendData);
+        }
+        endIndex = allPages ? 
 				(copyContext.getSourceDocumentParser().getPagesCount() - 1) : 
 						((typeof inPageAppendData.endIndex === 'undefined') ?  startIndex:inPageAppendData.endIndex);
-		for(var i=startIndex;i<=endIndex;++i)
-			copyContext.appendPDFPageFromPDF(i);
+		var result = 1;
+        for(var i=startIndex;i<=endIndex && !!result;++i) {
+			result = copyContext.appendPDFPageFromPDF(i);
+        }
+        if(!result) {
+            return cb(new Error('failed to append page from'),inPageAppendData);
+        }
 	} 
 	else if(originType == 'TIFF') 
 	{
@@ -118,12 +135,17 @@ function appendPage(inPageAppendData,inPDFWriter,inRenderingHelpers) {
 			var pdfPage = inPDFWriter.createPage(0,0,imageDimensions.width,imageDimensions.height);
 			var cxt = inPDFWriter.startPageContentContext(pdfPage);
 			cxt.drawImage(0,0,originPath);
-			inPDFWriter.writePage(pdfPage);
+			inPDFWriter.writePage(pdfPage); // this one here throws exception on error, so we should be fine
 		}
 	}
+    else {
+        return cb(new Error('Unrecognized source type for page appending = ' + originType));
+    }
+    
+    cb();
 }
 
-function createPage(inPage,inAccumulatedDims,inPDFWriter,inRenderingHelpers) {
+function createPage(inPage,inAccumulatedDims,inPDFWriter,inRenderingHelpers,callback) {
 	var thePageDriver;
 	if(inPage.modifiedFrom !== undefined)
 	{
@@ -139,17 +161,20 @@ function createPage(inPage,inAccumulatedDims,inPDFWriter,inRenderingHelpers) {
 
 	thePageDriver.links = []; // save links on page object
 
-
-	// render boxes
-	if(inPage.boxes)
-	{
-		inPage.boxes.forEach(function(inBox)
-		{
-			renderBox(inBox,thePageDriver,inPDFWriter,inRenderingHelpers);
-		});
-	}
-
-	thePageDriver.writePage(thePageDriver.links);	
+    async.eachSeries(inPage.boxes,
+        function(inBox,cb)
+        {
+            renderBox(inBox,thePageDriver,inPDFWriter,inRenderingHelpers);
+            cb();
+        },
+        function(err) {
+            if(err)
+                return callback(err);
+                
+            thePageDriver.writePage(thePageDriver.links);
+            callback();
+        }
+    );
 }
 
 function renderBox(inBox,inPDFPage,inPDFWriter,inRenderingHelpers)
