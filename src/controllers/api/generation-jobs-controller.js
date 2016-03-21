@@ -7,7 +7,7 @@ var jobPipeline = require('../../services/job-pipeline'),
     async = require('async'),
     remoteStorageService = require('../../services/remote-storage-service');
 
-function createFileEntryAndUpdateJob(job,result,callback) {
+function createFileEntryAndUpdateJob(job,user,result,callback) {
     generatedFilesService.create({
         downloadTitle: result.outputTitle,
         localSource: {
@@ -15,7 +15,8 @@ function createFileEntryAndUpdateJob(job,result,callback) {
             data: {
                 path: result.outputPath
             }
-        }                     
+        },
+        user:user._id 
     },function(err,generatedFileEntry) {
             if(err)
                 job.status = constants.eJobFailed;
@@ -28,16 +29,17 @@ function createFileEntryAndUpdateJob(job,result,callback) {
     );                    
 }
 
-function uploadPDF(filePath,callback) {
-    remoteStorageService.uploadFile(filePath,callback);
+function uploadPDF(filePath,user,callback) {
+    remoteStorageService.uploadFile(filePath,user,callback);
 }
 
-function startGenerationJob(inJobTicket,callback)
+function startGenerationJob(inJobTicket,user,callback)
 {
     // create job entry
     generationJobsService.create({
         status:constants.eJobInProgress,
-        ticket:inJobTicket
+        ticket:inJobTicket,
+        user:user._id
     },function(err,job) {
         if(err) return callback(err);
         
@@ -60,11 +62,11 @@ function startGenerationJob(inJobTicket,callback)
                         createFileEntryAndUpdateJob: function(callback) {
                             // will put in results the generated file entry, so we can later update with
                             // upload data
-                            createFileEntryAndUpdateJob(job,result,callback);
+                            createFileEntryAndUpdateJob(job,user,result,callback);
                         },
                         uploadPDF : function(callback) {
                             // will return with upload data that can be used to update the generated file entry
-                            uploadPDF(result.outputPath,callback);
+                            uploadPDF(result.outputPath,user,callback);
                         }
                     },
                     function(err,results) {
@@ -120,11 +122,15 @@ function GenerationJobsController() {
      */
     this.create = function(req, res, next) {
         var ticket = req.body;
+        var user = req.user;
         if (!ticket) {
             return res.badRequest('Missing job data');
         }
+        if (!user) {
+            return res.badRequest('Missing user. should have user for identifying whose job it is');
+        }
         
-        startGenerationJob(ticket,function(err,job) {
+        startGenerationJob(ticket,user,function(err,job) {
             if (err) { return res.unprocessable(err); }    
             
             res.status(200).json(job);        

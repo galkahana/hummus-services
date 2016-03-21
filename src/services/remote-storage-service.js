@@ -7,13 +7,15 @@ var config = require('../config/settings'),
 
 aws.config.loadFromPath(__dirname + '/aws.json');
 
-function uploadFile(localPath,callback) {
+function uploadFile(localPath,user,callback) {
     var client = s3c.createClient(
         {
             s3Client: new aws.S3({params: {Bucket: config.getConfig().s3BucketName}})
         });
  
-    var fileKey = "shared/" + uuid.v1() + ".pdf"; 
+    // separate users have their PDFs separate per a prefix which is their user
+    // object ID. for now.
+    var fileKey = user._id + '/' + uuid.v1() + '.pdf'; 
  
     var uploadParams = {
         localFile: localPath,

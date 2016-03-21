@@ -10,6 +10,11 @@ var generationJobSchema = new Schema({
         enum: constants.EJobStatuses,
         required: true
     },
+    user: {
+        type: Schema.ObjectId,
+        ref: 'User',
+        require: true        
+    },
     ticket: Schema.Types.Mixed,
     generatedFile: {
         type: Schema.ObjectId,

@@ -6,6 +6,7 @@
 
 var express = require('express'),
     router = express.Router(),
+    users = require('../services/users'),
 	path = require('path');
 
 
@@ -14,10 +15,10 @@ var controllersPath = path.resolve(__dirname,'../controllers/api/') + '/',
     generatedFilesController = require(controllersPath + 'generated-files-controller');
 
 router.route('/generation-jobs')
-    .post(generationJobsController.create);
+    .post(users.authenticateUserForExternalAPIOrDie,generationJobsController.create);
 router.route('/generation-jobs/:id')
-    .get(generationJobsController.show);
+    .get(users.authenticateUserForExternalAPIOrDie,generationJobsController.show);
 router.route('/generated-files/:id')
-    .get(generatedFilesController.download);
+    .get(users.authenticateUserForExternalAPIOrDie,generatedFilesController.download);
 
 module.exports = router;

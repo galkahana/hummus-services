@@ -6,6 +6,11 @@ var mongoose = require('mongoose'),
 
 
 var generatedFileSchema = new Schema({
+    user: {
+        type: Schema.ObjectId,
+        ref: 'User', 
+        required: true       
+    },
     downloadTitle: String,
     localSource: {
         sourceType: {
