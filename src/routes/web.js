@@ -1,7 +1,8 @@
 'use strict';
 
 var express = require('express'),
-    router = express.Router();
+    router = express.Router(),
+    path = require('path');
 
 // Root - any: route to index file (angular web app, to support deep linking without #)
 router.get('/*', function (req, res) {
