@@ -1,0 +1,50 @@
+@import "app-base";
+
+app-header {
+    background-color: #f5f5f5;
+    border-bottom: 1px solid #e5e5e5;
+    display:block;
+    padding-bottom:5px;
+    
+    .site-title {
+        @include no-underline-ever;
+        
+        img {
+            float:left;
+            margin-right:5px;
+            width:60px;
+        }
+        
+        h1 {
+            float:left;
+            font-size: 20px;
+            line-height: 1;
+            margin-right: 30px;
+            color:rgba(0,0,0,0.75);
+            
+            &:hover {
+                color: black;
+            }
+        }
+    }
+    
+    .header-tools {
+        float:left;
+        margin: 18px 30px 0 0;
+        
+        button {
+            background: rgba(0,0,0,0.05);
+            color: rgba(0,0,0,0.75);
+            font-size: 12px;
+            font-weight: 500;
+            text-transform: uppercase;
+            @include border-radius(20px);
+            border:0;
+            outline:none;
+            
+            &:hover {
+                color: black;
+            }            
+        }
+    }
+}

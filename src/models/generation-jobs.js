@@ -15,6 +15,7 @@ var generationJobSchema = new Schema({
         ref: 'User',
         require: true        
     },
+    label: String,
     ticket: Schema.Types.Mixed,
     generatedFile: {
         type: Schema.ObjectId,

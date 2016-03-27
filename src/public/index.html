@@ -4,39 +4,28 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>PDF Rendering Demo Page</title>
+    <title>PDFHummus Services</title>
 
+    <!-- BEGIN DYNAMICALLY LOADED CSS FILES (lazy loading for ui view) -->
+    <link id="ng_load_plugins_before"/>
+    <!-- END DYNAMICALLY LOADED CSS FILES -->
+    
+    <link rel="shortcut icon" type="image/png" href="/images/favicon.ico"/>
+    <link rel="shortcut icon" type="image/png" href="__websiteURL__/images/favicon.ico"/>    
 </head>
-<body>
-	<div class="container">
-		<h1>PDF Rendering Demo Page</h1>
-		<div class="description">
-		Welcome!
-		This page demonstrates how to generate PDF files using the Hummus PDF Rendering Service.
-		Just type below a PDF description object, and click "Create PDF".
-
-		Useful links:
-		<ul class="list-unstyled">
-			<li>
-				<a href="https://github.com/galkahana/hummusrenderrer/wiki">Service and PDF Descripition Object Documentation</a>
-			</li>
-			<li>
-				<a href="https://github.com/galkahana/hummusrenderrer/wiki">Github Project</a>
-			</li>
-			<li>
-				<a href="http://www.pdfhummus.com">Project Blog</a>
-			</li>
-		</ul>
-		</div>
-		<ul class="list-unstyled">
-			<li>
-				<button type="button" class="btn btn-primary" id="btnGenerate">Create PDF</button>
-			</li>
-			<li>
-				<textarea id="txtJobTicket"></textarea>
-			</li>
-		</ul>
-	</div>
+<body ng-app="pdfhummus-web">
+    
+    <div id="wrapper" ng-controller="appController">
+        <div id="header">
+            <app-header></app-header>
+        </div>
+        <div id="content">
+            <ui-view autoscroll="false" class="page"></ui-view>
+        </div>
+        <div id="footer">
+            <app-footer></app-footer>
+        </div>
+    </div>
     <script src="__webpackRoot__/commons.js"></script>
     <script src="__webpackRoot__/default.js"></script>
 </body>

@@ -38,6 +38,7 @@ function startGenerationJob(inJobTicket,user,callback)
     // create job entry
     generationJobsService.create({
         status:constants.eJobInProgress,
+        label:(inJobTicket.meta && inJobTicket.meta.label) ? inJobTicket.meta.label:undefined,
         ticket:inJobTicket,
         user:user._id
     },function(err,job) {

@@ -1,0 +1,14 @@
+@import "app-base";
+
+.home-page {
+    .list-unstyled>li
+    {
+        padding:4px;
+    }
+
+    #txtJobTicket
+    {
+        height:500px;
+        width:100%;
+    }
+}
