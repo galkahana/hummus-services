@@ -137,6 +137,18 @@ function GenerationJobsController() {
             res.status(200).json(job);        
         });        
     };
+    
+    this.list = function(req, res, next) {
+        var user = req.user;
+        if (!user) {
+            return res.badRequest('Missing user. should have user for identifying whose jobs are being queried');
+        }
+
+        generationJobsService.getAllOfUser(user,function(err, generationjobs) {
+            if (err) { return next(err); }
+            res.status(200).json(generationjobs);
+        });        
+    };
 }
 
 module.exports = new GenerationJobsController();

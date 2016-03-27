@@ -36,6 +36,7 @@ function router($ocLazyLoadProvider,
     $stateProvider
         .state('home', {
             url: '/',
+            data: {pageTitle: 'Home', pageSubTitle: 'PDF Rendering Demo Page'},
             template: require('../../../templates/home-page.html'),
             controller: require('../controllers/home-controller'),
             resolve: {
@@ -55,13 +56,11 @@ function router($ocLazyLoadProvider,
             }
 
         })
-        .state('test', {
-            url: '/test',
-            template: '<div>hello</div>',
-            controller: function() {
-                console.log('hello test');
-            }
-            
+        .state('jobs', {
+            url: '/jobs',
+            data: {pageTitle: 'Jobs', pageSubTitle: 'Manage your PDF jobs'},
+            template: require('../../../templates/jobs-page.html'),
+            controller: require('../controllers/jobs-controller'),            
         })
 }
 

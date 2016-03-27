@@ -1,0 +1,12 @@
+<div class="item-container">
+    <h4 class="item-title" ng-click="toggleOpenClose($event)">
+        <div class="item-select" ng-click="toggleSelected($event)">
+            <span ng-show="selected" class="glyphicon glyphicon-ok"></span>
+        </div>
+        <div class="title">{{ title() }}</div>
+        <div class="status" ng-class="statusClass()"></div>
+    </h4>
+    <div ng-show="open" class="item-main">
+        <pre>{{ item | prettyStringify }}</pre>
+    </div>
+</div>            

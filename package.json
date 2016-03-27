@@ -51,6 +51,7 @@
     "node-sass": "^3.4.2",
     "oclazyload": "^1.0.9",
     "preprocess-loader": "^0.2.0",
+    "restangular": "^1.5.2",
     "sass-loader": "^3.2.0",
     "string-replace-loader": "^1.0.0",
     "style-loader": "^0.13.0",
