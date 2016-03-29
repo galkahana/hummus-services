@@ -1,0 +1,10 @@
+.default-item-container {
+    border: 1px solid $default-gray-border;
+    background-color:$default-gray-background;
+}
+
+.position-base {
+  position: relative;
+  top: 0;
+  left: 0;
+}

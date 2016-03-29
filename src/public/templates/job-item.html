@@ -7,6 +7,41 @@
         <div class="status" ng-class="statusClass()"></div>
     </h4>
     <div ng-show="open" class="item-main">
-        <pre>{{ item | prettyStringify }}</pre>
+        <div class="row">
+            <div class="col-sm-2 item-label">Started:</div>
+            <div class="col-sm-10">{{item.createdAt | date : defaultDateFilter()}}</div>
+        </div>
+        <div class="row">
+            <div class="col-sm-2 item-label">Finished:</div>
+            <div class="col-sm-10">{{finishedText()}}</div>
+        </div>
+        <div class="row" ng-if="item.label">
+            <div class="col-sm-2 item-label">Job Name:</div>
+            <div class="col-sm-10">{{item.label}}</div>
+        </div>
+        <div class="row">
+            <div class="col-sm-2 item-label">Status:</div>
+            <div class="col-sm-10 status" ng-class="statusClass()">{{statusText()}}</div>
+        </div>
+        <div class="row">
+            <div class="col-sm-2 item-label">PDF File:</div>
+            <div class="col-sm-10">
+                <a ng-if="hasReadyFile()" target="_blank" ng-href={{downloadURL()}}>Download</a>
+                <span ng-if="!hasReadyFile()">N/A</a>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-2 item-label">Job Ticket:</div>
+            <div class="col-sm-10">
+                <a class="im-a-pretty-clickable" ng-click="jobticketOpen = !jobticketOpen">Show 
+                       <span class="glyphicon" ng-class="{'glyphicon-triangle-bottom':jobticketOpen,'glyphicon-triangle-right':!jobticketOpen}"></span>
+                </a>
+            </div>
+        </div>
+        <div class="row" ng-show="jobticketOpen">
+            <div class="col-sm-offset-2 col-sm-10">
+                <pre class="pre-scrollable">{{ item.ticket | prettyStringify }}</pre>
+            </div>
+        </div>
     </div>
 </div>            

@@ -1,10 +1,7 @@
 @import "colors";
+@import "default-elements";
+@import "default-media";
 
-.position-base {
-  position: relative;
-  top: 0;
-  left: 0;
-}
 
 @mixin border-radius($radius) {
   -webkit-border-radius: $radius;
@@ -29,24 +26,12 @@
     }
 }
 
-// media, matching the bootstrap breakpoints
-@import "~include-media/dist/include-media";
-$breakpoints: (sm: 768px, md: 992px, lg: 1200px);
+a.im-a-pretty-clickable {
+    @include no-underline-ever;
+    cursor: pointer;
 
-.mobile-hidden {
-  @include media(">=sm") {
-    display: none !important;
-  }
-}
-
-.tablet-hidden {
-  @include media(">=sm", "<lg") {
-    display: none !important;
-  }
-}
-
-.desktop-hidden {
-  @include media(">=lg") {
-    display: none !important;
-  }
+    color: $default-black-transparent;
+    &:hover {
+        color: $default-black;
+    }
 }

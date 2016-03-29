@@ -1,0 +1,109 @@
+@import "app-base";
+
+job-item {
+    display:block;
+
+    color: rgb(33, 33, 33);
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-size: 13.1999998092651px;
+    line-height: 19.7999992370605px;
+    outline-color: rgb(33, 33, 33);
+    outline-style: none;
+    outline-width: 0px;
+    background:white;
+    box-shadow: 0 -1px 0 #e5e5e5,0 0 2px rgba(0,0,0,.12),0 2px 4px rgba(0,0,0,.24);
+
+
+    padding:4px 14px;
+    
+    .item-title {
+        cursor: pointer;
+        overflow-x: hidden;
+        overflow-y: hidden;
+        white-space: nowrap;
+        
+        .item-select {
+            float:left;
+            width:20px;
+            height:20px;
+            border: 2px solid $default-black-transparent;
+            margin-right:10px;
+            text-align: center;
+            
+            &:hover {
+                border-color: $default-black;
+            }
+            
+            .glyphicon {
+                vertical-align: top;
+                font-size: 14px;
+            }
+        }
+        
+        .title {
+            float: left;
+            margin-right:10px;
+            color: $default-black-transparent;
+            width: calc( 100% - 70px ); // so i can get nice hovering display when on line
+            
+            &:hover {
+                color: $default-black;
+            }
+        }
+        
+        .status {
+            width:20px;
+            height:20px;
+            @include border-radius(10px);
+            background-color:black;
+            float:right;
+            
+            &.status-success {
+                background-color:green;
+            }
+            &.status-failure {
+                background-color:red;
+            }
+            &.status-waiting {
+                background-color:orange;
+            }
+
+        }
+    }
+    
+    .item-main
+    {
+        @extend .default-item-container;
+
+        margin:20px;
+        padding:10px;
+        
+        >.row {
+            margin-top: 10px;                
+            margin-bottom: 10px;                
+        }
+        
+        .item-label {
+            font-weight:700;
+            
+            @include media(">=sm") {
+                text-align:right;
+            }
+        }
+        
+        .status {
+            color:black;
+            
+            &.status-success {
+                color:green;
+            }
+            &.status-failure {
+                color:red;
+            }
+            &.status-waiting {
+                color:orange;
+            }
+            
+        }
+    }
+}  
