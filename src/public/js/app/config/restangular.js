@@ -8,9 +8,13 @@ module.exports.defaultRestangular = ['RestangularProvider',
         RestangularProvider.setRestangularFields({id: '_id'});
         RestangularProvider.setFullResponse(true);
 
-        // IE Cache Invalidation
         RestangularProvider.addFullRequestInterceptor(
             function(elemenet, operation, what, url, headers, params) {
+                if (operation === "remove") {
+                    // to avoid issues in browsers that require no payload
+                    return null;
+                } 
+                // IE Cache Invalidation
                 return {params: _.extend(params, {cacheKilla: new Date().getTime()})};
             });
     }];

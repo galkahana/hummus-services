@@ -7,10 +7,11 @@ require('../../../scss/job-item.scss');
 
 module.exports = angular.module('job-item.directives',[
     require('../filters/pretty-stringify').name,
-    require('../services/constants').name
+    require('../services/constants').name,
+    require('../services/generated-files').name
 ])
-    .directive('jobItem', ['$filter','Constants',
-       function($filter,Constants) {
+    .directive('jobItem', ['$filter','Constants','GeneratedFiles',
+       function($filter,Constants,GeneratedFiles) {
            return {
              restrict: 'E',
              scope: {
@@ -70,6 +71,23 @@ module.exports = angular.module('job-item.directives',[
                         $event.stopPropagation();
                         $scope.selected = !$scope.selected;
                         $scope.$emit('jobItem.selectionChanged',$scope.item,$scope.selected);
+                    }
+                    
+                    $scope.waitingForDelete = false;
+                    $scope.removeFile = function() {
+                        if($scope.waitingForDelete)
+                            return;
+                        
+                        $scope.waitingForDelete = true;
+                            
+                        GeneratedFiles.delete($scope.item.generatedFile).then(function(response) {
+                            $scope.item.generatedFile = null; // Done!
+                            $scope.waitingForDelete = false;
+                        },function(err) {
+                            console.log(err);
+                            $scope.waitingForDelete = false;
+                        });
+                        
                     }
              }  
            };

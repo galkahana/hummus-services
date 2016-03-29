@@ -26,7 +26,17 @@
         <div class="row">
             <div class="col-sm-2 item-label">PDF File:</div>
             <div class="col-sm-10">
-                <a ng-if="hasReadyFile()" target="_blank" ng-href={{downloadURL()}}>Download</a>
+                <span ng-if="hasReadyFile()">
+                    <a target="_blank" class="pdf-download" ng-href={{downloadURL()}}>Download</a>
+                    <button type="button" ng-click="removeFile()" class="pdf-remove btn btn-danger" ng-class="{'waiting':waitingForDelete}">
+                        <div class="delete"><span class="glyphicon glyphicon-remove"></span> Delete</div>
+                        <div class="spinner">
+                            <div class="bounce1"></div>
+                            <div class="bounce2"></div>
+                            <div class="bounce3"></div>
+                        </div>
+                    </button>
+                </span>
                 <span ng-if="!hasReadyFile()">N/A</a>
             </div>
         </div>

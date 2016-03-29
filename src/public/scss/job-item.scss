@@ -1,4 +1,5 @@
 @import "app-base";
+@import "waiting-spinner";
 
 job-item {
     display:block;
@@ -104,6 +105,39 @@ job-item {
                 color:orange;
             }
             
+        }
+        
+        .pdf-download {
+            margin-right:20px;    
+        }
+        
+        .btn.pdf-remove {
+            padding:3px 6px;
+            
+            .delete {
+                width: 70px;
+            }
+                
+            .spinner {
+                display:none;
+                margin:0 auto;
+                
+                >div {
+                    background-color:white;
+                    width: 12px;
+                    height: 12px;
+                }
+            }
+            
+            &.waiting {
+                .spinner {
+                    display:inherit;
+                }
+                
+                .delete {
+                    display:none;
+                }                
+            }
         }
     }
 }  

@@ -27,12 +27,29 @@ function downloadAndServe(res,remoteSourceData,inMime,inWithFileName) {
     remoteStorageService.downloadFileToStream(remoteSourceData,res);
 }
 
+function removeRemoteAndDeleteEntry(res,entry) {
+    logger.log('Removing remote file',entry.remoteSource);
+    remoteStorageService.removeFile(entry.remoteSource,function(err) {
+        if(err)
+            return res.unprocessable(err);
+
+        logger.log('Succeeded in removing remote file',entry.remoteSource);
+        // now delete the entry using the entry so the middlewares get into work
+        entry.remove(function(err) {
+            if (err) 
+                return res.unprocessable(err);
+
+            logger.log('Now also removed remote file entry',entry.remoteSource,'entry ID = ',entry._id);
+            res.sendStatus(204);
+        });
+    });
+}
 
 function GeneratedFilesController() {
 	
     this.download = function(req, res, next) {
         if (!req.params.id) {
-            return res.badRequest('Missing tag id');
+            return res.badRequest('Missing file id');
         }
 		
         generatedFilesService.get(req.params.id, function(err, fileEntry, localPath) {
@@ -55,6 +72,30 @@ function GeneratedFilesController() {
         });
 
     };
+    
+    this.delete = function(req,res,next) {
+        if (!req.params.id) {
+            return res.badRequest('Missing file id');
+        }
+        
+        generatedFilesService.get(req.params.id, function(err, fileEntry, localPath) {
+            if (err) { return next(err); }
+            if(!fileEntry)
+                return res.notFound();
+            if(localPath) {
+                fs.exists(localPath,function(result) {
+                    if(result) {
+                        fs.unlink(localPath); // remove local path
+                        logger.log('removing file at local path',localPath,'for file entry',fileEntry._id);
+                    }
+                    removeRemoteAndDeleteEntry(res,fileEntry);
+                });
+            }
+            else {
+                removeRemoteAndDeleteEntry(res,fileEntry);
+            }
+        });        
+    }
 }
 
 module.exports = new GeneratedFilesController();

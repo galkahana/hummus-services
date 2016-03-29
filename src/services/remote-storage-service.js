@@ -50,8 +50,18 @@ function downloadFileToStream(remoteData,targetStream) {
     s3.getObject({Key:remoteData.data.remoteKey}).createReadStream().pipe(targetStream);
 }
 
+function removeFile(remoteData,cb) {
+    var s3 = new aws.S3({
+        params: {
+            Bucket: config.getConfig().s3BucketName,
+        }
+       });
+    s3.deleteObject({Key:remoteData.data.remoteKey},cb);    
+}
+
 
 module.exports = {
 	uploadFile:uploadFile,
-    downloadFileToStream:downloadFileToStream
+    downloadFileToStream:downloadFileToStream,
+    removeFile:removeFile
 };

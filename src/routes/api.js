@@ -21,7 +21,8 @@ router.route('/generation-jobs')
 router.route('/generation-jobs/:id')
     .get(users.authenticateUserForExternalAPIOrDie,generationJobsController.show);
 router.route('/generated-files/:id')
-    .get(users.authenticateUserForExternalAPIOrDie,generatedFilesController.download);
+    .get(users.authenticateUserForExternalAPIOrDie,generatedFilesController.download)
+    .delete(users.authenticateUserForExternalAPIOrDie,generatedFilesController.delete)
 
 // get this before it gets to web...so we're clear that there's an API error
 router.get('/*', function (req, res) {

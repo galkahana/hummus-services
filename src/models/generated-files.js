@@ -1,7 +1,8 @@
 var mongoose = require('mongoose'),
     Schema = mongoose.Schema,
     timestamps = require('./plugins/timestamps'),
-    constants = require('./constants');
+    constants = require('./constants'),
+    generationJobs = require('./generation-jobs');
 
 
 
@@ -26,6 +27,17 @@ var generatedFileSchema = new Schema({
         },
         data: Schema.Types.Mixed
     } 
+});
+
+generatedFileSchema.pre('remove', function(next) {
+    var thisID = this.id;
+    console.log('deleting entry',thisID);
+    var self = this;
+
+    generationJobs.update({generatedFile:thisID}, {$set: {generatedFile: null}},function(err) {
+        if (err) { return next(err); }
+        next();
+    });
 });
 
 generatedFileSchema.plugin(timestamps, {index: true});
