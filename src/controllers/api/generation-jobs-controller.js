@@ -5,32 +5,44 @@ var jobPipeline = require('../../services/job-pipeline'),
     generatedFilesService = require('../../services/generated-files'),
     constants = require('../../models/constants'),
     async = require('async'),
-    remoteStorageService = require('../../services/remote-storage-service');
+    remoteStorageService = require('../../services/remote-storage-service'),
+    logger = require('../../services/logger');
 
-function createFileEntryAndUpdateJob(job,user,result,callback) {
+function createFileEntryAndUpdateJob(job,user,generationResult,remoteSourceData,callback) {
     generatedFilesService.create({
-        downloadTitle: result.outputTitle,
+        downloadTitle: generationResult.outputTitle,
         localSource: {
             sourceType: constants.eSourceLocal,
             data: {
-                path: result.outputPath
+                path: generationResult.outputPath
             }
         },
-        user:user._id 
+        user:user._id,
+        remoteSource:remoteSourceData 
     },function(err,generatedFileEntry) {
             if(err)
                 job.status = constants.eJobFailed;
             else 
                 job.generatedFile = generatedFileEntry._id;
-            generationJobsService.update(job._id,job,function(err){
-                callback(err,generatedFileEntry);
+            generationJobsService.update(job._id,job,function(newErr){
+                callback(newErr || err);
             });
         }
     );                    
 }
 
-function uploadPDF(filePath,user,callback) {
-    remoteStorageService.uploadFile(filePath,user,callback);
+function uploadPDF(filePath,user,job,callback) {
+    remoteStorageService.uploadFile(filePath,user,function(err,remoteSourceData) {
+            if(err) {
+                // if failed in upload, mark job as failed
+                job.status = constants.eJobFailed;
+                generationJobsService.update(job._id,job,function(newErr){
+                    callback(newErr || err,remoteSourceData);
+                });
+            }
+            else
+                callback(null,remoteSourceData);
+    });
 }
 
 function startGenerationJob(inJobTicket,user,callback)
@@ -45,48 +57,39 @@ function startGenerationJob(inJobTicket,user,callback)
         if(err) return callback(err);
         
         // start job code, async
-        jobPipeline.run(inJobTicket,function(err,result) {
+        jobPipeline.run(inJobTicket,function(err,generationResult) {
             if(err) {
                 // failed, update job entry
+                logger.error('Job failed in file creation stage',job._id);
+                
                 job.status = constants.eJobFailed;
                 generationJobsService.update(job._id,job,function(){});
             } else {
                 // succeeded. 
                 
                 /*
-                    Create a ready file entry and at the same time upload the prepared files.
-                    The ready file entry creation won't wait for upload, relying on job status change later to be the final judge
-                    for whether job is done.
+                    upload PDF and later create file entry with both local and uploaded version data
                 */
                 async.auto(
                     {
-                        createFileEntryAndUpdateJob: function(callback) {
-                            // will put in results the generated file entry, so we can later update with
-                            // upload data
-                            createFileEntryAndUpdateJob(job,user,result,callback);
-                        },
                         uploadPDF : function(callback) {
                             // will return with upload data that can be used to update the generated file entry
-                            uploadPDF(result.outputPath,user,callback);
-                        }
+                            uploadPDF(generationResult.outputPath,user,job,callback);
+                        },
+                        createFileEntryAndUpdateJob: ['uploadPDF',function(callback,results) {
+                            createFileEntryAndUpdateJob(job,user,generationResult,results.uploadPDF,callback);
+                        }]
                     },
                     function(err,results) {
-                        if(err) return;
+                        if(err) {
+                            logger.error('Job failed in file entry creation and upload stage',job._id);
+                            return;
+                        }
                         
-                        // when done both upload an file entlry creation, update generated file entry with the remote file information.
-                        // Note again that one does not wait for declaring the job finished
-                        // prior to uploading the data. In that case we still trust the local file to be around
-                        // to be retrieved directly with no required download
-                        var generatedFileEntry = results.createFileEntryAndUpdateJob;
-                        var remoteSourceData = results.uploadPDF;
-                        
-                        generatedFileEntry.remoteSource = remoteSourceData;
-                        
-                        generatedFilesService.update(generatedFileEntry._id,generatedFileEntry,function(err,fileEntry) {
-                            // on success, finally set the job status to done
-                            job.status = constants.eJobDone;
-                            generationJobsService.update(job._id,job);                            
-                        });
+                        // on success, finally set the job status to done
+                        logger.error('Job succeeded, finished OK',job._id);
+                        job.status = constants.eJobDone;
+                        generationJobsService.update(job._id,job);                            
                     }
                 );
             }
