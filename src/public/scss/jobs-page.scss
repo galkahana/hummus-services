@@ -1,5 +1,81 @@
 @import "app-base";
 
+// simple spin animation
+@-moz-keyframes spin { 100% { -moz-transform: rotate(360deg); } }
+@-webkit-keyframes spin { 100% { -webkit-transform: rotate(360deg); } }
+@keyframes spin { 100% { -webkit-transform: rotate(360deg); transform:rotate(360deg); } }
+
+$toolbar-background: #aaaaaa; //#CAAA52;
+$control-background: #999999; //#b09447;
+$control-border: #555555; // #9a813e
+
+
 .jobs-page {
    padding:20px 0;
+   
+   .toolbar {
+        margin-bottom: 20px;
+        
+        display:block;
+        width:100%;
+        background-color:$toolbar-background;
+        padding:8px 14px;
+        
+        
+        .btn.btn-default {
+            background-color: $control-background;
+            border-color: $control-border;
+            outline:none;
+        }
+        
+        .glyphicon {
+            font-size:14px;
+        }
+
+        .refreshing.glyphicon-refresh {
+            -webkit-animation:spin 1s linear infinite;
+            -moz-animation:spin 1s linear infinite;
+            animation:spin 1s linear infinite;
+        }
+        
+        .search-bar {
+            margin-left: 20px;
+            width:60%;
+            background-color: $control-background;
+            border: 1px solid $control-border;
+            padding: 7px 4px 7px 4px;
+            border-radius: 4px;   
+            line-height:1;
+            
+            form  {
+                
+                >* {
+                    display: inline-block;
+                    vertical-align: middle;
+                }
+
+                .search-bar-button {
+                    background-color:$control-background;
+                    margin: 0 10px;
+                    border: 0;
+                    outline: none;
+                    padding: 0;
+                }
+                
+                .search-bar-text {
+                    width: calc(100% - 41px);
+                    
+                    input {
+                        width:100%;
+                        background-color:$control-background;
+                        border:0;
+                        color:$default-black;
+                        outline:none;
+                    }
+                }
+
+            }
+            
+        }
+   }
 }

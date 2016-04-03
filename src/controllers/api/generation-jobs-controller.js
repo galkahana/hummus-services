@@ -146,8 +146,18 @@ function GenerationJobsController() {
         if (!user) {
             return res.badRequest('Missing user. should have user for identifying whose jobs are being queried');
         }
+        
+        // query by user
+        var queryParams = {
+            user:user._id
+        };
+        
+        // add search term for title
+        if(req.query.searchTerm !== undefined) {
+            queryParams.label =  {$regex:'.*' + req.query.searchTerm  + '.*',$options:'i'};
+        }
 
-        generationJobsService.getAllOfUser(user,function(err, generationjobs) {
+        generationJobsService.findAll(queryParams,function(err, generationjobs) {
             if (err) { return next(err); }
             res.status(200).json(generationjobs);
         });        

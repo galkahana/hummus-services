@@ -1,5 +1,12 @@
 
 // some defaults
+
+/*
+    the black, black-transparent combination should be used for 
+    text that implies interaction (you can click on it). in this
+    case use $default-black-transparent as a default color, and the
+    $default-black as hovering
+*/
 $default-black: rgb(33,33,33);
 $default-black-transparent: rgba(33,33,33,0.75);
 

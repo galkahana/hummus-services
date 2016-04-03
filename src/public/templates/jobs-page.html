@@ -1,5 +1,23 @@
 <div class="jobs-page">
     <div class="container">
+        <div class="toolbar">
+            <!-- refresh -->
+            <div class="btn-group">
+                <button type="button" class="btn btn-default refresh"ng-click="refresh()">
+                    <span class="glyphicon glyphicon-refresh" ng-class="{refreshing:refreshing}" ></span>
+                </button>
+            </div>
+            <!-- search bar -->
+            <div class="btn-group search-bar">
+                <form ng-submit="submitSearch()">
+                    <button class="search-bar-button" type="submit">
+                        <span class="glyphicon" ng-class="{'glyphicon-search':!searching,'glyphicon-refresh refreshing':searching}"></span>
+                    </button>
+                    <div class="search-bar-text"><input type="text" ng-model="searchTerm" placeholder="Search" ng-change="changingSearch()"></div>
+                </form>
+            </div>
+        </div>
+        
         <jobs-list items="jobs"></jobs-list>
     </div>
 </div>

@@ -11,6 +11,11 @@ body {
     background: #e6ebea;
     color:$default-black;
 }
+
+.btn {
+    @extend .default-font;
+}
+
 #wrapper {
 	min-height:100%;
 	position:relative;

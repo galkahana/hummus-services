@@ -15,8 +15,8 @@ module.exports = angular.module('generationjobs.services', [
                 get: function(id) {
                     return generationJobs.one(id).get();
                 },
-                query: function() {
-                    return generationJobs.getList();
+                query: function(params) {
+                    return generationJobs.getList(params);
                 }                
             };
         }
