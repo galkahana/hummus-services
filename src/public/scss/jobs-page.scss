@@ -26,10 +26,11 @@ $control-border: #555555; // #9a813e
             background-color: $control-background;
             border-color: $control-border;
             outline:none;
+            line-height: 1;
         }
         
         .glyphicon {
-            font-size:14px;
+            font-size:18px;
         }
 
         .refreshing.glyphicon-refresh {
@@ -43,7 +44,7 @@ $control-border: #555555; // #9a813e
             width:60%;
             background-color: $control-background;
             border: 1px solid $control-border;
-            padding: 7px 4px 7px 4px;
+            padding: 6px 4px 6px 4px;
             border-radius: 4px;   
             line-height:1;
             
@@ -63,7 +64,7 @@ $control-border: #555555; // #9a813e
                 }
                 
                 .search-bar-text {
-                    width: calc(100% - 41px);
+                    width: calc(100% - 43px);
                     
                     input {
                         width:100%;
