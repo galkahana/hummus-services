@@ -6,7 +6,8 @@ var jobPipeline = require('../../services/job-pipeline'),
     constants = require('../../models/constants'),
     async = require('async'),
     remoteStorageService = require('../../services/remote-storage-service'),
-    logger = require('../../services/logger');
+    logger = require('../../services/logger'),
+    _ = require('lodash');
 
 function createFileEntryAndUpdateJob(job,user,generationResult,remoteSourceData,callback) {
     generatedFilesService.create({
@@ -101,6 +102,94 @@ function startGenerationJob(inJobTicket,user,callback)
     });
 }
 
+function deleteFilesForGeneratedFileIDs(generatedFilesIDs,callback) {
+    /*
+        Important! this one does not null gnerated file entries
+    */
+    generatedFilesService.getSome(generatedFilesIDs,function(err,items) {
+        if(err)
+            return callback(err);
+        
+        // remove files from remote storage
+        remoteStorageService.removeFiles(
+            _.filter(
+                _.map(items,function(value){return value.remoteSource;}),
+                function(value){return !!value;}),function(err) {
+                    logger.info('Removed multiple files from remote storage');
+                    
+                    // remove generated files entries
+                    generatedFilesService.destroyIn(generatedFilesIDs,callback);
+                });
+    });
+}
+
+function deleteAllWithFiles(items,callback) {
+    logger.info('Delete multiple Jobs with files');
+    async.series(
+        [
+            function(cb) {
+                logger.info('Deleting files');
+                deleteFilesForGeneratedFileIDs(
+                    _.filter(_.map(items,function(value){return value.generatedFile;}),function(value){return !!value;}),
+                    function(err) {
+                        if(err) {
+                            logger.error('Error in deleting files for jobs',err);
+                        }
+                        else 
+                            logger.info('Succeeded Deleting files for jobs');
+                        cb(err);
+                    });
+            },
+            function(cb) {
+                logger.info('Deleting jobs');
+                generationJobsService.destroyIn(_.map(items,function(value){return value._id;}),
+                    function(err) {
+                        if(err) {
+                            logger.error('Error in deleting jobs',err);
+                        }
+                        else 
+                            logger.info('Succeeded Deleting multiple jobs');
+                        cb(err);
+                    });
+            }
+        ],callback
+    );
+    
+}
+
+function deleteFilesForJobs(items,callback) {
+    async.series(
+        [
+            function(cb) {
+                logger.info('Deleting files for jobs');
+                deleteFilesForGeneratedFileIDs(
+                    _.filter(_.map(items,function(value){return value.generatedFile;}),function(value){return !!value;}),
+                    function(err) {
+                        if(err) {
+                            logger.error('Error in deleting files for jobs',err);
+                        }
+                        else 
+                            logger.info('Succeeded Deleting files for jobs');
+                        cb(err);
+                    });
+            },
+            function(cb) {
+                logger.info('Deleting jobs');
+                generationJobsService.updateIn(_.map(items,function(value){return value._id;}),
+                    {generatedFile:null},
+                    function(err) {
+                        if(err) {
+                            logger.error('Error in updating jobs',err);
+                        }
+                        else 
+                            logger.info('Succeeded Updating multiple jobs by removing their files');
+                        cb(err);
+                    });
+            }
+        ],callback
+    );    
+}
+
 function GenerationJobsController() {
 
     /**
@@ -162,6 +251,40 @@ function GenerationJobsController() {
             res.status(200).json(generationjobs);
         });        
     };
+    
+    this.actions = function(req,res,next) {
+        var user = req.user;
+        if (!user) {
+            return res.badRequest('Missing user. should have user for identifying whose jobs are being manipulated');
+        }
+        
+        var type = req.body.type;
+        if(!type) {
+            return res.badRequest('Missing type. should be deleteAll or deleteFiles');
+        }
+        
+        switch(type) {
+            case 'deleteAll': {
+                deleteAllWithFiles(req.body.items,function(err) {
+                    if (err) { return next(err); }
+                    res.status(200).json({ok:true});
+                });
+                break;
+            }
+            case 'deleteFiles': {
+                deleteFilesForJobs(req.body.items,function(err) {
+                    if (err) { return next(err); }
+                    res.status(200).json({ok:true});
+                });
+                break;
+                
+            }
+            default: {
+                res.badRequest('Unknown type. should be deleteAll');
+            }
+        }
+        
+    }
 }
 
 module.exports = new GenerationJobsController();

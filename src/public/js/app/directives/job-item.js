@@ -72,6 +72,13 @@ module.exports = angular.module('job-item.directives',[
                         $scope.selected = !$scope.selected;
                         $scope.$emit('jobItem.selectionChanged',$scope.item,$scope.selected);
                     }
+
+                    $scope.$on('jobItem.selectionChanged.external',function(event,items,selection) {
+                        if($scope.selected !== selection &&
+                            _.indexOf(items, $scope.item) !== -1)
+                            $scope.selected = selection;
+                    });
+
                     
                     $scope.waitingForDelete = false;
                     $scope.removeFile = function() {

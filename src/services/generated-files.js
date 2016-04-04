@@ -17,6 +17,14 @@ GeneratedFiles.prototype.getAll = function (callback) {
         .exec(callback);
 };
 
+GeneratedFiles.prototype.getSome = function (ids,callback) {
+    generationFilesModel
+        .find({_id:{$in:ids}})
+        .lean()
+        .exec(callback);
+};
+
+
 GeneratedFiles.prototype.get = function (id, callback) {
     generationFilesModel
         .findOne({_id: id})
@@ -57,6 +65,12 @@ GeneratedFiles.prototype.update = function (id, data, callback) {
 GeneratedFiles.prototype.destroy = function(id, callback) {
     generationFilesModel
         .remove({_id: id})
+        .exec(callback);
+}
+
+GeneratedFiles.prototype.destroyIn = function(ids,callback) {
+    generationFilesModel
+        .remove({ _id: { $in: ids } })
         .exec(callback);
 }
 

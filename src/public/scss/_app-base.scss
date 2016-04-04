@@ -26,12 +26,15 @@
     }
 }
 
-a.im-a-pretty-clickable {
-    @include no-underline-ever;
+.im-a-pretty-clickable {
     cursor: pointer;
 
     color: $default-black-transparent;
     &:hover {
         color: $default-black;
     }
+}
+
+a.im-a-pretty-clickable {
+    @include no-underline-ever;
 }

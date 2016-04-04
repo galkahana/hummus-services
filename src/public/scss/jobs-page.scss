@@ -9,11 +9,20 @@ $toolbar-background: #aaaaaa; //#CAAA52;
 $control-background: #999999; //#b09447;
 $control-border: #555555; // #9a813e
 
+$selection-toolbar-background: #CAAA52;
+$selection-control-background: #b09447;
+$selection-control-border: #9a813e;
+
 
 .jobs-page {
    padding:20px 0;
    
    .toolbar {
+       
+       .hide-when-unselected {
+           display:none;
+       }
+       
         margin-bottom: 20px;
         
         display:block;
@@ -78,5 +87,73 @@ $control-border: #555555; // #9a813e
             }
             
         }
+        
+        .selection-bar {
+            margin-right:20px;
+            
+            >div {
+                display:inline-block;
+                vertical-align: middle;
+                padding: 5px 0;
+            }
+            
+            .cancel-selection {
+                .glyphicon {
+                    margin-right:5px;
+                }
+                
+                margin-right:20px;
+            }
+            
+            .selection-count {
+                color: $default-bright-blue;
+            }            
+        }
+        
+        .btn-delete-files {
+            img {
+                width:20px;
+            }
+            
+            .glyphicon-ok {
+                color:green;
+            }
+        }
+
+        
+        &.selection {
+            .hide-when-unselected {
+                display:inline-block;
+            }
+            .hide-when-selected {
+                display:none;
+            }
+
+            background-color:$selection-toolbar-background;
+            
+            .btn.btn-default {
+                background-color: $selection-control-background;
+                border-color: $selection-control-border;
+            }
+            
+            
+            .search-bar {
+                background-color: $selection-control-background;
+                border-color: $selection-control-border;
+                
+                form  {
+                    .search-bar-button {
+                        background-color:$selection-control-background;
+                    }
+                    
+                    .search-bar-text {
+                        input {
+                            background-color:$selection-control-background;
+                        }
+                    }
+                }
+            }
+        }
    }
+   
 }

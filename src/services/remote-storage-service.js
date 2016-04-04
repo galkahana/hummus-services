@@ -3,7 +3,8 @@ var config = require('../config/settings'),
     constants = require('../models/constants.js'),
     uuid = require('uuid'),
     aws = require('aws-sdk'),
-    s3c = require('s3');
+    s3c = require('s3'),
+    _ = require('lodash');
 
 aws.config.loadFromPath(__dirname + '/aws.json');
 
@@ -59,9 +60,30 @@ function removeFile(remoteData,cb) {
     s3.deleteObject({Key:remoteData.data.remoteKey},cb);    
 }
 
+function removeFiles(remoteDatas,cb) {
+    if(!remoteDatas || remoteDatas.length == 0)
+        return cb();
+    
+    var params = {Delete:{
+            Objects: _.map(remoteDatas,function(value){return {Key:value.data.remoteKey}})
+        }};
+    
+    var s3 = new aws.S3({
+        params: {
+            Bucket: config.getConfig().s3BucketName,
+        }
+       });
+    s3.deleteObjects(params,function(err,data) {
+        if (err) console.log(err, err.stack); // an error occurred
+        else     console.log(data);           // successful response
+        cb(err);
+        
+    });      
+}
 
 module.exports = {
 	uploadFile:uploadFile,
     downloadFileToStream:downloadFileToStream,
-    removeFile:removeFile
+    removeFile:removeFile,
+    removeFiles:removeFiles
 };

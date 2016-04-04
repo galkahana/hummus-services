@@ -18,6 +18,8 @@ var controllersPath = path.resolve(__dirname,'../controllers/api/') + '/',
 router.route('/generation-jobs')
     .post(users.authenticateUserForExternalAPIOrDie,generationJobsController.create)
     .get(authentication.authenticateOrDie,generationJobsController.list)
+router.route('/generation-jobs/actions')
+    .post(authentication.authenticateOrDie,generationJobsController.actions)
 router.route('/generation-jobs/:id')
     .get(users.authenticateUserForExternalAPIOrDie,generationJobsController.show);
 router.route('/generated-files/:id')

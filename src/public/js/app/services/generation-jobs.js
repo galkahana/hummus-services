@@ -10,6 +10,7 @@ module.exports = angular.module('generationjobs.services', [
     .factory('GenerationJob', ['Restangular',
         function(Restangular) {
             var generationJobs = Restangular.service('generation-jobs');
+            var generationJobsActions = Restangular.service('generation-jobs/actions');
 
             return {
                 get: function(id) {
@@ -17,7 +18,14 @@ module.exports = angular.module('generationjobs.services', [
                 },
                 query: function(params) {
                     return generationJobs.getList(params);
-                }                
+                },
+                deleteMultiple: function(items) {
+                    return generationJobsActions.post({type:'deleteAll',items:items});
+                },
+                deleteMultipleFiles: function(items) {
+                    return generationJobsActions.post({type:'deleteFiles',items:items});
+                    
+                }             
             };
         }
     ]);

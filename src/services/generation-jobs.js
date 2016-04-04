@@ -47,12 +47,25 @@ GenerationJobs.prototype.update = function (id, data, callback) {
         });
 };
 
+GenerationJobs.prototype.updateIn = function (ids, fieldsToSet, callback) {
+    generationJobModel
+        .update(
+            {_id: {$in:ids}}, 
+            {$set: fieldsToSet},
+            {multi: true})
+        .exec(callback);
+};
 
 GenerationJobs.prototype.destroy = function(id, callback) {
     generationJobModel
         .remove({_id: id})
         .exec(callback);
-}
+};
 
+GenerationJobs.prototype.destroyIn = function(ids,callback) {
+    generationJobModel
+        .remove({ _id: { $in: ids } })
+        .exec(callback);
+};
 
 module.exports = new GenerationJobs();

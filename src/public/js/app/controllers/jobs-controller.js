@@ -1,6 +1,7 @@
 'use strict';
 
 require('../../../scss/jobs-page.scss'); // app css
+var _ = require('lodash');
 
 jobsController.$inject = ['$scope','$timeout','GenerationJob'];
 
@@ -10,6 +11,10 @@ function jobsController($scope,$timeout,GenerationJob) {
     $scope.searchActive = false;
     
     function loadData(cb) {
+    
+        // reset selected elements
+        $scope.selectedElements = [];
+    
         var params = {};
         
         if($scope.searchActive) {
@@ -73,6 +78,58 @@ function jobsController($scope,$timeout,GenerationJob) {
         },500);
     }
     
+    // selection handling
+    $scope.$on('jobItem.selectionChanged',function($event,item,selected) {
+        if(selected) 
+            $scope.selectedElements =  $scope.selectedElements.concat(item);
+        else
+            $scope.selectedElements =  _.without($scope.selectedElements, item);
+    });
+
+    $scope.deselectAll = function() {
+        $scope.$broadcast('jobItem.selectionChanged.external',$scope.selectedElements,false);
+        $scope.selectedElements = [];
+    }
+    
+    // deleting
+    $scope.deleting = false;
+    $scope.delete = function() {
+        $scope.deleting = true;
+        
+        GenerationJob.deleteMultiple($scope.selectedElements).then(function(response) {
+            $scope.jobs = _.difference($scope.jobs,$scope.selectedElements);
+            $scope.selectedElements = [];
+            $scope.deleting = false;
+        },
+        function(err) {
+            console.log('error!',err);
+            $scope.deleting = false;
+        });        
+    }
+    
+    // deleting files
+    $scope.deletingFiles = false;
+    $scope.doneDeletingFiles = false;
+    $scope.deleteFiles = function() {
+        $scope.deletingFiles = true;
+        
+        GenerationJob.deleteMultipleFiles($scope.selectedElements).then(function(response) {
+            $scope.selectedElements.forEach(function(value) {
+                value.generatedFile = null;
+            });
+            $scope.doneDeletingFiles = true;
+            $timeout(function(){
+                // extra OK mark for 1/2 second to show that all was done well
+                $scope.doneDeletingFiles = false;
+                $scope.deletingFiles = false;
+            },500);
+        },
+        function(err) {
+            console.log('error!',err);
+            $scope.deletingFiles = false;
+        });        
+    }
+        
     loadData();
 }
 
