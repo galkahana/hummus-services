@@ -94,6 +94,9 @@ function jobsController($scope,$timeout,GenerationJob) {
     // deleting
     $scope.deleting = false;
     $scope.delete = function() {
+        if($scope.deleting)
+            return;
+        
         $scope.deleting = true;
         
         GenerationJob.deleteMultiple($scope.selectedElements).then(function(response) {
@@ -111,6 +114,9 @@ function jobsController($scope,$timeout,GenerationJob) {
     $scope.deletingFiles = false;
     $scope.doneDeletingFiles = false;
     $scope.deleteFiles = function() {
+        if($scope.deletingFiles)
+            return;
+        
         $scope.deletingFiles = true;
         
         GenerationJob.deleteMultipleFiles($scope.selectedElements).then(function(response) {
