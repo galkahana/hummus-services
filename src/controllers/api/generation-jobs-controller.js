@@ -124,25 +124,14 @@ function deleteFilesForGeneratedFileIDs(generatedFilesIDs,callback) {
 }
 
 function deleteAllWithFiles(items,callback) {
-    logger.info('Delete multiple Jobs with files');
     async.series(
         [
             function(cb) {
-                logger.info('Deleting files');
-                deleteFilesForGeneratedFileIDs(
-                    _.filter(_.map(items,function(value){return value.generatedFile;}),function(value){return !!value;}),
-                    function(err) {
-                        if(err) {
-                            logger.error('Error in deleting files for jobs',err);
-                        }
-                        else 
-                            logger.info('Succeeded Deleting files for jobs');
-                        cb(err);
-                    });
+                deleteFilesForJobIDsNoUpdate(items,cb);
             },
             function(cb) {
                 logger.info('Deleting jobs');
-                generationJobsService.destroyIn(_.map(items,function(value){return value._id;}),
+                generationJobsService.destroyIn(items,
                     function(err) {
                         if(err) {
                             logger.error('Error in deleting jobs',err);
@@ -154,16 +143,28 @@ function deleteAllWithFiles(items,callback) {
             }
         ],callback
     );
-    
 }
 
-function deleteFilesForJobs(items,callback) {
+function deleteFilesForJobIDsNoUpdate(items,callback) {
+    var jobItems;
+    
     async.series(
         [
             function(cb) {
+                logger.info('Fetching job items for IDs');
+                generationJobsService.getAllIn(items,function(err, generationJobs){
+                   if(err) {
+                        logger.error('Error in fetching jobs for files delete',err);
+                        return cb(err);
+                   }
+                   jobItems = generationJobs;
+                   cb(); 
+                });
+            },
+            function(cb) {
                 logger.info('Deleting files for jobs');
                 deleteFilesForGeneratedFileIDs(
-                    _.filter(_.map(items,function(value){return value.generatedFile;}),function(value){return !!value;}),
+                    _.filter(_.map(jobItems,function(value){return value.generatedFile;}),function(value){return !!value;}),
                     function(err) {
                         if(err) {
                             logger.error('Error in deleting files for jobs',err);
@@ -172,10 +173,20 @@ function deleteFilesForJobs(items,callback) {
                             logger.info('Succeeded Deleting files for jobs');
                         cb(err);
                     });
+            }
+        ],callback
+    );       
+}
+
+function deleteFilesForJobs(items,callback) {
+    async.series(
+        [
+            function(cb) {
+                deleteFilesForJobIDsNoUpdate(items,cb);
             },
             function(cb) {
-                logger.info('Deleting jobs');
-                generationJobsService.updateIn(_.map(items,function(value){return value._id;}),
+                logger.info('Updating jobs with null files');
+                generationJobsService.updateIn(items,
                     {generatedFile:null},
                     function(err) {
                         if(err) {
@@ -245,8 +256,12 @@ function GenerationJobsController() {
         if(req.query.searchTerm !== undefined) {
             queryParams.label =  {$regex:'.*' + req.query.searchTerm  + '.*',$options:'i'};
         }
+        
+        if(req.query.in !== undefined) {
+            queryParams._id = {$in:req.query.in};            
+        }
 
-        generationJobsService.findAll(queryParams,function(err, generationjobs) {
+        generationJobsService.findAllDesc(queryParams,function(err, generationjobs) {
             if (err) { return next(err); }
             res.status(200).json(generationjobs);
         });        

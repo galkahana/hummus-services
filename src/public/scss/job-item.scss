@@ -1,6 +1,61 @@
 @import "app-base";
 @import "waiting-spinner";
 
+@mixin keyframes($animation-name) {
+  @-webkit-keyframes #{$animation-name} {
+    @content;
+  }
+  @-moz-keyframes #{$animation-name} {
+    @content;
+  }
+  @keyframes #{$animation-name} {
+    @content;
+  }
+}
+
+@mixin animation($animation-data) {
+    -webkit-animation: #{$animation-data};
+    -moz-animation: #{$animation-data};
+    animation: #{$animation-data};
+}
+
+@include keyframes(waiting-to-error) {
+    0% {
+        opacity:1;
+        background-color:orange; 
+    }
+    40% { 
+        opacity:0;
+        background-color:orange; 
+    }
+    70% {
+        background-color:red; 
+    }    
+    100% {
+        opacity:1;
+        background-color:red; 
+    }
+}
+
+@include keyframes(waiting-to-success) {
+    0% {
+        opacity:1;
+        background-color:orange; 
+    }
+    40% { 
+        opacity:0;
+        background-color:orange; 
+    }
+    70% {
+        background-color:green; 
+    }    
+    100% {
+        opacity:1;
+        background-color:green; 
+    }
+}
+
+
 job-item {
     display:block;
 
@@ -66,9 +121,17 @@ job-item {
                 background-color:red;
             }
             &.status-waiting {
-                background-color:orange;
+                background-color:orange;                
             }
-
+            
+            &.waiting-to-success {
+                @include animation(waiting-to-success 2s linear 1 forwards);
+            }
+            
+            &.waiting-to-error {
+                @include animation(waiting-to-error 2s linear 1 forwards);
+            }
+            
         }
     }
     

@@ -18,109 +18,22 @@ $selection-control-border: #9a813e;
    padding:20px 0;
    
    .toolbar {
+        margin-bottom: 20px;        
+        display:block;
        
-       .hide-when-unselected {
-           display:none;
+       &.detached {
+            position:fixed;
+            top:0;
+            z-index:5000;
+            left: 50%;
+            transform: translateX(-50%);
+            -webkit-transform: translateX(-50%);
+            
+            .toolbar-frame {
+                box-shadow: 0 -1px 0 #e5e5e5,0 0 2px rgba(0,0,0,.12),0 2px 4px rgba(0,0,0,.24);
+            }
        }
        
-        margin-bottom: 20px;
-        
-        display:block;
-        width:100%;
-        background-color:$toolbar-background;
-        padding:8px 14px;
-        
-        
-        .btn.btn-default {
-            background-color: $control-background;
-            border-color: $control-border;
-            outline:none;
-            line-height: 1;
-        }
-        
-        .glyphicon {
-            font-size:18px;
-        }
-
-        .refreshing.glyphicon-refresh {
-            -webkit-animation:spin 1s linear infinite;
-            -moz-animation:spin 1s linear infinite;
-            animation:spin 1s linear infinite;
-        }
-        
-        .search-bar {
-            margin-left: 20px;
-            width:60%;
-            background-color: $control-background;
-            border: 1px solid $control-border;
-            padding: 6px 4px 6px 4px;
-            border-radius: 4px;   
-            line-height:1;
-            
-            form  {
-                
-                >* {
-                    display: inline-block;
-                    vertical-align: middle;
-                }
-
-                .search-bar-button {
-                    background-color:$control-background;
-                    margin: 0 10px;
-                    border: 0;
-                    outline: none;
-                    padding: 0;
-                }
-                
-                .search-bar-text {
-                    width: calc(100% - 43px);
-                    
-                    input {
-                        width:100%;
-                        background-color:$control-background;
-                        border:0;
-                        color:$default-black;
-                        outline:none;
-                    }
-                }
-
-            }
-            
-        }
-        
-        .selection-bar {
-            margin-right:20px;
-            
-            >div {
-                display:inline-block;
-                vertical-align: middle;
-                padding: 5px 0;
-            }
-            
-            .cancel-selection {
-                .glyphicon {
-                    margin-right:5px;
-                }
-                
-                margin-right:20px;
-            }
-            
-            .selection-count {
-                color: $default-bright-blue;
-            }            
-        }
-        
-        .btn-delete-files {
-            img {
-                width:20px;
-            }
-            
-            .glyphicon-ok {
-                color:green;
-            }
-        }
-
-        
         &.selection {
             .hide-when-unselected {
                 display:inline-block;
@@ -129,31 +42,133 @@ $selection-control-border: #9a813e;
                 display:none;
             }
 
-            background-color:$selection-toolbar-background;
+            .toolbar-frame {
+                background-color:$selection-toolbar-background;
+                
+                .btn.btn-default {
+                    background-color: $selection-control-background;
+                    border-color: $selection-control-border;
+                }
+                
+                
+                .search-bar {
+                    background-color: $selection-control-background;
+                    border-color: $selection-control-border;
+                    
+                    form  {
+                        .search-bar-button {
+                            background-color:$selection-control-background;
+                        }
+                        
+                        .search-bar-text {
+                            input {
+                                background-color:$selection-control-background;
+                            }
+                        }
+                    }
+                }                
+            }
+        }           
+
+
+        .hide-when-unselected {
+            display:none;
+        }
+       
+       .toolbar-frame {
+            background-color:$toolbar-background;
+            padding:8px 14px;
+
             
             .btn.btn-default {
-                background-color: $selection-control-background;
-                border-color: $selection-control-border;
+                background-color: $control-background;
+                border-color: $control-border;
+                outline:none;
+                line-height: 1;
             }
             
+            .glyphicon {
+                font-size:18px;
+            }
+
+            .refreshing.glyphicon-refresh {
+                -webkit-animation:spin 1s linear infinite;
+                -moz-animation:spin 1s linear infinite;
+                animation:spin 1s linear infinite;
+            }
             
             .search-bar {
-                background-color: $selection-control-background;
-                border-color: $selection-control-border;
+                margin-left: 20px;
+                width:60%;
+                background-color: $control-background;
+                border: 1px solid $control-border;
+                padding: 6px 4px 6px 4px;
+                border-radius: 4px;   
+                line-height:1;
                 
                 form  {
+                    
+                    >* {
+                        display: inline-block;
+                        vertical-align: middle;
+                    }
+
                     .search-bar-button {
-                        background-color:$selection-control-background;
+                        background-color:$control-background;
+                        margin: 0 10px;
+                        border: 0;
+                        outline: none;
+                        padding: 0;
                     }
                     
                     .search-bar-text {
+                        width: calc(100% - 43px);
+                        
                         input {
-                            background-color:$selection-control-background;
+                            width:100%;
+                            background-color:$control-background;
+                            border:0;
+                            color:$default-black;
+                            outline:none;
                         }
                     }
+
+                }
+                
+            }
+            
+            .selection-bar {
+                margin-right:20px;
+                
+                >div {
+                    display:inline-block;
+                    vertical-align: middle;
+                    padding: 5px 0;
+                }
+                
+                .cancel-selection {
+                    .glyphicon {
+                        margin-right:5px;
+                    }
+                    
+                    margin-right:20px;
+                }
+                
+                .selection-count {
+                    color: $default-bright-blue;
+                }            
+            }
+            
+            .btn-delete-files {
+                img {
+                    width:20px;
+                }
+                
+                .glyphicon-ok {
+                    color:green;
                 }
             }
-        }
+       }
    }
    
 }

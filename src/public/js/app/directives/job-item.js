@@ -1,24 +1,28 @@
 'use strict';
 
 var angular = require('angular');
-var _ = require('lodash');
+var _ = require('lodash'),
+    toastr = require('toastr');
 
 require('../../../scss/job-item.scss');
+    
+toastr.options = {timeOut:'2000'};
 
 module.exports = angular.module('job-item.directives',[
     require('../filters/pretty-stringify').name,
     require('../services/constants').name,
-    require('../services/generated-files').name
+    require('../services/generated-files').name,
+    require('../services/modal-alert').name
 ])
-    .directive('jobItem', ['$filter','Constants','GeneratedFiles',
-       function($filter,Constants,GeneratedFiles) {
+    .directive('jobItem', ['$filter','Constants','GeneratedFiles','ModalAlert',
+       function($filter,Constants,GeneratedFiles,ModalAlert) {
            return {
              restrict: 'E',
              scope: {
                  item:'='
              },
              template: require('../../../templates/job-item.html'),
-             link:function($scope) {
+             link:function($scope,element) {
                     $scope.open = false;
 
                     $scope.toggleOpenClose = function($event)
@@ -78,23 +82,43 @@ module.exports = angular.module('job-item.directives',[
                             _.indexOf(items, $scope.item) !== -1)
                             $scope.selected = selection;
                     });
+                    
+                    $scope.$watch('item.status',function(newValue,oldValue) {
+                        if(oldValue == Constants.eJobInProgress) {
+                            if(newValue == Constants.eJobDone)
+                                element[0].querySelector('.item-title .status').className+= ' waiting-to-success';
+                            else if(newValue == Constants.eJobFailed)
+                                element[0].querySelector('.item-title .status').className+= ' waiting-to-error';
+                        }
+                    });
 
                     
                     $scope.waitingForDelete = false;
                     $scope.removeFile = function() {
                         if($scope.waitingForDelete)
                             return;
-                        
-                        $scope.waitingForDelete = true;
                             
-                        GeneratedFiles.delete($scope.item.generatedFile).then(function(response) {
-                            $scope.item.generatedFile = null; // Done!
-                            $scope.waitingForDelete = false;
-                        },function(err) {
-                            console.log(err);
-                            $scope.waitingForDelete = false;
-                        });
-                        
+                        ModalAlert.open('Warning',
+                            'You are about to permanently delete the file for this job. This action **may not** be undone. You good with that?',
+                            {
+                                confirm:'Sure',
+                                reject:'Nope'
+                            },function(result) {
+                                if(!result)
+                                    return;
+                                    
+                                $scope.waitingForDelete = true;
+                                    
+                                GeneratedFiles.delete($scope.item.generatedFile).then(function(response) {
+                                    $scope.item.generatedFile = null; // Done!
+                                    $scope.waitingForDelete = false;
+                                    toastr.success('File delete successful');
+                                },function(err) {
+                                    toastr.error('Failed to delete file');
+                                    console.log(err);
+                                    $scope.waitingForDelete = false;
+                                });
+                            })
                     }
              }  
            };

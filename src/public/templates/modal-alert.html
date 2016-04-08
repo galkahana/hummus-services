@@ -1,0 +1,11 @@
+<div class="modal-alert">
+    <div class="modal-header">
+        <h3 class="modal-title">{{modalOptions.title}}</h3>
+    </div>
+    <div class="modal-body" ng-bind-html="modalOptions.message">
+    </div>
+    <div class="modal-footer">
+        <button class="btn btn-primary" type="button" ng-click="ok()">{{modalOptions.confirm}}</button>
+        <button class="btn btn-default" type="button" ng-click="cancel()">{{modalOptions.reject}}</button>
+    </div>
+</div>

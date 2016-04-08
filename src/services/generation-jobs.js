@@ -16,7 +16,21 @@ GenerationJobs.prototype.getAll = function (callback) {
         .exec(callback);
 };
 
+GenerationJobs.prototype.getAllIn = function (ids, callback) {
+    generationJobModel
+        .find({_id: {$in:ids}})
+        .lean()
+        .exec(callback);
+};
+
 GenerationJobs.prototype.findAll = function(queryParams,callback) {
+    generationJobModel
+        .find(queryParams)
+        .lean()
+        .exec(callback); 
+};
+
+GenerationJobs.prototype.findAllDesc = function(queryParams,callback) {
     generationJobModel
         .find(queryParams)
         .sort({createdAt:-1})
