@@ -13,7 +13,8 @@ constants.EStatusTexts = ['Done','In Progress','Failed'];
 
 // others
 
-constants.DEFAULT_DATE_FILTER  = 'MMM d, y hh:mm:ss:sss\'ms\'';
+constants.DEFAULT_DATE_TIME_FILTER  = 'MMM d, y hh:mm:ss:sss\'ms\'';
+constants.DEFAULT_DATE_FILTER  = 'MMM DD, YYYY';
 
 module.exports = angular.module('constants.services', [])
     .factory('Constants', [

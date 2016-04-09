@@ -3,7 +3,7 @@
         <div class="toolbar" ng-class="{'selection':selectedElements.length > 0,'detached container':detachToolbar}">
             <div class="toolbar-frame">
                 <!-- refresh -->
-                <div class="btn-group hide-when-selected">
+                <div class="btn-group refresh-bar hide-when-selected">
                     <button type="button" class="btn btn-default refresh"ng-click="refresh()">
                         <span class="glyphicon glyphicon-refresh" ng-class="{refreshing:refreshing}" ></span>
                     </button>
@@ -16,6 +16,15 @@
                         </button>
                         <div class="search-bar-text"><input type="text" ng-model="searchTerm" placeholder="Search" ng-change="changingSearch()"></div>
                     </form>
+                </div>
+                <!-- date filter -->
+                <div class="btn-group date-filter-bar hide-when-selected">
+                        <button class="date-fiter-bar-button" type="button" ng-click="openDateDialog($event)">
+                            <span class="glyphicon glyphicon-calendar"></span>
+                        </button>
+                        <div class="date-filter-text">
+                            <input type="text" date-range-picker="true" ng-model="dateFilter" placeholder="jobs date range">
+                        </div>
                 </div>
                 
                 <!-- cancel selection -->

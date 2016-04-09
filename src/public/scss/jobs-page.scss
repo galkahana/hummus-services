@@ -49,24 +49,6 @@ $selection-control-border: #9a813e;
                     background-color: $selection-control-background;
                     border-color: $selection-control-border;
                 }
-                
-                
-                .search-bar {
-                    background-color: $selection-control-background;
-                    border-color: $selection-control-border;
-                    
-                    form  {
-                        .search-bar-button {
-                            background-color:$selection-control-background;
-                        }
-                        
-                        .search-bar-text {
-                            input {
-                                background-color:$selection-control-background;
-                            }
-                        }
-                    }
-                }                
             }
         }           
 
@@ -91,15 +73,19 @@ $selection-control-border: #9a813e;
                 font-size:18px;
             }
 
-            .refreshing.glyphicon-refresh {
-                -webkit-animation:spin 1s linear infinite;
-                -moz-animation:spin 1s linear infinite;
-                animation:spin 1s linear infinite;
-            }
+            .refresh-bar {
+                margin-right:20px;
+                
+                .refreshing.glyphicon-refresh {
+                    -webkit-animation:spin 1s linear infinite;
+                    -moz-animation:spin 1s linear infinite;
+                    animation:spin 1s linear infinite;
+                }
+            } 
             
             .search-bar {
-                margin-left: 20px;
-                width:60%;
+                margin-right:20px;
+                width:40%;
                 background-color: $control-background;
                 border: 1px solid $control-border;
                 padding: 6px 4px 6px 4px;
@@ -136,6 +122,41 @@ $selection-control-border: #9a813e;
                 }
                 
             }
+            
+            .date-filter-bar {
+                margin-right:20px;
+                width:40%;
+                background-color: $control-background;
+                border: 1px solid $control-border;
+                padding: 6px 4px 6px 4px;
+                border-radius: 4px;   
+                line-height:1;
+                
+                >* {
+                    display: inline-block;
+                    vertical-align: middle;
+                }
+
+                .date-fiter-bar-button {
+                    background-color:$control-background;
+                    margin: 0 10px;
+                    border: 0;
+                    outline: none;
+                    padding: 0;
+                }
+                
+                .date-filter-text {
+                    width: calc(100% - 43px);
+                    
+                    input {
+                        width:100%;
+                        background-color:$control-background;
+                        border:0;
+                        color:$default-black;
+                        outline:none;
+                    }
+                }
+            }            
             
             .selection-bar {
                 margin-right:20px;

@@ -8,6 +8,7 @@ angular.module('pdfhummus-web', [
     require('./directives/app-footer').name,
     require('./directives/page-title').name,
     require('./directives/jobs-list').name,
+    require('./directives/date-range-picker').name,
     require('./services/generation-jobs').name,
     require('./services/modal-alert').name,
     require('./services/constants').name

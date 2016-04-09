@@ -7,7 +7,8 @@ var jobPipeline = require('../../services/job-pipeline'),
     async = require('async'),
     remoteStorageService = require('../../services/remote-storage-service'),
     logger = require('../../services/logger'),
-    _ = require('lodash');
+    _ = require('lodash'),
+    moment = require('moment');
 
 function createFileEntryAndUpdateJob(job,user,generationResult,remoteSourceData,callback) {
     generatedFilesService.create({
@@ -256,11 +257,39 @@ function GenerationJobsController() {
         if(req.query.searchTerm !== undefined) {
             queryParams.label =  {$regex:'.*' + req.query.searchTerm  + '.*',$options:'i'};
         }
-        
+
+        // add date range
+        if(req.query.dateRangeFrom !== undefined &&
+            req.query.dateRangeTo !== undefined) {
+            var from = moment(req.query.dateRangeFrom).toDate();
+            var to = moment(req.query.dateRangeTo).toDate();
+            
+            to.setDate(to.getDate() + 1); // inclusive
+            
+            queryParams.$or = [
+              {
+                  $and: [
+                      {createdAt: {$gte: from}},
+                      {createdAt: {$lte: to}}
+                  ]
+              },
+              {
+                  $and: [
+                      {updatedAt: { $ne : null }},
+                      {updatedAt: {$gte: from}},
+                      {updatedAt: {$lte: to}}
+                  ]
+              }  
+            ];
+        }
+
+        // add specific ids        
         if(req.query.in !== undefined) {
             queryParams._id = {$in:req.query.in};            
         }
 
+        console.log(JSON.stringify(queryParams,null,2));
+        
         generationJobsService.findAllDesc(queryParams,function(err, generationjobs) {
             if (err) { return next(err); }
             res.status(200).json(generationjobs);

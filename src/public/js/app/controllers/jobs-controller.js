@@ -4,7 +4,8 @@ require('../../../scss/jobs-page.scss'); // app css
 require('toastr/build/toastr.css');
 
 var _ = require('lodash'),
-    toastr = require('toastr');
+    toastr = require('toastr'),
+    moment = require('moment');
     
     toastr.options = {timeOut:'2000'};
 
@@ -14,6 +15,9 @@ function jobsController($scope,$timeout,$document,GenerationJob,ModalAlert,Const
     
     $scope.searchTerm = null;
     $scope.searchActive = false;
+    $scope.dateFilter = moment().startOf('month').format(Constants.DEFAULT_DATE_FILTER) + 
+                            ' - ' +  
+                            moment().endOf('month').format(Constants.DEFAULT_DATE_FILTER);
     
     function loadData(cb) {
     
@@ -24,6 +28,14 @@ function jobsController($scope,$timeout,$document,GenerationJob,ModalAlert,Const
         
         if($scope.searchActive) {
             params.searchTerm = $scope.searchTerm;
+        }
+        
+        if($scope.dateFilter) {
+            var dates = $scope.dateFilter.split('-');
+            if(dates.length == 2) {
+                params.dateRangeFrom =  moment(dates[0],Constants.DEFAULT_DATE_FILTER).toDate();
+                params.dateRangeTo = moment(dates[1],Constants.DEFAULT_DATE_FILTER).toDate();
+            }
         }
         
         GenerationJob.query(params).then(function(response) {
@@ -39,6 +51,7 @@ function jobsController($scope,$timeout,$document,GenerationJob,ModalAlert,Const
         });
     }
 
+    // refresh
     $scope.refresh = function() {
         $scope.refreshing = 2;
         loadData(function(){
@@ -50,6 +63,7 @@ function jobsController($scope,$timeout,$document,GenerationJob,ModalAlert,Const
         },500);
     };
     
+    // search
     $scope.cancelSearch = function() {
         $scope.searching = true;
         $scope.searchActive = false;
@@ -101,7 +115,7 @@ function jobsController($scope,$timeout,$document,GenerationJob,ModalAlert,Const
         return _.map($scope.selectedElements,function(value){return value._id});
     }
     
-    // deleting
+    // deleting jobs
     $scope.deleting = false;
     $scope.delete = function() {
         if($scope.deleting)
@@ -217,6 +231,17 @@ function jobsController($scope,$timeout,$document,GenerationJob,ModalAlert,Const
             });
         }
         
+    }
+    
+    // date filter
+    $scope.$watch('dateFilter',function(value,oldValue) {
+        if(!value && !oldValue)
+            return; // init, forget it
+        loadData();
+    });
+    
+    $scope.openDateDialog = function($event) {
+        $event.currentTarget.parentElement.querySelector('.date-filter-text>input').click()
     }
         
     // load the window data

@@ -48,7 +48,7 @@ module.exports = angular.module('job-item.directives',[
                     }
                     
                     $scope.defaultDateFilter = function(){
-                        return Constants.DEFAULT_DATE_FILTER;
+                        return Constants.DEFAULT_DATE_TIME_FILTER;
                     }
                     
                     $scope.finishedText = function() {
