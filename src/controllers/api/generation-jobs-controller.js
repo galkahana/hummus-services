@@ -288,8 +288,6 @@ function GenerationJobsController() {
             queryParams._id = {$in:req.query.in};            
         }
 
-        console.log(JSON.stringify(queryParams,null,2));
-        
         generationJobsService.findAllDesc(queryParams,function(err, generationjobs) {
             if (err) { return next(err); }
             res.status(200).json(generationjobs);
