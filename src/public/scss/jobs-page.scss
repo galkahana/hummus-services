@@ -20,6 +20,13 @@ $selection-control-border: #9a813e;
    .toolbar {
         margin-bottom: 20px;        
         display:block;
+        
+        .refreshing.glyphicon-refresh {
+            -webkit-animation:spin 1s linear infinite;
+            -moz-animation:spin 1s linear infinite;
+            animation:spin 1s linear infinite;
+        }
+
        
        &.detached {
             position:fixed;
@@ -75,12 +82,6 @@ $selection-control-border: #9a813e;
 
             .refresh-bar {
                 margin-right:20px;
-                
-                .refreshing.glyphicon-refresh {
-                    -webkit-animation:spin 1s linear infinite;
-                    -moz-animation:spin 1s linear infinite;
-                    animation:spin 1s linear infinite;
-                }
             } 
             
             .search-bar {
