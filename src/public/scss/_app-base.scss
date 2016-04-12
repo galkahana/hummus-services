@@ -10,6 +10,14 @@
   border-radius: $radius;
 }
 
+@mixin transform($transform) {
+  -webkit-transform: $transform;
+  -moz-transform: $transform;
+  -ms-transform: $transform;
+  transform: $transform;
+    
+}
+
 .default-font {
     font-family: Helvetica Neue, Arial, sans-serif;
     font-weight:400;

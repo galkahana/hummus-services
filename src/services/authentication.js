@@ -15,7 +15,7 @@ function ensureAuthentication(req, res, next) {
 function authenticate(req,res,next) {
     // for the sake of the demo fetch the single demo user. later we'll have a propper
     // api to user mapping   
-    usersModel.findOne({name:'gal'}, function (err, user) {
+    usersModel.findOne({name:'gal.kahana@hotmail.com'}, function (err, user) {
         if (err)
             return res.unprocessable(err, message);
         req.user = user;
