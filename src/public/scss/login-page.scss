@@ -1,0 +1,12 @@
+@import "app-base";
+
+.login-page {
+    .login-form {
+        @extend .default-item-container;
+
+        padding:10px;
+        width: 340px;
+        
+        margin: 20px auto;
+    }
+}

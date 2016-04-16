@@ -1,0 +1,18 @@
+.public-base.wrapper {
+	min-height:100%;
+	position:relative;
+
+
+    $footerHeight: 100px;
+
+    .content {
+        padding-bottom:$footerHeight;
+    }
+    .footer {
+        width:100%;
+        height:$footerHeight;
+        position:absolute;
+        bottom:0;
+        left:0;
+    }
+}

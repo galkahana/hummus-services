@@ -7,7 +7,8 @@ module.exports.defaultRestangular = ['RestangularProvider',
         RestangularProvider.setBaseUrl('__apiURL__');
         RestangularProvider.setRestangularFields({id: '_id'});
         RestangularProvider.setFullResponse(true);
-
+        
+        // Generic handler
         RestangularProvider.addFullRequestInterceptor(
             function(elemenet, operation, what, url, headers, params) {
                 if (operation === "remove") {

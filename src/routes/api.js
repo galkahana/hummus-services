@@ -14,7 +14,8 @@ var express = require('express'),
 var controllersPath = path.resolve(__dirname,'../controllers/api/') + '/',
     generationJobsController = require(controllersPath + 'generation-jobs-controller'),
     generatedFilesController = require(controllersPath + 'generated-files-controller'),
-    usersController = require(controllersPath + 'users');
+    usersController = require(controllersPath + 'users-controller'),
+    authenticationController = require(controllersPath + 'authentication-controller');
 
 router.route('/generation-jobs')
     .post(users.authenticateUserForExternalAPIOrDie,generationJobsController.create)
@@ -28,6 +29,11 @@ router.route('/generated-files/:id')
     .delete(users.authenticateUserForExternalAPIOrDie,generatedFilesController.delete)
 router.route('/users/me')
     .get(authentication.authenticateOrDie,usersController.me)
+router.route('/authenticate/sign-in')
+    .post(authenticationController.signIn)
+router.route('/authenticate/sign-out')
+    .delete(authentication.authenticateOrDie,authenticationController.signOut)
+
 
 // get this before it gets to web...so we're clear that there's an API error
 router.get('/*', function (req, res) {

@@ -13,12 +13,12 @@ var express = require('express'),
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json());
 
-// cors handling
+// cors handling and some allowed headers
 app.use(
 	function(req, res, next) {
     res.header('Access-Control-Allow-Origin', "*");
     res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
-    res.header('Access-Control-Allow-Headers', "access-control-allow-origin, accept, content-type");
+    res.header('Access-Control-Allow-Headers', "access-control-allow-origin, accept, content-type, Authorization");
     next();
 });
 

@@ -13,20 +13,8 @@
     <link rel="shortcut icon" type="image/png" href="/images/favicon.ico"/>
     <link rel="shortcut icon" type="image/png" href="__websiteURL__/images/favicon.ico"/>    
 </head>
-<body ng-app="pdfhummus-web">
-    
-    <div id="wrapper" ng-controller="appController">
-        <div id="header">
-            <app-header></app-header>
-        </div>
-        <div id="content">
-            <page-title></page-title>
-            <ui-view autoscroll="false" class="page"></ui-view>
-        </div>
-        <div id="footer">
-            <app-footer></app-footer>
-        </div>
-    </div>
+<body ng-app="pdfhummus-web" ng-controller="appController">
+    <ui-view autoscroll="false" class="base"></ui-view>
     <script src="__webpackRoot__/commons.js"></script>
     <script src="__webpackRoot__/default.js"></script>
 </body>
