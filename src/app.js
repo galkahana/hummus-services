@@ -3,6 +3,7 @@ var express = require('express'),
 	path = require('path'),
 	log = require('./services/logger'),
     configuration = require('./config/index'),
+    errorHandler = require('./controllers/errors-controller'),
 	app = express();
 	
 	
@@ -48,4 +49,9 @@ function listen() {
     1. configure
     2. when done - start listening by calling listen();
 */
-configuration.config(app, listen);
+configuration.config(app, function() {
+    listen();
+
+    app.use(errorHandler);
+
+});

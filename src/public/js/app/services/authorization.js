@@ -14,6 +14,7 @@ module.exports = angular.module('authorization.services', [
               
             var isAuthenticated = principal.isAuthenticated();
 
+              // i don't really have authorization yet. 
               if (isAuthenticated) {
                 if ($rootScope.toState.data.roles && $rootScope.toState.data.roles.length > 0 && !principal.isInAnyRole($rootScope.toState.data.roles)) {
                     $state.go('accessdenied'); // TBD

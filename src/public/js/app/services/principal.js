@@ -58,7 +58,7 @@ module.exports = angular.module('principal.services', [
             },
             function(err) {
                 // cant, cancel token and require authentication
-                this.authenticate(null);
+                self.authenticate(null);
                 deferred.resolve(_identity);
             });            
         }

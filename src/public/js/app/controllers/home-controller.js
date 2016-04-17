@@ -5,9 +5,9 @@ require('../../../scss/home-page.scss');
 var moment = require('moment'),
     hummusService = require('exports?hummusService!../../lib/hummus/hummusservice');
 
-homeController.$inject = ['$scope','$filter'];
+homeController.$inject = ['$scope','$filter','authentication'];
 
-function homeController($scope,$filter) {
+function homeController($scope,$filter,authentication) {
 
     var kDefaultJobTicket = {
         "title": "Sample.pdf",
@@ -58,6 +58,7 @@ function homeController($scope,$filter) {
 
         hummusService.generatePDFDocument(
             '__apiURL__',
+            authentication.getToken(),
             $('#txtJobTicket').val(),
             function(url){
                 window.open(url);

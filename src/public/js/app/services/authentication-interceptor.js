@@ -10,7 +10,7 @@ module.exports = angular.module('authentication-interceptor.services', [
         function($q, $cookies,$location) {
             return {
                 request: function(config) {
-                    var accessToken = $cookies.get('accessToken');
+                    var accessToken = $cookies.get('hummus-services-access-token');
                     if (accessToken) {
                         config.headers.Authorization = 'Bearer ' + accessToken;
                     }

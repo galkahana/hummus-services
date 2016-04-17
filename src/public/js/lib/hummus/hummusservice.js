@@ -7,8 +7,10 @@ ga('create', 'UA-54473292-1', 'auto');
 
 var hummusService = {
 
-	generatePDFDocument:function(inServiceURL,inDocumentString,successCB,failureCB)
+	generatePDFDocument:function(inServiceURL,inAccessToken,inDocumentString,successCB,failureCB)
 	{
+        var accessToken = inAccessToken;
+        
 		failureCB = failureCB || noOp;
         
 		function openPDFWhenDone(inServiceURL,inData,successCB,failureCB)
@@ -26,7 +28,9 @@ var hummusService = {
 			{
 				window.setTimeout(function()
 				{
-                    sendXHR(inServiceURL + '/generation-jobs/' + inData._id,
+                    sendXHR({
+                            url:inServiceURL + '/generation-jobs/' + inData._id,
+                            headers: [['Authorization', 'Bearer ' + accessToken]]},
                             function(responseText){
                                 openPDFWhenDone(inServiceURL,JSON.parse(responseText),successCB,failureCB);
                             },
@@ -62,7 +66,8 @@ var hummusService = {
                     method:'POST',
                     url:inServiceURL + '/generation-jobs',
                     headers: [
-                        ['Content-type','application/json; charset=utf-8']
+                        ['Content-type','application/json; charset=utf-8'],
+                        ['Authorization', 'Bearer ' + accessToken]
                     ],
                     data:inDocumentString
                 },

@@ -225,10 +225,10 @@ gulp.task('run', ['run-sequance'], function(cb) {
             cb();
         });
 
-    // load sample web page
+    // load sample web page (using 127.0.0.1 so cookies will work. localhost will not have cookies updated)
     gulp.src(__filename)
         .pipe(open({
-            uri: 'http://localhost:' + kBasePort + '/index.html',
+            uri: 'http://127.0.0.1:' + kBasePort + '/index.html',
             app: chromeApp
         }));
 

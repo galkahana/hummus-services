@@ -2,7 +2,7 @@
 
 var _ = require('lodash');
 
-function Users() {
+function UsersController() {
      /**
      * GET /users/me
      * @param req request object with ID
@@ -16,9 +16,9 @@ function Users() {
             return res.badRequest('Missing user. shouldnt get here');
         }
         
-        res.status(200).json(_.pick(user,['name']));   
+        res.status(200).json(_.pick(user,['name','email']));   
     };
 }
 
 
-module.exports = new Users();
+module.exports = new UsersController();
