@@ -6,7 +6,6 @@
 
 var express = require('express'),
     router = express.Router(),
-    users = require('../services/users'),
     authentication = require('../services/authentication'),
 	path = require('path');
 
@@ -18,15 +17,15 @@ var controllersPath = path.resolve(__dirname,'../controllers/api/') + '/',
     authenticationController = require(controllersPath + 'authentication-controller');
 
 router.route('/generation-jobs')
-    .post(users.authenticateUserForExternalAPIOrDie,generationJobsController.create)
+    .post(authentication.authenticateOrDie,generationJobsController.create)
     .get(authentication.authenticateOrDie,generationJobsController.list)
 router.route('/generation-jobs/actions')
     .post(authentication.authenticateOrDie,generationJobsController.actions)
 router.route('/generation-jobs/:id')
-    .get(users.authenticateUserForExternalAPIOrDie,generationJobsController.show);
+    .get(authentication.authenticateOrDie,generationJobsController.show);
 router.route('/generated-files/:id')
-    .get(users.authenticateUserForExternalAPIOrDie,generatedFilesController.download)
-    .delete(users.authenticateUserForExternalAPIOrDie,generatedFilesController.delete)
+    .get(authentication.authenticateOrDie,generatedFilesController.download)
+    .delete(authentication.authenticateOrDie,generatedFilesController.delete)
 router.route('/users/me')
     .get(authentication.authenticateOrDie,usersController.me)
 router.route('/authenticate/sign-in')
