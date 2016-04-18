@@ -9,14 +9,18 @@ function loginController($scope,$state,$rootScope,$cookies,principal,authenticat
     $scope.credentials = {};
     
     $scope.login = function(){
+        
+        $scope.$emit('loginController.loginStarts');
         authentication.login($scope.credentials,function(err){
             if(err) {
+                $scope.$emit('loginController.loginEnds');
                 console.log('login error');
                 return;
             }
             
             // trigger principal load of identity
             principal.identity(true).then(function() {
+                $scope.$emit('loginController.loginEnds');
                 // if needs to route, route
                 if($rootScope.returnToState) {
                     $state.go($rootScope.returnToState,$rootScope.returnToStateParams);

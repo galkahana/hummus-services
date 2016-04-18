@@ -1,4 +1,6 @@
 @import "app-base";
+@import "waiting-spinner";
+
 
 html,
 body {
@@ -10,8 +12,18 @@ body {
     -webkit-overflow-scrolling: touch;
     background: #e6ebea;
     color:$default-black;
+    
+    .waiting {
+        position:fixed;
+        background: white;
+        width:100%;
+        top:0;
+        bottom:0;
+        z-index:5000;
+    }
 }
 
 .btn {
     @extend .default-font;
 }
+

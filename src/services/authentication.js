@@ -3,7 +3,8 @@ var User = require('../models/users'),
     passport = require('passport'),
     BearerStrategy = require('passport-http-bearer').Strategy,
     LocalStrategy = require('passport-local').Strategy,
-    crypto = require('crypto');
+    crypto = require('crypto'),
+    randomSeconds = require('./random-seconds');
 
 
 // configure strategies
@@ -69,11 +70,24 @@ function AuthenticationService() {
     
 }
 
+/*
+    im faking some wait time to throw of potential hackers a bit.
+    ok and maybe make my users db seem large :).
+    but mainly for the first reason
+*/
+
+function waitRandomSeconds(min,max,cb) {
+    setTimeout(cb,randomSeconds(min,max));
+}
+
 function ensureAuthentication(req, res, next) {
     if (!req.user) {
-        return res.unauthenticated('Unauthenticated request');
+        waitRandomSeconds(2,4,function(){
+            return res.unauthenticated('Unauthenticated request');
+        })
     }
-    return next();
+    else
+        return next();
 };
 
 function authenticate(req,res,next) {
@@ -115,6 +129,7 @@ function login(req,res,next) {
 
 AuthenticationService.prototype.authenticate  = authenticate
 AuthenticationService.prototype.authenticateOrDie = [authenticate,ensureAuthentication];
+AuthenticationService.prototype.login = login;
 AuthenticationService.prototype.loginOrDie = [login,ensureAuthentication];
 
 module.exports = new AuthenticationService();

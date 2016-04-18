@@ -9,8 +9,14 @@ module.exports = angular.module('authorization.services', [
   function($rootScope, $state, principal) {
     return {
       authorize: function() {
+        
+        $rootScope.$broadcast('authorization.authorizationStarts');
+        
         return principal.identity()
           .then(function() {
+
+
+            $rootScope.$broadcast('authorization.authorizationEnds');
               
             var isAuthenticated = principal.isAuthenticated();
 
@@ -28,6 +34,7 @@ module.exports = angular.module('authorization.services', [
                 $rootScope.returnToStateParams = $rootScope.toStateParams;
                 $state.go('public.login');
               }
+
 
           });
       }

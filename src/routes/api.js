@@ -29,7 +29,7 @@ router.route('/generated-files/:id')
 router.route('/users/me')
     .get(authentication.authenticateOrDie,usersController.me)
 router.route('/authenticate/sign-in')
-    .post(authentication.loginOrDie,authenticationController.signIn)
+    .post(authentication.login,authenticationController.signIn)
 router.route('/authenticate/sign-out')
     .delete(authentication.authenticateOrDie,authenticationController.signOut)
 

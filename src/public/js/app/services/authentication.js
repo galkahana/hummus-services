@@ -7,27 +7,34 @@ var HUMMUS_SERVICES_ACCESS_TOKEN = 'hummus-services-access-token';
 
 module.exports = angular.module('authentication.services', [
     require('angular-cookies'),
-    require('./users').name
+    require('./users').name,
+    require('./authentication-interceptor').name
 ])
-.factory('authentication', ['$cookies','Users',
-  function($cookies,Users) {
+.factory('authentication', ['$cookies','Users','AuthenticationInterceptor',
+  function($cookies,Users,AuthenticationInterceptor) {
+      
+        var localAuth = null;
     
         function clearToken() {
             $cookies.put(HUMMUS_SERVICES_ACCESS_TOKEN,'');
-            $cookies.remove(HUMMUS_SERVICES_ACCESS_TOKEN);            
+            $cookies.remove(HUMMUS_SERVICES_ACCESS_TOKEN);  
+            localAuth = null;    
+            AuthenticationInterceptor.clearToken();      
         }
         
         function saveToken(inToken) {
             $cookies.put(HUMMUS_SERVICES_ACCESS_TOKEN,inToken);            
+            localAuth = inToken;          
+            AuthenticationInterceptor.setToken(inToken);
         }
       
       
     return {
         hasToken: function() {
-            return !!$cookies.get(HUMMUS_SERVICES_ACCESS_TOKEN);
+            return !!localAuth || !!$cookies.get(HUMMUS_SERVICES_ACCESS_TOKEN);
         },
-        getToken: function() {
-            return $cookies.get(HUMMUS_SERVICES_ACCESS_TOKEN);
+        authentication: function() {
+            return localAuth || $cookies.get(HUMMUS_SERVICES_ACCESS_TOKEN);
         },
         login: function(credentials,cb) {
             Users.login(credentials)
