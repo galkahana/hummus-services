@@ -70,11 +70,7 @@ function calculatePreProcessData() {
 }
 
 function takeReplacesSnapshot() {
-    kReplaces = [
-        ['__apiURL__', config.apiURL],
-        ['__websiteURL__', config.websiteURL],
-        ['__webpackRoot__',config.webpackRoot]
-    ];
+    kReplaces = _.map(config,function(value,key) {return ['__' + key + '__',value];});
 }
 
 // webpack setup. takes care of JS, Sass, angular templates etc. whatever is required
@@ -142,12 +138,6 @@ gulp.task('dist-images', function() {
         .pipe(gulp.dest('./dist'));
 });
 
-// fonts copy [seems like mostly handled by webpack]
-//gulp.task('dist-fonts', function() {
-//    return gulp.src(['./src/public/fonts*/**/*','./src/public/*/*/fonts/**/*'])
-//        .pipe(gulp.dest('./dist'));
-//});
-
 // html copy for the base htmls (+ replaces) [templates are handled by webpack]
 function gulpTaskHTML(inTaskName, inSourcePath, inTarget) {
     gulp.task(inTaskName, function() {
@@ -187,10 +177,8 @@ gulp.task('watch', [], function() {
     // requires it so for detecting added/removed files on these paths.
     // when using absolute paths gulp.watch will only look at modified files
 
-    // non JS resources
+    // anything handled outside of webpack
     gulp.watch(['src/public/images/**/*', 'src/public/*/*/images/**/*'], ['dist-images']);
-    gulp.watch('src/public/config/**/*', ['dist-config']);
-    //gulp.watch(['src/public/fonts/**/*','src/public/*/*/fonts/**/*'], ['dist-fonts']);
     gulp.watch('src/public/*.html', ['dist-html']);
 
     // IMPORTANT! since using webpack, than watching the main file running works
