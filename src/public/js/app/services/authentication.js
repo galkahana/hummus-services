@@ -33,7 +33,7 @@ module.exports = angular.module('authentication.services', [
         hasToken: function() {
             return !!localAuth || !!$cookies.get(HUMMUS_SERVICES_ACCESS_TOKEN);
         },
-        authentication: function() {
+        getToken: function() {
             return localAuth || $cookies.get(HUMMUS_SERVICES_ACCESS_TOKEN);
         },
         login: function(credentials,cb) {

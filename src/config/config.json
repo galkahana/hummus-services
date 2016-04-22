@@ -1,5 +1,4 @@
 {
-	"dbURL":"localhost/hummus-services",
+	"dbURL":"mongodb://hummus-app:123Genesis@ds013881.mlab.com:13881/hummus-services",
     "s3BucketName" : "hummus-services"
-
 }
