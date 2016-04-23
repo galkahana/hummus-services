@@ -75,7 +75,7 @@ function AuthenticationController() {
             }
     };
     
-    this.signOut = function(req,res,next) {
+    this.signOut = function(req,res,next) {        
         if(req.info && 
             req.info.provider == 'bearer' && 
             !!req.info.accessToken) {
@@ -84,7 +84,7 @@ function AuthenticationController() {
                         return res.serverError(err);
                     }
                 
-                    res.status(204).json({
+                    res.status(200).json({
                         ok:true
                     });
                 });                
