@@ -8,15 +8,24 @@ module.exports.defaultRestangular = ['RestangularProvider',
         RestangularProvider.setRestangularFields({id: '_id'});
         RestangularProvider.setFullResponse(true);
         
+        // if it's not clear
+        RestangularProvider.setDefaultHeaders({'Content-Type': 'application/json'});
+        
         // Generic handler
         RestangularProvider.addFullRequestInterceptor(
-            function(elemenet, operation, what, url, headers, params) {
-                if (operation === "remove") {
-                    // to avoid issues in browsers that require no payload
-                    return null;
-                } 
-                // IE Cache Invalidation
-                return {params: _.extend(params, {cacheKilla: new Date().getTime()})};
+            function(element, operation, what, url, headers, params) {
+                if (operation == 'remove') {
+                    // avoid payload issues at server
+                    element = null;
+                }
+
+                return {
+                    headers: headers,
+                    // IE Cache Invalidation
+                    params: {params: _.extend(params, {cacheKilla: new Date().getTime()})},
+                    element: element,
+                    httpConfig: {}
+                };
             });
     }];
 
