@@ -3,3 +3,6 @@ vm: true
 
 skip_files:
   - ^(.*/)?.*/node_modules/.*$
+  
+manual_scaling:
+  instances: 2

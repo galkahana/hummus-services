@@ -84,9 +84,7 @@ function AuthenticationController() {
                         return res.serverError(err);
                     }
                 
-                    res.status(200).json({
-                        ok:true
-                    });
+                    res.status(204).send();
                 });                
             }
             else {

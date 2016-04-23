@@ -20,7 +20,15 @@
         </div>
         <ul class="list-unstyled">
             <li>
-                <button type="button" class="btn btn-primary" id="btnGenerate" ng-click="submitTicket()">Create PDF</button>
+                <button type="button" class="btn btn-primary" id="btnGenerate" ng-click="submitTicket()" ng-class="{'waiting':waitingForComplete}">
+                    <div class="create">Create PDF</div>
+                    <div class="spinner">
+                        <div class="bounce1"></div>
+                        <div class="bounce2"></div>
+                        <div class="bounce3"></div>
+                    </div>
+                </button>
+                <a target="_blank"  ng-show="!!downloadLink" class="pdf-download" ng-href={{downloadLink}}>Download</a>
             </li>
             <li>
                 <textarea id="txtJobTicket" ng-model="ticket"></textarea>

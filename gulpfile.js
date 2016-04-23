@@ -22,6 +22,7 @@ var gulp = require('gulp'),
     fs = require('fs'),
     _ = require('lodash'),
     open = require('gulp-open'),
+    cp = require('child_process'),
     chromeApp = require('./chromeapp'),
     gutil = require('gulp-util'),
     WebpackDevServer = require('webpack-dev-server'),
@@ -42,6 +43,9 @@ var config = {
     forDebug: false || argv.d,
     apiURL: 'http://localhost:3000/api',
     websiteURL: 'http://localhost:3000',
+    publishApiURL: 'http://services.pdfhummus.com/api',
+    publishWebsiteURL: 'http://services.pdfhummus.com',
+    publishEnvVars: ['MONGODB_URI'],
     webpackRoot: '/assets'
 };
 
@@ -114,10 +118,6 @@ function setupWebpackConfig() {
     );
 }
 
-takeReplacesSnapshot();
-calculatePreProcessData();
-setupWebpackConfig();
-
 // gulp tasks!
 
 /*
@@ -128,7 +128,7 @@ setupWebpackConfig();
  */
 
 gulp.task('clean', function(cb) {
-    del(['./dist']).then(function() {cb()});
+    del(['./dist']).then(function(){cb()});
 });
 
 
@@ -160,9 +160,16 @@ gulp.task('dist-app', function(callback) {
     });
 });
 
+gulp.task('prepare-for-dist',function(callback) {
+    takeReplacesSnapshot();
+    calculatePreProcessData();
+    setupWebpackConfig();    
+    
+    callback();
+});
 
 // full dist-spree (component) preparation
-gulp.task('dist', gulpSequence(['dist-images', 'dist-html'], 'dist-app'));
+gulp.task('dist', gulpSequence('prepare-for-dist',['dist-images', 'dist-html'], 'dist-app'));
 
 
 // default
@@ -188,7 +195,6 @@ gulp.task('watch', [], function() {
 
 gulp.task('webpack-replace-update',[],function(cb) {
     config.webpackRoot = '';
-    takeReplacesSnapshot();
     cb();
 });
 
@@ -221,3 +227,40 @@ gulp.task('run', ['run-sequance'], function(cb) {
         }));
 
 });
+
+gulp.task('prepare-for-publish',function(callback) {
+    config.apiURL = config.publishApiURL;
+    config.websiteURL = config.publishWebsiteURL;
+    callback();
+});
+
+
+var TEMP_DEPLOY_FILE = './_app.yaml',
+    ORG_DEPLOY_FILE = './app.yaml';
+
+gulp.task('prepare-env-vars-for-deploy',function(callback) {
+    fs.readFile(ORG_DEPLOY_FILE, 'utf8', function(err,data) {
+        if(err)
+            return callback(err);
+        data+= '\n\env_variables:\n';
+        
+        config.publishEnvVars.forEach(function(value) {
+           data+='  ' + value + ': \'' + process.env[value] + '\'\n'
+        });
+        
+        fs.writeFile(TEMP_DEPLOY_FILE,data,callback);
+    });
+});
+
+gulp.task('google-deploy',function(callback) {
+    // deploy to default environment
+    cp.execSync('gcloud preview app deploy ' + TEMP_DEPLOY_FILE + ' --quiet --stop-previous-version ',{stdio:[0,1,2]});
+    callback();
+});
+
+
+gulp.task('cleanup-deploy',function(cb) {
+    del([TEMP_DEPLOY_FILE]).then(function(){cb();});
+})
+
+gulp.task('publish', gulpSequence('prepare-for-publish','prepare-env-vars-for-deploy','default','google-deploy','cleanup-deploy'));

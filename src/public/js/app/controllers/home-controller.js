@@ -55,15 +55,20 @@ function homeController($scope,$filter,authentication) {
         // use hummus service to generate the document described in txtJobTicket ($('#txtJobTicket').val())
         // using the local service ('.')
         // when done open it (function(url){window.open(url);})
+        $scope.waitingForComplete = true;
+        $scope.downloadLink = null;
 
         hummusService.generatePDFDocument(
             '__apiURL__',
             authentication.getToken(),
             $('#txtJobTicket').val(),
             function(url){
-                window.open(url);
+                $scope.waitingForComplete = false;
+                $scope.downloadLink = url;
+                $scope.$apply();
             },
             function(){
+                $scope.waitingForComplete = false;
                 alert('Error in creating PDF file');
             });        
     }
