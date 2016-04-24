@@ -28,12 +28,16 @@ function getPhantomInstance(cb) {
     if(phantomInstance) {
         cb(phantomInstance);
     } else {
+        var options = {
+                path: '/usr/local/bin/'
+        };        
+        
         logger.log('Creating PhantomJS instance');
         phantom.create('--web-security=no',function (ph) {
             logger.log('Created PhantomJS instance');
             phantomInstance = ph;
             cb(ph);
-        });
+        }, options);
     }
 }
 
@@ -52,6 +56,11 @@ function pointsToPhantomMeasure(inPoints) {
 
 module.exports.render = function(inHTMLData,inOptions,inCallback) {
     getPhantomInstance(function(ph) {
+        if(!ph) {
+            logger.error('Phantom instance not created');
+            return inCallback(new Error('Phantom instance not created'));
+        }
+        
         ph.createPage(function (page) {
             page.set('paperSize', 
                        {
