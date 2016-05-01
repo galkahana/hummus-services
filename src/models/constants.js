@@ -11,5 +11,11 @@ constants.eJobInProgress = 1;
 constants.eJobFailed = 2;
 constants.EJobStatuses = [constants.eJobDone,constants.eJobInProgress,constants.eJobFailed];
 
+// roles
+constants.eTokenRoleSiteUser = 'siteUser';
+constants.eTokenRolePrivateAPI = 'privateAPI';
+constants.eTokenRolePublicAPI = 'publicAPI';
+
+constants.ETokenRoles = [constants.eTokenRoleSiteUser,constants.eTokenRolePrivateAPI,constants.eTokenRolePublicAPI];
 
 module.exports = constants;

@@ -18,7 +18,13 @@ var hummusService = {
 			if(inData.status == 0)
 			{
 				ga('send', 'pageview',{'page':'/generated-files/id'}); // send tracking when done
-				successCB(inServiceURL + '/generated-files/' + inData.generatedFile);
+                sendXHR({
+                    url:inServiceURL + '/generated-files/' + inData.generatedFile,
+                    headers: [['Authorization', 'Bearer ' + accessToken]]},
+                    function(responseText){
+                        successCB(inServiceURL + '/public/' + encodeURIComponent(JSON.parse(responseText).publicDownloadId) + '/download');
+                    },
+                    failureCB);
 			}
 			else if(inData.status == 2 && failureCB)
 			{

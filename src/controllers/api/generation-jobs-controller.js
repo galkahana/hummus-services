@@ -8,7 +8,8 @@ var jobPipeline = require('../../services/job-pipeline'),
     remoteStorageService = require('../../services/remote-storage-service'),
     logger = require('../../services/logger'),
     _ = require('lodash'),
-    moment = require('moment');
+    moment = require('moment'),
+    crypto = require('crypto');
 
 function createFileEntryAndUpdateJob(job,user,generationResult,remoteSourceData,callback) {
     generatedFilesService.create({
@@ -27,7 +28,7 @@ function createFileEntryAndUpdateJob(job,user,generationResult,remoteSourceData,
             else 
                 job.generatedFile = generatedFileEntry._id;
             generationJobsService.update(job._id,job,function(newErr){
-                callback(newErr || err);
+                callback(newErr || err,generatedFileEntry);
             });
         }
     );                    
@@ -47,7 +48,11 @@ function uploadPDF(filePath,user,job,callback) {
     });
 }
 
-function startGenerationJob(inJobTicket,user,callback)
+function hashMe(value) {
+    return crypto.createHash('sha256').update(value).digest('base64');
+}
+
+function startGenerationJob(inJobTicket,user,creatorId,callback)
 {
     // create job entry
     generationJobsService.create({
@@ -80,6 +85,21 @@ function startGenerationJob(inJobTicket,user,callback)
                         },
                         createFileEntryAndUpdateJob: ['uploadPDF',function(callback,results) {
                             createFileEntryAndUpdateJob(job,user,generationResult,results.uploadPDF,callback);
+                        }],
+                        createPublicUrl: ['createFileEntryAndUpdateJob',function(callback,results) {
+                            if(job.meta && job.meta.private) 
+                                return callback(null,null);
+                                
+                            // create public download URL for PDF
+                           var fileEntry = results.createFileEntryAndUpdateJob;
+                           
+                           fileEntry.publicDownloadId = hashMe(fileEntry._id.toString()) + 
+                                                        hashMe(moment().format()) + 
+                                                        hashMe(creatorId);
+                            fileEntry.save(function(err) {
+                               callback(err,fileEntry); 
+                            });
+
                         }]
                     },
                     function(err,results) {
@@ -202,6 +222,18 @@ function deleteFilesForJobs(items,callback) {
     );    
 }
 
+function limitToUserJobs(items,userId,callback) {
+    generationJobsService.getAllIn(items,function(err, generationJobs){
+        if(err) {
+            logger.error('Error in fetching jobs for files delete',err);
+            return callback(err);
+        }
+        callback(null,_.map(_.filter(generationJobs,function(job){
+            return job.user.equals(userId)})),function(o){return o._id}); 
+    });
+}
+
+
 function GenerationJobsController() {
 
     /**
@@ -213,11 +245,17 @@ function GenerationJobsController() {
      */
     this.show = function(req, res, next) {
         if (!req.params.id) {
-            return res.badRequest('Missing tag id');
+            return res.badRequest('Missing job id');
+        }
+
+        if (!req.user) {
+            return res.badRequest('Missing user. should have user for identifying whose job it is');
         }
 
         generationJobsService.get(req.params.id, function(err, job) {
             if (err) { return next(err); }
+            if(!job || !job.user.equals(req.user._id))
+                return res.notFound();   
             res.status(200).json(job);
         });
     };
@@ -235,7 +273,7 @@ function GenerationJobsController() {
             return res.badRequest('Missing user. should have user for identifying whose job it is');
         }
         
-        startGenerationJob(ticket,user,function(err,job) {
+        startGenerationJob(ticket,user,req.info && req.info.accessToken ? req.info.accessToken:user._id,function(err,job) {
             if (err) { return res.unprocessable(err); }    
             
             res.status(200).json(job);        
@@ -307,16 +345,23 @@ function GenerationJobsController() {
         
         switch(type) {
             case 'deleteAll': {
-                deleteAllWithFiles(req.body.items,function(err) {
+                limitToUserJobs(req.body.items,user._id,function(err,items) {
                     if (err) { return next(err); }
-                    res.status(200).json({ok:true});
-                });
+
+                    deleteAllWithFiles(items,function(err) {
+                        if (err) { return next(err); }
+                        res.status(200).json({ok:true});
+                    });
+                })
                 break;
             }
             case 'deleteFiles': {
-                deleteFilesForJobs(req.body.items,function(err) {
+                limitToUserJobs(req.body.items,user._id,function(err,items) {
                     if (err) { return next(err); }
-                    res.status(200).json({ok:true});
+                    deleteFilesForJobs(items,function(err) {
+                        if (err) { return next(err); }
+                        res.status(200).json({ok:true});
+                    });
                 });
                 break;
                 

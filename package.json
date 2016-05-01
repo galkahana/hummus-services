@@ -28,9 +28,11 @@
     "node-uuid": "^1.4.7",
     "oauth2orize": "^1.2.2",
     "passport": "^0.3.2",
+    "passport-custom": "^1.0.5",
     "passport-http-bearer": "^1.0.1",
     "passport-local": "^1.0.0",
     "phantom": "^0.8.4",
+    "rbac2": "^1.0.7",
     "s3": "^4.4.0",
     "temporary": "0.0.8",
     "uuid": "^2.0.1"

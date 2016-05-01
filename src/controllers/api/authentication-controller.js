@@ -3,6 +3,7 @@
 var Client = require('../../models/clients'),
     AccessToken = require('../../models/access-tokens'),
     oauth2 = require('../../services/oauth2'),
+    constants = require('../../models/constants'),
     randomSeconds = require('../../services/random-seconds');
 
 /*
@@ -56,7 +57,10 @@ function AuthenticationController() {
                             }) ;
                         }
 
-                        oauth2.generateTokens(req.user, client, function (err, refreshToken, accessToken) {
+                        oauth2.generateTokens(req.user, 
+                                            client,
+                                            {tokenType:constants.eTokenRoleSiteUser}, 
+                                            function (err, refreshToken, accessToken) {
                             if (err) {
                                 waitBadRandomSeconds(function() {
                                     return res.unprocessable(err); 
@@ -79,13 +83,38 @@ function AuthenticationController() {
         if(req.info && 
             req.info.provider == 'bearer' && 
             !!req.info.accessToken) {
-                AccessToken.findOneAndRemove({value: req.info.accessToken}, function(err) {
-                    if (err) {
-                        return res.serverError(err);
-                    }
+                var user = req.user;
+                if (!user) {
+                    return res.badRequest('Missing user. should have user for identifying whose jobs are being manipulated');
+                }
                 
-                    res.status(204).send();
-                });                
+                var clientId = req.info ? req.info.accessClientId:null;
+                if(!clientId) {
+                    return res.badRequest('No clientId, cant identify client');
+                }
+
+                // looking per client Id. no need to pass secret again, as i already have a token, and supposedly secure
+                Client
+                    .findOne({ clientId: clientId}) 
+                    .exec(function (err, client) {
+                        if (err || !client) {
+                            if(err)
+                                res.unprocessable(err);
+                            else 
+                                res.unprocessable(err, 'Invalid client');
+                            return;
+                        }
+                        oauth2.revokeTokens(user,
+                                        client,
+                                        {tokenType:constants.eTokenRoleSiteUser},
+                                        function(err) {
+                            if (err) {
+                                return res.unprocessable(err); 
+                            } else {
+                                return res.status(204).send();
+                            }
+                        });                                               
+                    });
             }
             else {
                 res.status(200).json({

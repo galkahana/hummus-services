@@ -14,8 +14,8 @@ module.exports = angular.module('job-item.directives',[
     require('../services/generated-files').name,
     require('../services/modal-alert').name
 ])
-    .directive('jobItem', ['$filter','Constants','GeneratedFiles','ModalAlert',
-       function($filter,Constants,GeneratedFiles,ModalAlert) {
+    .directive('jobItem', ['$filter','Constants','GeneratedFiles','ModalAlert','AuthenticationInterceptor',
+       function($filter,Constants,GeneratedFiles,ModalAlert,AuthenticationInterceptor) {
            return {
              restrict: 'E',
              scope: {
@@ -64,7 +64,7 @@ module.exports = angular.module('job-item.directives',[
                     }
                     
                     $scope.downloadURL = function() {
-                        return '__apiURL__/generated-files/' + $scope.item.generatedFile.toString();
+                        return AuthenticationInterceptor.idUrl('__apiURL__/generated-files/' + $scope.item.generatedFile.toString() + '/download');
                     }
                     
                     $scope.statusText = function() {

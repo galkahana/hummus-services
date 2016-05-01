@@ -13,14 +13,12 @@ function GeneratedFiles() {
 GeneratedFiles.prototype.getAll = function (callback) {
     generationFilesModel
         .find()
-        .lean()
         .exec(callback);
 };
 
 GeneratedFiles.prototype.getSome = function (ids,callback) {
     generationFilesModel
         .find({_id:{$in:ids}})
-        .lean()
         .exec(callback);
 };
 
@@ -31,10 +29,22 @@ GeneratedFiles.prototype.get = function (id, callback) {
         .exec(function(err, fileEntry) {
             if (err) return callback(err);
             // add auxiliery data about local path wharabouts if local
-            callback(null,fileEntry,localFiles[fileEntry._id]);
+            callback(null,fileEntry,fileEntry ? localFiles[fileEntry._id]:null);
         });
 
 };
+
+GeneratedFiles.prototype.getWithPublic = function (id, callback) {
+    generationFilesModel
+        .findOne({publicDownloadId: id})
+        .exec(function(err, fileEntry) {
+            if (err) return callback(err);
+            // add auxiliery data about local path wharabouts if local
+            callback(null,fileEntry,fileEntry ? localFiles[fileEntry._id]:null);
+        });
+
+};
+
 
 GeneratedFiles.prototype.create = function (data, callback) {
     generationFilesModel

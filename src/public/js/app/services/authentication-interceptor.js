@@ -24,6 +24,10 @@ module.exports = angular.module('authentication-interceptor.services', [
                     }
                     return $q.reject(rejection);
                 },
+                idUrl: function(url) {
+                    var accessToken = localAuth || $cookies.get('hummus-services-access-token');
+                    return url + (accessToken ? ('?b=' + accessToken):'');
+                },
                 setToken: function(token) {
                     localAuth = token;
                 },

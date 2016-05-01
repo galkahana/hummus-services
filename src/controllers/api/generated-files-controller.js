@@ -51,9 +51,16 @@ function GeneratedFilesController() {
         if (!req.params.id) {
             return res.badRequest('Missing file id');
         }
+
+        if (!req.user) {
+            return res.badRequest('Missing user. should have user for identifying whose job it is');
+        }
+
 		
         generatedFilesService.get(req.params.id, function(err, fileEntry, localPath) {
             if (err) { return next(err); }
+            if(!fileEntry || !fileEntry.user.equals(req.user._id))
+                return res.notFound();   
             if(localPath) {
                 fs.exists(localPath,function(result) {
                     if(result) {
@@ -73,15 +80,65 @@ function GeneratedFilesController() {
 
     };
     
+    this.downloadPublic = function(req,res,next)  {
+        if(!req.params.publicDownloadId) {
+            return res.badRequest('Missing file id');
+        }
+        
+        
+        generatedFilesService.getWithPublic(req.params.publicDownloadId, function(err, fileEntry, localPath) {
+            if (err) { return next(err); }
+            if(!fileEntry)
+                return res.notFound();   
+            if(localPath) {
+                fs.exists(localPath,function(result) {
+                    if(result) {
+                        logger.log('Serving file entry',fileEntry._id,' from local source',fileEntry.localSource.data.path)
+                        serveFile(res,fileEntry.localSource.data.path,'application/pdf',fileEntry.downloadTitle);
+                    } else {   
+                        logger.log('Cant find file, so serving file entry',fileEntry._id,' from remote source');
+                        downloadAndServe(res,fileEntry.remoteSource,'application/pdf',fileEntry.downloadTitle);
+                    }
+                });
+            }
+            else {
+                logger.log('File is not local, so serving file entry',fileEntry._id,' from remote source');
+                downloadAndServe(res,fileEntry.remoteSource,'application/pdf',fileEntry.downloadTitle);
+            }
+        });        
+    }
+    
+    this.show = function(req,res, next) {
+        if (!req.params.id) {
+            return res.badRequest('Missing file id');
+        }
+		
+        if (!req.user) {
+            return res.badRequest('Missing user for action');
+        }        
+        
+        generatedFilesService.get(req.params.id, function(err, fileEntry, localPath) {
+            if (err) { return next(err); }
+            if(!fileEntry || !fileEntry.user.equals(req.user._id))
+                return res.notFound();   
+            res.status(200).json(fileEntry);
+        });  
+    }
+    
     this.delete = function(req,res,next) {
         if (!req.params.id) {
             return res.badRequest('Missing file id');
         }
         
+        if (!req.user) {
+            return res.badRequest('Missing user for action');
+        }        
+        
         generatedFilesService.get(req.params.id, function(err, fileEntry, localPath) {
             if (err) { return next(err); }
-            if(!fileEntry)
-                return res.notFound();
+            if(!fileEntry || !fileEntry.user.equals(req.user._id))
+                return res.notFound();   
+                             
             if(localPath) {
                 fs.exists(localPath,function(result) {
                     if(result) {

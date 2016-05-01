@@ -13,6 +13,7 @@ var generatedFileSchema = new Schema({
         required: true       
     },
     downloadTitle: String,
+    publicDownloadId: String,
     localSource: {
         sourceType: {
             type: Number,
@@ -31,7 +32,6 @@ var generatedFileSchema = new Schema({
 
 generatedFileSchema.pre('remove', function(next) {
     var thisID = this.id;
-    console.log('deleting entry',thisID);
     var self = this;
 
     generationJobs.update({generatedFile:thisID}, {$set: {generatedFile: null}},function(err) {
@@ -39,6 +39,9 @@ generatedFileSchema.pre('remove', function(next) {
         next();
     });
 });
+
+generatedFileSchema.index({user: 1});
+generatedFileSchema.index({publicDownloadId: 1});
 
 generatedFileSchema.plugin(timestamps, {index: true});
 

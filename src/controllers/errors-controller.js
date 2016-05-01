@@ -13,13 +13,13 @@ module.exports = function(err, req, res, next) {
             res.send(err.message);
         },
 
-        html: function () {
+        /*html: function () {
             res.render('error', {
                     message: err.message,
                     error: errData,
                     info: err.info
                 });
-        },
+        },*/
 
         json: function () {
             res.json({

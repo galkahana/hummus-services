@@ -1,14 +1,11 @@
-/**
- * Created by asafam on 1/3/15.
- */
-
 'use strict';
 
 var mongoose = require('mongoose'),
     Schema = mongoose.Schema,
     timestamps = require('./plugins/timestamps'),
     crypto = require('crypto'),
-    base64url = require('base64url');
+    base64url = require('base64url'),
+    constants = require('./constants');
 
 var refreshTokenSchema = new Schema({
     value: {
@@ -24,11 +21,16 @@ var refreshTokenSchema = new Schema({
     clientId: {
         type: String,
         required: true
+    },
+    tokenType: {
+     type:String,
+     enum: constants.ETokenRoles
     }
+
 });
 
 // Indexes
-refreshTokenSchema.index({userId: 1, clientId: 1}, {unique: true});
+refreshTokenSchema.index({userId: 1, clientId: 1, tokenType:1}, {unique: true});
 refreshTokenSchema.index({value: 1}, { unique: true });
 
 // Plugins

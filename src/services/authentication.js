@@ -1,16 +1,20 @@
 var User = require('../models/users'),
+    constants = require('../models/constants'),
     AccessToken = require('../models/access-tokens'),
     passport = require('passport'),
     BearerStrategy = require('passport-http-bearer').Strategy,
     LocalStrategy = require('passport-local').Strategy,
     crypto = require('crypto'),
-    randomSeconds = require('./random-seconds');
+    randomSeconds = require('./random-seconds'),
+    CustomStrategy = require('passport-custom');
+    moment = require('moment');
 
 
 // configure strategies
 
 // bearer configuration
-passport.use(new BearerStrategy(function(accessToken, done) {
+
+function userFromAccessToken(accessToken,done) {
         AccessToken
             .findOne({value: accessToken})
             .exec(function(err, token) {
@@ -21,7 +25,12 @@ passport.use(new BearerStrategy(function(accessToken, done) {
                 if (!token) {
                     return done(null, false);
                 }
-
+                
+                // for site tokens, check also expiration.
+                if(token.tokenType == constants.eTokenRoleSiteUser &&
+                    moment().subtract(1, 'hour').isAfter(moment(token.createdAt))) {
+                    return done(null, false);
+                }
                 User.findOne({_id: token.userId})
                     .exec(function(err, user) {
                         if (err) {
@@ -32,10 +41,19 @@ passport.use(new BearerStrategy(function(accessToken, done) {
                             return done(null, false);
                         }
 
-                        done(null, user, {provider: 'bearer', accessToken : accessToken});
+                        done(null, user, {provider: 'bearer', accessToken : accessToken, accessTokenType: token.tokenType, accessClientId: token.clientId});
                     });
-            })
-}));
+            });    
+}
+
+passport.use(new BearerStrategy(userFromAccessToken));
+
+// custom configuration
+passport.use('bearer-parameter', new CustomStrategy(
+  function(req, callback) {
+    return userFromAccessToken(req.query.b,callback);   
+  }
+));
 
 // login
 
@@ -95,7 +113,7 @@ function authenticate(req,res,next) {
         return res.sendStatus(200);
     }
         
-    passport.authenticate(['bearer'], {session: false}, function(err, user, info) {
+    passport.authenticate(['bearer','bearer-parameter'], {session: false}, function(err, user, info) {
         if (err) {
             return next(err);
         }
