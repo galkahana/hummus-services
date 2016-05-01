@@ -22,7 +22,7 @@ module.exports.defaultRestangular = ['RestangularProvider',
                 return {
                     headers: headers,
                     // IE Cache Invalidation
-                    params: {params: _.extend(params, {cacheKilla: new Date().getTime()})},
+                    params:  _.extend(params, {cacheKilla: new Date().getTime()}),
                     element: element,
                     httpConfig: {}
                 };

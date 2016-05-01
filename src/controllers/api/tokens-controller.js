@@ -1,7 +1,8 @@
 
 var oauth2 = require('../../services/oauth2'),
     Client = require('../../models/clients'),
-    constants = require('../../models/constants');
+    constants = require('../../models/constants'),
+    _ = require('lodash');
 
 function TokensController() {
     this.show = function(req,res,next) {

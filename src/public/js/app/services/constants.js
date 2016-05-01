@@ -10,6 +10,9 @@ constants.eJobFailed = 2;
 constants.EJobStatuses = [constants.eJobDone,constants.eJobInProgress,constants.eJobFailed];
 constants.EStatusTexts = ['Done','In Progress','Failed'];
 
+// token types
+constants.eTokenRolePrivateAPI = 'privateAPI';
+constants.eTokenRolePublicAPI = 'publicAPI';
 
 // others
 

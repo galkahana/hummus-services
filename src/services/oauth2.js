@@ -18,6 +18,8 @@ function generateTokens(user, client,options,done) {
         tokenParams.tokenType = options.tokenType;
     }
     
+    console.log('creating tokens with',tokenParams);
+    
     async.auto({
         removeRefreshToken: function (callback) {
             RefreshToken.remove(tokenParams, function(err) {

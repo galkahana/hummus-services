@@ -1,0 +1,50 @@
+<div class="panel-container">
+    <div class="row">
+        <div class="col-md-12">
+            <label class="name">
+                Public Key:
+            </label>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-offset-1 col-md-11">
+            <div class="btn-group">
+                <button type="button" class="btn btn-default btn-create" ng-click="createPublicKey()">
+                    <span class="glyphicon" 
+                        ng-class="{'glyphicon-plus':!publicKey && !creatingPublic,'glyphicon-refresh':publicKey || creatingPublic,'spinning':creatingPublic}"></span>
+                </button>
+                <button type="button" class="btn btn-default btn-delete" ng-click="deletePublicKey()">
+                    <span class="glyphicon" 
+                        ng-class="{'glyphicon-trash':!deletingPublic,'glyphicon-refresh spinning':deletingPublic}"></span>
+                </button>
+            </div>
+            <span class="key-container">
+                {{publicKey || 'N/A'}}
+            </span>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <label class="name">
+                Private Key:
+            </label>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-offset-1 col-md-11">
+            <div class="btn-group">
+                <button type="button" class="btn btn-default btn-create" ng-click="createPrivateKey()">
+                    <span class="glyphicon" 
+                        ng-class="{'glyphicon-plus':!privateKey && !creatingPrivate,'glyphicon-refresh':privateKey || creatingPrivate,'spinning':creatingPrivate}"></span>
+                </button>
+                <button type="button" class="btn btn-default btn-delete" ng-click="deletePrivateKey()">
+                    <span class="glyphicon" 
+                        ng-class="{'glyphicon-trash':!deletingPrivate,'glyphicon-refresh spinning':deletingPrivate}"></span>
+                </button>
+            </div>
+            <span class="key-container">
+                {{privateKey || 'N/A'}}
+            </span>
+        </div>
+    </div>
+</div>

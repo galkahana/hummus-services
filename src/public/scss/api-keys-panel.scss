@@ -1,0 +1,30 @@
+@import "app-base";
+@import "spinning";
+
+$control-background: #999999; //#b09447;
+$control-border: #555555; // #9a813e
+
+api-keys-panel {
+    display:block;
+
+    .glyphicon {
+        font-size: 18px;
+    }
+    
+    .panel-container {
+        @extend .default-item-container;
+
+        padding:10px;
+        margin: 20px auto;
+        
+        .row {
+            .key-container {
+                border: 1px solid $control-border;
+                background: $control-background;
+                padding: 6px 4px 6px 4px;
+                border-radius: 4px;
+            }
+        }
+    }
+    
+}
