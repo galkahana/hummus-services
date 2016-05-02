@@ -34,9 +34,23 @@ GenerationJobs.prototype.findAllDesc = function(queryParams,callback) {
         .exec(callback); 
 };
 
-GenerationJobs.prototype.get = function (id, callback) {
-    generationJobModel
-        .findOne({_id: id})
+GenerationJobs.prototype.get = function (id, inOptions, callback) {
+    if(typeof inOptions == 'function') {
+        callback = inOptions;
+        inOptions = null;
+    }
+    
+    if(!inOptions) {
+        inOptions = {};
+    }
+    
+    var query = generationJobModel
+        .findOne({_id: id});
+        
+        if(inOptions.populateGeneratedFile)
+            query.populate('generatedFile')
+        
+        query
         .exec(callback);
 
 };

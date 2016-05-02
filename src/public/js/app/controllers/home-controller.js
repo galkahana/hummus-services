@@ -59,7 +59,6 @@ function homeController($scope,$filter,authentication) {
         $scope.downloadLink = null;
 
         hummusService.generatePDFDocument(
-            '__apiURL__',
             authentication.getToken(),
             $('#txtJobTicket').val(),
             function(url){

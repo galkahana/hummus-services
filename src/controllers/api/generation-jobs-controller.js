@@ -252,7 +252,7 @@ function GenerationJobsController() {
             return res.badRequest('Missing user. should have user for identifying whose job it is');
         }
 
-        generationJobsService.get(req.params.id, function(err, job) {
+        generationJobsService.get(req.params.id,{populateGeneratedFile:req.query.full}, function(err, job) {
             if (err) { return next(err); }
             if(!job || !job.user.equals(req.user._id))
                 return res.notFound();   

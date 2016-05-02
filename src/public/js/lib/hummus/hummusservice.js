@@ -5,26 +5,54 @@ m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
 
 ga('create', 'UA-54473292-1', 'auto');
 
+var DEFAULT_SERVICE_URL = '__apiURL__';
+
 var hummusService = {
 
-	generatePDFDocument:function(inServiceURL,inAccessToken,inDocumentString,successCB,failureCB)
+    /*
+        generatePDFDocument - generate a PDF document on hummus services and callback when done with
+        a download url.
+        
+        inAccessToken - a token to identify the user. either the publicAPI token, or a private API token.
+        inJobTicket - a job ticket object defining the PDF
+        [inOptions] - options object (can omit)
+        [inSuccessCB] - success callback. function(downloadURL){} where downloadURL is a downlod url for the file
+        [inFailureCB] - failure callback. function(response){} where response is the error response
+        
+        inOptions can have the following properties:
+        1. serviceURL - an alternative url to get hummus service from. defaults to __apiURL__
+        
+         
+    */
+
+	generatePDFDocument:function(inAccessToken,inJobTicket,inOptions,successCB,failureCB)
 	{
         var accessToken = inAccessToken;
         
-		failureCB = failureCB || noOp;
         
-		function openPDFWhenDone(inServiceURL,inData,successCB,failureCB)
+        // allow skipping options
+        if(typeof inOptions == 'function')
+        {
+            failureCB = successCB;
+            successCB = inOptions;
+            inOptions = null;
+        }
+
+        // defaults        
+		failureCB = failureCB || noOp;
+		successCB = successCB || noOp;
+        if(!inOptions) {
+            inOptions = {};
+        }
+        
+        var serviceURL = inOptions.serviceURL || DEFAULT_SERVICE_URL;
+        
+		function openPDFWhenDone(inData,successCB,failureCB)
 		{
 			if(inData.status == 0)
 			{
 				ga('send', 'pageview',{'page':'/generated-files/id'}); // send tracking when done
-                sendXHR({
-                    url:inServiceURL + '/generated-files/' + inData.generatedFile,
-                    headers: [['Authorization', 'Bearer ' + accessToken]]},
-                    function(responseText){
-                        successCB(inServiceURL + '/public/' + encodeURIComponent(JSON.parse(responseText).publicDownloadId) + '/download');
-                    },
-                    failureCB);
+                successCB(serviceURL + '/public/' + encodeURIComponent(inData.generatedFile.publicDownloadId) + '/download');
 			}
 			else if(inData.status == 2 && failureCB)
 			{
@@ -35,10 +63,10 @@ var hummusService = {
 				window.setTimeout(function()
 				{
                     sendXHR({
-                            url:inServiceURL + '/generation-jobs/' + inData._id,
+                            url:serviceURL + '/generation-jobs/' + inData._id + '?full=true',
                             headers: [['Authorization', 'Bearer ' + accessToken]]},
                             function(responseText){
-                                openPDFWhenDone(inServiceURL,JSON.parse(responseText),successCB,failureCB);
+                                openPDFWhenDone(JSON.parse(responseText),successCB,failureCB);
                             },
                             failureCB);
 				},1000);
@@ -70,15 +98,15 @@ var hummusService = {
 		ga('send', 'pageview',{'page':'/generation-jobs/'}); // send tracking when starting
         sendXHR( {
                     method:'POST',
-                    url:inServiceURL + '/generation-jobs',
+                    url:serviceURL + '/generation-jobs',
                     headers: [
                         ['Content-type','application/json; charset=utf-8'],
                         ['Authorization', 'Bearer ' + accessToken]
                     ],
-                    data:inDocumentString
+                    data:((typeof inJobTicket == 'string') ? inJobTicket:JSON.stringify(inJobTicket))
                 },
                 function(responseText){
-                    openPDFWhenDone(inServiceURL,JSON.parse(responseText),successCB,failureCB);
+                    openPDFWhenDone(JSON.parse(responseText),successCB,failureCB);
                 },
                 failureCB);
 	}
