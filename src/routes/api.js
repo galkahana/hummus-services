@@ -24,6 +24,8 @@ router.route('/generation-jobs/actions')
     .post(authentication.authenticateOrDie,authorize(permissions.manageJobs),generationJobsController.actions)
 router.route('/generation-jobs/:id')
     .get(authentication.authenticateOrDie,authorize(permissions.createPDF),generationJobsController.show);
+router.route('/generated-files')
+    .get(authentication.authenticateOrDie,authorize(permissions.manageJobs),generatedFilesController.list)
 router.route('/generated-files/:id')
     .get(authentication.authenticateOrDie,authorize(permissions.createPDF),generatedFilesController.show)
     .delete(authentication.authenticateOrDie,authorize(permissions.manageJobs),generatedFilesController.delete)

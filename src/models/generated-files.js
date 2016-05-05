@@ -45,4 +45,18 @@ generatedFileSchema.index({publicDownloadId: 1});
 
 generatedFileSchema.plugin(timestamps, {index: true});
 
+// limit fields when going public
+var GENERATED_FILE_PRIVATE_FIELDS = ['user','localSource','remoteSource'];
+generatedFileSchema.set('toJSON', { 
+    transform: function (doc, ret, options) {
+        /*
+            remove black listed fields
+        */
+        GENERATED_FILE_PRIVATE_FIELDS.forEach(function(fn) {
+           delete ret[fn]; 
+        });
+        
+    }
+});
+
 module.exports = mongoose.model('GeneratedFile', generatedFileSchema);

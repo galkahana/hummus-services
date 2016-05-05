@@ -27,5 +27,18 @@ generationJobSchema.index({status: 1});
 generationJobSchema.index({user: 1});
 generationJobSchema.plugin(timestamps, {index: true});
 
+// limit fields when going public
+var GENERATION_JOB_PRIVATE_FIELDS = ['user'];
+generationJobSchema.set('toJSON', { 
+    transform: function (doc, ret, options) {
+        /*
+            remove black listed fields
+        */
+        GENERATION_JOB_PRIVATE_FIELDS.forEach(function(fn) {
+           delete ret[fn]; 
+        });
+        
+    }
+});
 
 module.exports = mongoose.model('GenerationJob', generationJobSchema);

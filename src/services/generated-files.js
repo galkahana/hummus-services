@@ -16,12 +16,24 @@ GeneratedFiles.prototype.getAll = function (callback) {
         .exec(callback);
 };
 
-GeneratedFiles.prototype.getSome = function (ids,callback) {
+GeneratedFiles.prototype.getAllIn = function (ids,callback) {
     generationFilesModel
         .find({_id:{$in:ids}})
         .exec(callback);
 };
 
+GeneratedFiles.prototype.findAll = function(queryParams,callback) {
+    generationFilesModel
+        .find(queryParams)
+        .exec(callback); 
+};
+
+GeneratedFiles.prototype.findAllDesc = function(queryParams,callback) {
+    generationFilesModel
+        .find(queryParams)
+        .sort({createdAt:-1})
+        .exec(callback); 
+};
 
 GeneratedFiles.prototype.get = function (id, callback) {
     generationFilesModel

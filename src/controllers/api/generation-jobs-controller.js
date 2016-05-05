@@ -125,9 +125,9 @@ function startGenerationJob(inJobTicket,user,creatorId,callback)
 
 function deleteFilesForGeneratedFileIDs(generatedFilesIDs,callback) {
     /*
-        Important! this one does not null gnerated file entries
+        Important! this one does not null gneerated file entries
     */
-    generatedFilesService.getSome(generatedFilesIDs,function(err,items) {
+    generatedFilesService.getAllIn(generatedFilesIDs,function(err,items) {
         if(err)
             return callback(err);
         
@@ -297,28 +297,58 @@ function GenerationJobsController() {
         }
 
         // add date range
-        if(req.query.dateRangeFrom !== undefined &&
+        if(req.query.dateRangeFrom !== undefined ||
             req.query.dateRangeTo !== undefined) {
-            var from = moment(req.query.dateRangeFrom).toDate();
-            var to = moment(req.query.dateRangeTo).toDate();
+            var from = req.query.dateRangeFrom ? moment(req.query.dateRangeFrom).toDate():null;
+            var to = req.query.dateRangeTo ? moment(req.query.dateRangeTo).toDate():null;
             
-            to.setDate(to.getDate() + 1); // inclusive
-            
-            queryParams.$or = [
-              {
-                  $and: [
-                      {createdAt: {$gte: from}},
-                      {createdAt: {$lte: to}}
-                  ]
-              },
-              {
-                  $and: [
-                      {updatedAt: { $ne : null }},
-                      {updatedAt: {$gte: from}},
-                      {updatedAt: {$lte: to}}
-                  ]
-              }  
-            ];
+            if(to) {
+                if(from) {
+                    // both
+                    queryParams.$or = [
+                    {
+                        $and: [
+                            {createdAt: {$gte: from}},
+                            {createdAt: {$lte: to}}
+                        ]
+                    },
+                    {
+                        $and: [
+                            {updatedAt: { $ne : null }},
+                            {updatedAt: {$gte: from}},
+                            {updatedAt: {$lte: to}}
+                        ]
+                    }  
+                    ];                    
+                }  
+                else {
+                    // only to
+                    queryParams.$or = [
+                    {
+                        createdAt: {$lte: to}
+                    },
+                    {
+                        $and: [
+                            {updatedAt: { $ne : null }},
+                            {updatedAt: {$lte: to}}
+                        ]
+                    }  
+                    ];                       
+                }
+            } else if(from) {
+                // only from
+                queryParams.$or = [
+                {
+                    createdAt: {$gte: from}
+                },
+                {
+                    $and: [
+                        {updatedAt: { $ne : null }},
+                        {updatedAt: {$gte: from}}
+                    ]
+                }  
+                ];                 
+            }
         }
 
         // add specific ids        

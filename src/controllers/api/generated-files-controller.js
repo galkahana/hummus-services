@@ -108,6 +108,7 @@ function GeneratedFilesController() {
         });        
     }
     
+    
     this.show = function(req,res, next) {
         if (!req.params.id) {
             return res.badRequest('Missing file id');
@@ -124,6 +125,84 @@ function GeneratedFilesController() {
             res.status(200).json(fileEntry);
         });  
     }
+    
+    this.list = function(req, res, next) {
+        var user = req.user;
+        if (!user) {
+            return res.badRequest('Missing user. should have user for identifying whose jobs are being queried');
+        }
+        
+        // query by user
+        var queryParams = {
+            user:user._id
+        };
+        
+        // add date range
+        if(req.query.dateRangeFrom !== undefined ||
+            req.query.dateRangeTo !== undefined) {
+            var from = req.query.dateRangeFrom ? moment(req.query.dateRangeFrom).toDate():null;
+            var to = req.query.dateRangeTo ? moment(req.query.dateRangeTo).toDate():null;
+            
+            if(to) {
+                if(from) {
+                    // both
+                    queryParams.$or = [
+                    {
+                        $and: [
+                            {createdAt: {$gte: from}},
+                            {createdAt: {$lte: to}}
+                        ]
+                    },
+                    {
+                        $and: [
+                            {updatedAt: { $ne : null }},
+                            {updatedAt: {$gte: from}},
+                            {updatedAt: {$lte: to}}
+                        ]
+                    }  
+                    ];                    
+                }  
+                else {
+                    // only to
+                    queryParams.$or = [
+                    {
+                        createdAt: {$lte: to}
+                    },
+                    {
+                        $and: [
+                            {updatedAt: { $ne : null }},
+                            {updatedAt: {$lte: to}}
+                        ]
+                    }  
+                    ];                       
+                }
+            } else if(from) {
+                // only from
+                queryParams.$or = [
+                {
+                    createdAt: {$gte: from}
+                },
+                {
+                    $and: [
+                        {updatedAt: { $ne : null }},
+                        {updatedAt: {$gte: from}}
+                    ]
+                }  
+                ];                 
+            }
+        }
+
+        // add specific ids        
+        if(req.query.in !== undefined) {
+            queryParams._id = {$in:req.query.in};            
+        }
+
+        generatedFilesService.findAllDesc(queryParams,function(err, generatedFiles) {
+            if (err) { return next(err); }
+            res.status(200).json(generatedFiles);
+        });        
+    };    
+    
     
     this.delete = function(req,res,next) {
         if (!req.params.id) {

@@ -34,7 +34,7 @@ function jobsController($scope,$timeout,$document,GenerationJob,ModalAlert,Const
             var dates = $scope.dateFilter.split('-');
             if(dates.length == 2) {
                 params.dateRangeFrom =  moment(dates[0],Constants.DEFAULT_DATE_FILTER).toDate();
-                params.dateRangeTo = moment(dates[1],Constants.DEFAULT_DATE_FILTER).toDate();
+                params.dateRangeTo = moment(dates[1],Constants.DEFAULT_DATE_FILTER).add(1, 'days').toDate();
             }
         }
         
