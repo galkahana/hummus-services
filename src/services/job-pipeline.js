@@ -19,6 +19,9 @@ function downloadExternals(jobDescriptor,callback) {
 }
 
 function getDocument(jobDescriptor,callback,results) {
+	if(!jobDescriptor.document)
+		return callback(new Error('Document is missing',null));
+	
 	if(jobDescriptor.document.embedded)
 		return callback(null,jobDescriptor.document.embedded)
 	
@@ -95,11 +98,15 @@ function renderHTMLToPDF(jobDescriptor,callback,results) {
 }
 
 function getEngine(jobDescriptor) {
-    return  jobDescriptor.document.engine || {name:'JDocToPDF'};
+    return  jobDescriptor.document ? (jobDescriptor.document.engine || {name:'JDocToPDF'}) : null;
 }
 
 function generatePDF(jobDescriptor,callback,results) {
     var engine = getEngine(jobDescriptor);
+	
+	if(!engine) {
+    	return callback(new Error('Undefined engine'),null);
+	}
 
     switch(engine.name) {
         case 'JDocToPDF': {

@@ -15,7 +15,7 @@ function downloadFile(inFileURL,inTargetFilePath,inCallback)
 		file.on('finish', function() {
 		      file.close(inCallback(null,inTargetFilePath));
 		    });  		
-	});	
+	}).on('error', inCallback);	
 }
 
 module.exports = {

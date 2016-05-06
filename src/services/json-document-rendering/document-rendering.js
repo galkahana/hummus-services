@@ -171,7 +171,12 @@ function createPage(inPage,inAccumulatedDims,inPDFWriter,inRenderingHelpers,call
             if(err)
                 return callback(err);
                 
-            thePageDriver.writePage(thePageDriver.links);
+			try {
+	            thePageDriver.writePage(thePageDriver.links);
+			}
+			catch(err) {
+	            return callback(err);
+			}
             callback();
         }
     );
