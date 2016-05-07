@@ -67,7 +67,7 @@ function encryptPassword(password) {
 
 passport.use('login', new LocalStrategy(
     function(username, password, done) {
-        User.findOne({$or: [{email: username}, {name: username}]})
+        User.findOne({$or: [{email: username}, {username: username}]})
             .select('password')
             .exec(function(err, user) {
                 if (err) {
@@ -149,5 +149,7 @@ AuthenticationService.prototype.authenticate  = authenticate
 AuthenticationService.prototype.authenticateOrDie = [authenticate,ensureAuthentication];
 AuthenticationService.prototype.login = login;
 AuthenticationService.prototype.loginOrDie = [login,ensureAuthentication];
+AuthenticationService.prototype.passwordOK = passwordOK;
+AuthenticationService.prototype.encryptPassword = encryptPassword;
 
 module.exports = new AuthenticationService();

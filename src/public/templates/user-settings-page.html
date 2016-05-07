@@ -2,12 +2,16 @@
     <div class="container">
         <!-- Nav tabs -->
         <ul class="nav nav-tabs" role="tablist">
-            <li class="active"><a href="#apiKeys" data-toggle="tab">API Keys</a></li>
+            <li class="active"><a href="#general" data-toggle="tab">General</a></li>
+            <li><a href="#apiKeys" data-toggle="tab">API Keys</a></li>
         </ul>
 
         <!-- Tab panes -->
         <div class="tab-content">
-            <div class="tab-pane active" id="apiKeys">
+            <div class="tab-pane active" id="general">
+                <general-panel></general-panel>
+            </div>
+            <div class="tab-pane" id="apiKeys">
                 <api-keys-panel></api-keys-panel>
             </div>
         </div>

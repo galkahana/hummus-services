@@ -39,3 +39,33 @@
     transform: scale(1.0);
   }
 }
+
+
+.btn-spinner {
+    .spinner {
+        display:none;
+    }
+    
+    &.spinner-active {
+        .spinner {
+            display:block;
+        }
+        
+        .default {
+            display:none;
+        }                
+    }
+    
+    &.btn-primary {
+        .spinner {
+            margin:0;
+          
+            >div {
+                background-color:white;
+                width: 12px;
+                height: 12px;
+            }
+        }
+
+    }
+}

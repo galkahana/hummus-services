@@ -18,6 +18,8 @@ module.exports = angular.module('users.services', [
     .factory('Users', ['Restangular',
         function(Restangular) {
             var users = Restangular.service('users');
+            var usersActions = Restangular.service('users/actions');
+
 
             return {
                 me: function() {
@@ -33,6 +35,12 @@ module.exports = angular.module('users.services', [
                 },
                 logout: function() {
                     return Restangular.all('authenticate').customDELETE('sign-out');
+                },
+                updateUsername: function(username) {
+                    return usersActions.post({type:'changeUsername',username:username});
+                },
+                updatePassword: function(oldPassword,newPassword) {
+                    return usersActions.post({type:'changePassword',oldPassword:oldPassword,newPassword:newPassword});
                 }
             };
         }

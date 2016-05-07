@@ -1,0 +1,35 @@
+@import "app-base";
+@import "_waiting-spinner";
+
+
+general-panel {
+    .section-content {
+        @extend .default-item-container;
+        padding:10px;
+    }
+    
+    .section.profile {
+        .btn-spinner .default {
+            width: 70px;
+        }
+    }
+    
+    .section.account {
+        
+        .section-content.username {
+            margin-bottom:10px;
+
+            .btn-spinner .spinner {
+                width:133.66px;
+            }
+        }
+
+        .section-content.password {
+
+            .btn-spinner .spinner {
+                width:131px;
+            }
+        }
+
+    }
+}

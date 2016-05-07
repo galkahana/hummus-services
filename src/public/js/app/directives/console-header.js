@@ -15,7 +15,7 @@ module.exports = angular.module('console-header.directives',[
              restrict: 'E',
              template: require('../../../templates/console-header.html'),
              link:function($scope) {
-                principal.identity().then(function(value) {
+                $scope.me = principal.identity().then(function(value) {
                     $scope.me = value;
                 });
                 

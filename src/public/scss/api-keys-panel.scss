@@ -5,8 +5,6 @@ $control-background: #999999; //#b09447;
 $control-border: #555555; // #9a813e
 
 api-keys-panel {
-    display:block;
-
     .glyphicon {
         font-size: 18px;
     }
@@ -15,7 +13,6 @@ api-keys-panel {
         @extend .default-item-container;
 
         padding:10px;
-        margin: 20px auto;
         
         .row {
             .key-container {
