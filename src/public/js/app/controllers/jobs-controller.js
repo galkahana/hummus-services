@@ -245,7 +245,10 @@ function jobsController($scope,$timeout,$document,GenerationJob,ModalAlert,Const
     }
         
     // load the window data
-    loadData();
+    $scope.refreshing = 1;
+    loadData(function(){
+        --$scope.refreshing;
+    });
     
     /*
         toolbar && scroll behavior
