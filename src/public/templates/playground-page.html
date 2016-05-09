@@ -1,0 +1,20 @@
+<div class="playground-page">
+    <div class="container">
+        <ul class="list-unstyled">
+            <li>
+                <button type="button" class="btn btn-primary btn-spinner" id="btnGenerate" ng-click="submitTicket()" ng-class="{'spinner-active':waitingForComplete}">
+                    <div class="default">Create PDF</div>
+                    <div class="spinner">
+                        <div class="bounce1"></div>
+                        <div class="bounce2"></div>
+                        <div class="bounce3"></div>
+                    </div>
+                </button>
+                <a target="_blank"  ng-show="!!downloadLink" class="pdf-download" ng-href={{downloadLink}}>Download</a>
+            </li>
+            <li>
+                <code-editor init="initTicket" code="ticket"></code-editor>
+            </li>
+        </ul>
+    </div>
+</div>

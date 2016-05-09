@@ -67,9 +67,15 @@ function router($ocLazyLoadProvider,
         })
         .state('console.home', {
             url: '',
-            data: {pageTitle: 'Home', pageSubTitle: 'PDF Rendering Demo Page'},
+            data: {pageTitle: 'Welcome!'},
             template: require('../../../templates/home-page.html'),
             controller: require('../controllers/home-controller'),
+        })
+        .state('console.playground', {
+            url: '/playground',  
+            data: {pageTitle: 'Playground', pageSubTitle: 'Design Lovely PDFs'},
+            template: require('../../../templates/playground-page.html'),
+            controller: require('../controllers/playground-controller'),            
             resolve: {
                deps: ['$q', '$ocLazyLoad',  function ($q, $ocLazyLoad) {
                             // attempt at lazy loading...not so great...
@@ -85,7 +91,6 @@ function router($ocLazyLoadProvider,
                             return deferred.promise;
                         }]
             }
-
         })
         .state('console.jobs', {
             url: '/jobs',

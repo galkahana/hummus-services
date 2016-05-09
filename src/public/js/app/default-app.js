@@ -14,6 +14,7 @@ angular.module('pdfhummus-web', [
     require('./directives/date-range-picker').name,
     require('./directives/api-keys-panel').name,
     require('./directives/general-panel').name,
+    require('./directives/code-editor').name,
     require('./services/generation-jobs').name,
     require('./services/modal-alert').name,
     require('./services/constants').name,

@@ -1,24 +1,8 @@
 @import "app-base";
-@import "waiting-spinner";
 
 .home-page {
     .list-unstyled>li
     {
         padding:4px;
-    }
-
-    #btnGenerate {
-        padding:3px 6px;
-        margin-right:20px;    
-            
-        .spinner {
-            margin:0 6px;
-        }
-    }
-
-    #txtJobTicket
-    {
-        height:500px;
-        width:100%;
     }
 }

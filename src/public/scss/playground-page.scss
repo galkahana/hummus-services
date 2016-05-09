@@ -1,0 +1,23 @@
+@import "app-base";
+@import "waiting-spinner";
+
+.playground-page {
+    .list-unstyled>li
+    {
+        padding:4px;
+    }
+
+    #btnGenerate {
+        padding:3px 6px;
+        margin-right:20px;    
+            
+        .spinner {
+            margin:0 6px;
+        }
+    }
+
+    code-editor
+    {
+        height:500px;
+    }
+}

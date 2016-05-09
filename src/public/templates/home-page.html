@@ -1,11 +1,21 @@
 <div class="home-page">
     <div class="container">
-        <div class="description">
-            Welcome!
-            This page demonstrates how to generate PDF files using the Hummus PDF Rendering Service.
-            Just type below a PDF description object, and click "Create PDF".
-
-            Useful links:
+        <div>
+            <h3>Find your way around</h3>
+            <ul class="links list-unstyled">
+                <li>
+                    <a ui-sref="console.playground">Design new PDF Jobs</a>
+                </li>
+                <li>
+                    <a ui-sref="console.jobs">Review your existing jobs</a>
+                </li>
+                <li>
+                    <a ui-sref="console.userSettings">Create API keys and change your account data</a>
+                </li>
+            </ul>
+        </div>
+        <div>
+            <h3>Documentation</h3>
             <ul class="links list-unstyled">
                 <li>
                     <a href="https://github.com/galkahana/hummusrenderrer/wiki">Service and PDF Descripition Object Documentation</a>
@@ -18,21 +28,5 @@
                 </li>
             </ul>
         </div>
-        <ul class="list-unstyled">
-            <li>
-                <button type="button" class="btn btn-primary btn-spinner" id="btnGenerate" ng-click="submitTicket()" ng-class="{'spinner-active':waitingForComplete}">
-                    <div class="default">Create PDF</div>
-                    <div class="spinner">
-                        <div class="bounce1"></div>
-                        <div class="bounce2"></div>
-                        <div class="bounce3"></div>
-                    </div>
-                </button>
-                <a target="_blank"  ng-show="!!downloadLink" class="pdf-download" ng-href={{downloadLink}}>Download</a>
-            </li>
-            <li>
-                <textarea id="txtJobTicket" ng-model="ticket"></textarea>
-            </li>
-        </ul>
     </div>
 </div>

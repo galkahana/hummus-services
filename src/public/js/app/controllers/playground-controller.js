@@ -1,13 +1,13 @@
 'use strict';
 
-require('../../../scss/home-page.scss');
+require('../../../scss/playground-page.scss');
 
 var moment = require('moment'),
     hummusService = require('exports?hummusService!../../lib/hummus/hummusservice');
 
-homeController.$inject = ['$scope','$filter','authentication'];
+playgroundController.$inject = ['$scope','$filter','authentication'];
 
-function homeController($scope,$filter,authentication) {
+function playgroundController($scope,$filter,authentication) {
 
     var kDefaultJobTicket = {
         "title": "Sample.pdf",
@@ -48,14 +48,10 @@ function homeController($scope,$filter,authentication) {
         }
     };
     
-    // default value with default ticket
     $scope.initTicket = $filter('prettyStringify')(kDefaultJobTicket);
     $scope.ticket = '';
 
     $scope.submitTicket = function() {
-        // use hummus service to generate the document described in txtJobTicket ($('#txtJobTicket').val())
-        // using the local service ('.')
-        // when done open it (function(url){window.open(url);})
         $scope.waitingForComplete = true;
         $scope.downloadLink = null;
 
@@ -75,4 +71,4 @@ function homeController($scope,$filter,authentication) {
 
 }
 
-module.exports = homeController;
+module.exports = playgroundController;

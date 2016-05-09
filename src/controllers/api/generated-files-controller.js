@@ -1,12 +1,18 @@
 var fs = require('fs'),
+    _ = require('lodash'),
     generatedFilesService = require('../../services/generated-files'),
     remoteStorageService = require('../../services/remote-storage-service'),
     logger = require('../../services/logger');
 
 function setupDownloadHeader(res,inMime,inWithFileName) {
 	inMime = inMime || 'application/octet-stream';
-    if(inWithFileName)
+    if(inWithFileName) {
+        // make sure it ends with .pdf
+        if(!_.endsWith(inWithFileName,'.pdf'))
+            inWithFileName+='.pdf';
+        
         res.writeHead(200, {'Content-Type': inMime,'Content-disposition':'attachment; filename=' + encodeURIComponent(inWithFileName)});
+    }
     else
         res.writeHead(200, {'Content-Type': inMime});
 }
@@ -61,20 +67,21 @@ function GeneratedFilesController() {
             if (err) { return next(err); }
             if(!fileEntry || !fileEntry.user.equals(req.user._id))
                 return res.notFound();   
+            var targetFilename = fileEntry.downloadTitle || fileEntry._id.toString();
             if(localPath) {
                 fs.exists(localPath,function(result) {
                     if(result) {
                         logger.log('Serving file entry',fileEntry._id,' from local source',fileEntry.localSource.data.path)
-                        serveFile(res,fileEntry.localSource.data.path,'application/pdf',fileEntry.downloadTitle);
+                        serveFile(res,fileEntry.localSource.data.path,'application/pdf',targetFilename);
                     } else {   
                         logger.log('Cant find file, so serving file entry',fileEntry._id,' from remote source');
-                        downloadAndServe(res,fileEntry.remoteSource,'application/pdf',fileEntry.downloadTitle);
+                        downloadAndServe(res,fileEntry.remoteSource,'application/pdf',targetFilename);
                     }
                 });
             }
             else {
                 logger.log('File is not local, so serving file entry',fileEntry._id,' from remote source');
-                downloadAndServe(res,fileEntry.remoteSource,'application/pdf',fileEntry.downloadTitle);
+                downloadAndServe(res,fileEntry.remoteSource,'application/pdf',targetFilename);
             }
         });
 
@@ -90,14 +97,15 @@ function GeneratedFilesController() {
             if (err) { return next(err); }
             if(!fileEntry)
                 return res.notFound();   
+            var targetFilename = fileEntry.downloadTitle || fileEntry._id.toString();
             if(localPath) {
                 fs.exists(localPath,function(result) {
                     if(result) {
                         logger.log('Serving file entry',fileEntry._id,' from local source',fileEntry.localSource.data.path)
-                        serveFile(res,fileEntry.localSource.data.path,'application/pdf',fileEntry.downloadTitle);
+                        serveFile(res,fileEntry.localSource.data.path,'application/pdf',targetFilename);
                     } else {   
                         logger.log('Cant find file, so serving file entry',fileEntry._id,' from remote source');
-                        downloadAndServe(res,fileEntry.remoteSource,'application/pdf',fileEntry.downloadTitle);
+                        downloadAndServe(res,fileEntry.remoteSource,'application/pdf',targetFilename);
                     }
                 });
             }
