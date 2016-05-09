@@ -21,6 +21,9 @@ var hummusService = {
         
         inOptions can have the following properties:
         1. serviceURL - an alternative url to get hummus service from. defaults to __apiURL__
+        2. forEmbed - boolean flag. false means that the pdf is intended for download. Otherwise for "embed", which would 
+            either fit browser embed solution or window/tab opening. in other words - download adds attachment header, and embed
+            does not
         
          
     */
@@ -52,7 +55,10 @@ var hummusService = {
 			if(inData.status == 0)
 			{
 				ga('send', 'pageview',{'page':'/generated-files/id'}); // send tracking when done
-                successCB(serviceURL + '/public/' + encodeURIComponent(inData.generatedFile.publicDownloadId) + '/download');
+                successCB(serviceURL + 
+                            '/public/' + 
+                            encodeURIComponent(inData.generatedFile.publicDownloadId) + 
+                            (inOptions.forEmbed ? '/embed':'/download'));
 			}
 			else if(inData.status == 2 && failureCB)
 			{

@@ -24,6 +24,7 @@ router.route('/generation-jobs/actions')
     .post(authentication.authenticateOrDie,authorize(permissions.manageJobs),generationJobsController.actions)
 router.route('/generation-jobs/:id')
     .get(authentication.authenticateOrDie,authorize(permissions.createPDF),generationJobsController.show);
+
 router.route('/generated-files')
     .get(authentication.authenticateOrDie,authorize(permissions.manageJobs),generatedFilesController.list)
 router.route('/generated-files/:id')
@@ -31,22 +32,30 @@ router.route('/generated-files/:id')
     .delete(authentication.authenticateOrDie,authorize(permissions.manageJobs),generatedFilesController.delete)
 router.route('/generated-files/:id/download')
     .get(authentication.authenticateOrDie,authorize(permissions.manageJobs),generatedFilesController.download)
+router.route('/generated-files/:id/embed')
+    .get(authentication.authenticateOrDie,authorize(permissions.manageJobs),generatedFilesController.embed)
+
 router.route('/users/me')
     .get(authentication.authenticateOrDie,authorize(permissions.siteGeneric),usersController.me)
 router.route('/users/:id')
     .put(authentication.authenticateOrDie,authorize(permissions.siteGeneric),usersController.update)
 router.route('/users/actions')
     .post(authentication.authenticateOrDie,authorize(permissions.siteGeneric),usersController.actions)
+
 router.route('/tokens')
     .get(authentication.authenticateOrDie,authorize(permissions.siteGeneric),tokensController.show)
 router.route('/tokens/actions')
     .post(authentication.authenticateOrDie,authorize(permissions.siteGeneric),tokensController.actions)
+
 router.route('/authenticate/sign-in')
     .post(authentication.login,authenticationController.signIn)
 router.route('/authenticate/sign-out')
     .delete(authentication.authenticateOrDie,authorize(permissions.siteGeneric),authenticationController.signOut)
+
 router.route('/public/:publicDownloadId/download')
     .get(generatedFilesController.downloadPublic);
+router.route('/public/:publicDownloadId/embed')
+    .get(generatedFilesController.embedPublic);
 
 
 // get this before it gets to web...so we're clear that there's an API error
