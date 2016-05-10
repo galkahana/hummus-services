@@ -2,22 +2,22 @@
 @import "waiting-spinner";
 
 .playground-page {
-    .list-unstyled>li
-    {
-        padding:4px;
-    }
-
-    #btnGenerate {
+    .btn.generate {
         padding:3px 6px;
-        margin-right:20px;    
+        margin-right:20px;
             
         .spinner {
             margin:0 6px;
         }
     }
+    
+    .row {
+        margin-bottom:10px;
+    }
 
-    code-editor
+    .editor-split-screen
     {
+        @extend .position-base;
         height:500px;
     }
 }

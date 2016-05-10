@@ -1,5 +1,6 @@
 'use strict';
 
+require('angular-ui-layout/src/ui-layout.css');
 require('../../../scss/playground-page.scss');
 
 var moment = require('moment'),
@@ -54,13 +55,15 @@ function playgroundController($scope,$filter,authentication) {
     $scope.submitTicket = function() {
         $scope.waitingForComplete = true;
         $scope.downloadLink = null;
+        $scope.embedLink = null;
 
         hummusService.generatePDFDocument(
             authentication.getToken(),
             $scope.ticket,
-            function(url){
+            function(urlDownload,urlEmbed){
                 $scope.waitingForComplete = false;
-                $scope.downloadLink = url;
+                $scope.downloadLink = urlDownload;
+                $scope.embedLink = urlEmbed;
                 $scope.$apply();
             },
             function(){

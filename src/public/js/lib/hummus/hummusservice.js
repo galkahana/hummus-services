@@ -55,10 +55,10 @@ var hummusService = {
 			if(inData.status == 0)
 			{
 				ga('send', 'pageview',{'page':'/generated-files/id'}); // send tracking when done
-                successCB(serviceURL + 
+                var baseURL = serviceURL + 
                             '/public/' + 
-                            encodeURIComponent(inData.generatedFile.publicDownloadId) + 
-                            (inOptions.forEmbed ? '/embed':'/download'));
+                            encodeURIComponent(inData.generatedFile.publicDownloadId);
+                successCB(baseURL + '/download',baseURL + '/embed');
 			}
 			else if(inData.status == 2 && failureCB)
 			{

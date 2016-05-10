@@ -3,6 +3,7 @@ var angular = require('angular');
 angular.module('pdfhummus-web', [
     require('angular-cookies'),
     require('angular-ui-router'),
+    require('angular-ui-layout'),
     require('oclazyload'),
     require('angular-animate'),
     require('./directives/console-header').name,
@@ -15,6 +16,7 @@ angular.module('pdfhummus-web', [
     require('./directives/api-keys-panel').name,
     require('./directives/general-panel').name,
     require('./directives/code-editor').name,
+    require('./directives/pdf-preview').name,
     require('./services/generation-jobs').name,
     require('./services/modal-alert').name,
     require('./services/constants').name,
