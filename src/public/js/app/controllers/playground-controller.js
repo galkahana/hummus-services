@@ -31,7 +31,7 @@ function playgroundController($scope,$filter,authentication) {
                                 "text": {
                                     "text": "hello world!",
                                     "options": {
-                                        "fontPath": "./assets/arial.ttf",
+                                        "fontSource": {"name":"arial","origin":"local"},
                                         "size": 40,
                                         "color": "pink"
                                     }
@@ -40,7 +40,7 @@ function playgroundController($scope,$filter,authentication) {
                             {
                                 "bottom": 600,
                                 "left": 10,
-                                "image": {"external":"fbLogo"}
+                                "image": {"source":"fbLogo"}
                             }
                         ]
                     }

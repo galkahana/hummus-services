@@ -1,58 +1,55 @@
 var path = require('path');
 
+var localResources = {
+	'arial':'./fonts/arial.ttf',
+	'arial bold':'./fonts/arialb.ttf',
+	'arial bold italic':'./fonts/arialbi.ttf',
+	'arial black':'./fonts/arialbl.ttf',
+	'arial black bold':'./fonts/arialblb.ttf',
+	'arial black italic':'./fonts/arialbli.ttf',
+	'arial italic':'./fonts/ariali.ttf',
+	'comic sans':'./fonts/comicms.ttf',
+	'comic sans bold':'./fonts/comicmsb.ttf',
+	'courier':'./fonts/courier.ttf',
+	'courier bold':'./fonts/courierb.ttf',
+	'courier bold italic': './fonts/courierbi.ttf',
+	'courier italic':'./fonts/courieri.ttf',
+	'georgia':'./fonts/georgia.ttf',
+	'georgia bold':'./fonts/georgiab.ttf',
+	'georgia bold italic':'./fonts/georgiabi.ttf',
+	'georgia italic':'./fonts/georgiai.ttf',
+	'impact':'./fonts/impact.ttf'
+};
+
+
 function FilesMap(inLocalFilesRoot,inExternals) {
 	this.localFilesRoot = inLocalFilesRoot;
 	this.externalsLocalFiles = inExternals;
 }
 
-FilesMap.prototype.getExternalFilePath = function(inExternalName)
+FilesMap.prototype.get = function(inData)
 {
-	return this.externalsLocalFiles[inExternalName];
-};
-
-FilesMap.prototype.getLocalPath = function(inFilePath) 
-{
-	return localFilePath(this,inFilePath);	
-};
-
-function localFilePath(self,inPath) {
-	if(path.isAbsolute(inPath) || !self.localFilesRoot)
-		return inPath;
-	else
-		return path.resolve(self.localFilesRoot,inPath);
-}
-
-FilesMap.prototype.getItemFilePath = function(inItem) {
-	if(inItem.path)
-		return localFilePath(this,inItem.path);
-	else if(inItem.external)
-		return this.externalsLocalFiles[inItem.external];
-	else
+	if(typeof inData == 'string') {
+		inData = {
+			name:inData,
+			origin:'external'
+		}
+	}
+	
+	if(!inData)
 		return null;
-}
-
-FilesMap.prototype.getImageItemFilePath = function(inItem)
-{
-	return this.getItemFilePath(inItem);
-};
-
-FilesMap.prototype.getFontItemFilePath = function(inItem)
-{
-	if(inItem.options.fontPath)
-		return localFilePath(this,inItem.options.fontPath);
-	else if(inItem.options.fontExternal)
-		return this.externalsLocalFiles[inItem.options.fontExternal];
-	else
-		return null;
-};
-
-FilesMap.prototype.getFontSecondItemFilePath = function(inItem)
-{
-	if(inItem.options.fontSecondPath)
-		return localFilePath(this,inItem.options.fontSecondPath);
-	else if(inItem.options.fontSecondExternal)
-		return this.externalsLocalFiles[inItem.options.fontSecondExternal];
-	else
+	
+	if(inData.origin == 'external')
+		return this.externalsLocalFiles[inData.name];
+	else if(inData.origin == 'local') {
+		var local = localResources[inData.name];
+		if(local) {
+			return path.resolve(this.localFilesRoot,local);	
+		}
+		else
+			return null;
+	}
+	else 
 		return null;
 };
 

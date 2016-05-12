@@ -26,7 +26,7 @@ var hummus = require('hummus'),
 			}
 		}
 		
-		pwd is quite important, it is the base for all relative file references in the document.
+		pwd is quite important, it is the base for all local resources
 		pdfWriter is an object with options specific to the hummus module. they are the options provided to pdfWriter on creation.
 			for example, you can setup a log file for the pdf generation via a log entry.
 	inCallback - callback to call when done (not commiting here on async, but that's the way to be notified about the end)
@@ -48,9 +48,7 @@ module.exports.render = function(inDocument,inExternals,inTargetStream,inOptions
 
 		if(inDocument.source)
 		{
-			modifiedFileStream = new hummus.PDFRStreamForFile(inDocument.source.path ? 
-																		renderingHelpers.filesMap.getLocalPath(inDocument.source.path) : 
-																		renderingHelpers.filesMap.getExternalFilePath(inDocument.source.external));
+			modifiedFileStream = new hummus.PDFRStreamForFile(renderingHelpers.filesMap.get(inDocument.source));
 			writer = hummus.createWriterToModify(modifiedFileStream,inTargetStream,pdfWriterOptions);
 		}
 		else
@@ -94,7 +92,7 @@ function renderDocument(inDocument,inPDFWriter,inRenderingHelpers,callback)
 }
 
 function appendPage(inPageAppendData,inPDFWriter,inRenderingHelpers,cb) {
-   	var originPath = inRenderingHelpers.filesMap.getImageItemFilePath(inPageAppendData);
+   	var originPath = inRenderingHelpers.filesMap.get(inPageAppendData.source);
     if(!originPath) {
         return cb(new Error('No source path defined for appending pages'));
     } 
@@ -108,8 +106,7 @@ function appendPage(inPageAppendData,inPDFWriter,inRenderingHelpers,cb) {
 		Allow appending pages of PDF files or of TIFF images
 	*/
 	if(originType === 'PDF') {
-		var copyContext = inRenderingHelpers.pdfCopyingContexts.getContext(
-							inRenderingHelpers.filesMap.getImageItemFilePath(inPageAppendData));
+		var copyContext = inRenderingHelpers.pdfCopyingContexts.getContext(originPath);
 		if(!copyContext) {
             return cb(new Error('Unable to create copying context for appended page'),inPageAppendData);
         }
@@ -251,7 +248,7 @@ function renderImageItem(inBox,inItem,inPDFPage,inPDFWriter,inRenderingHelpers)
 	}
 
 	var left = getLeftForAlignment(inBox,inItem,inPDFWriter,inRenderingHelpers);
-	var imagePath = inRenderingHelpers.filesMap.getImageItemFilePath(inItem);
+	var imagePath = inRenderingHelpers.filesMap.get(inItem.source);
 	if(imagePath)
 		inPDFPage.startContentContext().drawImage(left,inBox.bottom,imagePath,opts);	
 

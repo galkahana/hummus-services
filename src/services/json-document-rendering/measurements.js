@@ -277,7 +277,7 @@ Measurements.prototype.getImageItemMeasures = function(inItem,inPDFWriter)
 	// note that below, any derivation of the transformation width/height from the box width/height should have already happened
 
 	var result;
-	var imagePath = this.filesMap.getImageItemFilePath(inItem);
+	var imagePath = this.filesMap.get(inItem.source);
 	
 	if(inItem.transformation)
 	{
@@ -298,7 +298,7 @@ Measurements.prototype.getImageItemMeasures = function(inItem,inPDFWriter)
 						height:inItem.transformation.height};
 	}
 	else if(imagePath)
-		result = inPDFWriter.getImageDimensions(this.filesMap.getImageItemFilePath(inItem)); 
+		result = inPDFWriter.getImageDimensions(this.filesMap.get(inItem.source)); 
 	else
 		result = {width:0,height:0}; 
 

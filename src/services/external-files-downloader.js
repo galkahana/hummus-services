@@ -35,18 +35,42 @@ module.exports = {
 	
 		async.forEachOf(inExternals,
 						function(inValue, inKey, cb) {
-							downloadFile(inValue,
-										new tmp.File().path,
-										function(err,inTargetFilePath)
-										{
-											if(err) {
-												return cb(err);
-											}
-											downloadMap[inKey] = inTargetFilePath;
-											logger.log('downloaded',inKey,'from',inValue,'to',inTargetFilePath);
-											cb();
-										});
-
+							if(typeof inValue == 'string') {
+								downloadFile(inValue,
+											new tmp.File().path,
+											function(err,inTargetFilePath)
+											{
+												if(err) {
+													return cb(err);
+												}
+												downloadMap[inKey] = inTargetFilePath;
+												logger.log('downloaded',inKey,'from',inValue,'to',inTargetFilePath);
+												cb();
+											});
+							} else if(_.isArray(value)) {
+								var results = [];
+								async.each(value,function(file,done) {
+										downloadFile(file,
+											new tmp.File().path,
+											function(err,inTargetFilePath)
+											{
+												if(err) {
+													return done(err);
+												}
+												results.push(inTargetFilePath);
+												logger.log('downloaded',inKey,'from',inValue,'to',inTargetFilePath);
+												done();
+											});									
+								},function(err) {
+									if(err) {
+										return cb(err);
+									}
+									downloadMap[inKey] = results;
+									cb();
+								});
+							}
+							else 
+								return cb(new Error('Unrecognized type. externals table values can be either strings or arrays'));
 						},
 						function(err) {
 							inCallback(err,downloadMap);

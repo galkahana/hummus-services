@@ -25,9 +25,9 @@ function getDocument(jobDescriptor,callback,results) {
 	if(jobDescriptor.document.embedded)
 		return callback(null,jobDescriptor.document.embedded)
 	
-    if(jobDescriptor.document.path || jobDescriptor.document.external) {
+    if(jobDescriptor.document.referenced) {
         var filesMap = new FilesMap(localResourcesPath,results.download_externals);
-        var filePath = filesMap.getItemFilePath(jobDescriptor.document);
+        var filePath = filesMap.get(jobDescriptor.document.referenced);
         
         if(filePath) {
             fs.readFile(filePath,'utf8',function(err,data) {
