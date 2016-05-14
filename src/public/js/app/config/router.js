@@ -73,7 +73,7 @@ function router($ocLazyLoadProvider,
         })
         .state('console.playground', {
             url: '/playground',  
-            data: {pageTitle: 'Playground', pageSubTitle: 'Design Lovely PDFs'},
+            data: {pageTitle: 'Playground', pageSubTitle: 'Create & Test Job Tickets'},
             template: require('../../../templates/playground-page.html'),
             controller: require('../controllers/playground-controller'),            
             resolve: {

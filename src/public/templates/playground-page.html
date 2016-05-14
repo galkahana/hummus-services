@@ -1,7 +1,7 @@
 <div class="playground-page">
     <div class="container">
-        <div class="row">
-            <div class="col-xs-12">
+        <div class="section">
+            <div class="editor-controls">
                 <button type="button" class="btn btn-primary btn-spinner generate" ng-click="submitTicket()" ng-class="{'spinner-active':waitingForComplete}">
                     <div class="default">Preview PDF</div>
                     <div class="spinner">
@@ -12,19 +12,169 @@
                 </button>
                 <a target="_blank"  ng-show="!!downloadLink" class="pdf-download" ng-href={{downloadLink}}>Download Preview</a>
             </div>
+            <div class="editor-split-screen">
+                <div ui-layout="{flow : 'column'}">
+                        <div ui-layout-container>
+                            <code-editor init="initTicket" code="ticket"></code-editor>
+                        </div>
+                        <div ui-layout-container>
+                            <pdf-preview embed="embedLink" download="downloadLink"></pdf-preview>               
+                        </div>
+                </div>  
+            </div>
         </div>
-        <div class="row">
-            <div class="col-xs-12">
-                <div class="editor-split-screen">
-                    <div ui-layout="{flow : 'column'}">
-                            <div ui-layout-container>
-                                <code-editor init="initTicket" code="ticket"></code-editor>
-                            </div>
-                            <div ui-layout-container>
-                                <pdf-preview embed="embedLink" download="downloadLink"></pdf-preview>               
-                            </div>
-                    </div>  
+        
+        <div class="section examples">
+            <div class="section-title">
+                <h3>Using this ticket with:</h3>
+            </div>
+            <div>
+                <!-- Nav tabs -->
+                <ul class="nav nav-tabs" role="tablist">
+                    <li class="active"><a href="#browser" data-toggle="tab">Browser</a></li>
+                    <li><a href="#nodejs" data-toggle="tab">NodeJS</a></li>
+                    <li><a href="#rest" data-toggle="tab">REST</a></li>
+                </ul>
+
+                <!-- Tab panes -->
+                <div class="tab-content">
+                    <div class="tab-pane active" id="browser">
+                        <p>Create A PDF file directly in the client's browser by following these steps:</p>
+                        <ol>
+                        <li>
+                            <p>Acquire a public api key. You can do this through users settings api keys tab - <a ui-sref='console.userSettings' target="_blank">here</a></p>
+                        </li>
+                        <li>
+                            <p>In your web page include hummus client library by adding a script tag:</p>
+                            <p><pre>
+&lt;script type="text/javascript" src="__websiteURL__/hummus/hummusservice.js"&gt;&lt;/script&gt;</pre></p>
+                        </li>
+                        <li>
+                            <p>Where relevant make a call to <code>hummusService.generatePDFDocument</code> to generate the PDF file, like this:</p>
+                            <p><pre>
+hummusService.generatePDFDocument(                            
+        {{publicKey ? ('\'' + publicKey + '\'') : '/* Your public key */'}},
+        /* The ticket */,
+        function(urlDownload,urlEmbed){
+            /* success */
+        },
+        function(){
+            /* error */
+        });</pre></p>                        
+                            <p>Provide the public api key as the first parameter. Provide the job ticket string as the second parameter, and then a callback for success and one for failure.</p>
+                            <p>The success callback accepts two parameters. <code>urlDownload</code> can be used for downloading the PDF file. <code>urlEmbed</code> can be used for opening the PDF in a window
+                            or embedding in a page.</p>
+        
+                        </li>
+                        </ol>
+                    </div>
+                    <div class="tab-pane" id="nodejs">
+                        <p>Create A PDF file by following these steps:</p>
+                        <ol>
+                            <li>
+                                <p>Acquire a private api key. You can do this through users settings api keys tab - <a ui-sref='console.userSettings' target="_blank">here</a></p>
+                            </li>
+                            <li>
+                                <p>Install <code>hummus-client</code> with:</p>
+                                <p><pre>npm install hummus-client</pre></p>
+                            </li>
+                            <li>
+                                <p>Create a hummus client instance with you private API token like this:</p>
+                                <p><pre>var hc = require('hummus-client')({{privateKey ? ('\'' + privateKey + '\'') : '/* Your private key */'}});</pre></p>
+                            </li>
+                            <li>
+                                <p>Where relevant make a call to <code>hc.jobs.createAndDownload</code>:</p>
+                                <p>
+                                    <pre>hc.jobs.createAndDownload(/* The ticket */,function(err,readable) {
+    if(err) {
+        // handle error
+    }
+    else {
+        // do something with the readable stream, containing the new pdf
+        readable
+            .on('response', function(response) {
+                // use for getting general resonse data
+            })
+            .on('error', function(err) {
+                // handle stream reading error
+            })        
+            .pipe(fs.createWriteStream(/* some file path */));
+    }
+});
+                                        </pre></p>
+                                <p>Provide the ticket string as the first parameter. The second parameter is a callback to be executed when the job is finished</p>
+                                <p>In the callback the first parameter is a general error object. The second parameters is a readable stream of the resulting PDF, allowing
+                                    you to write the PDF result to wherever you want. In this example the readable stream is piped to a file stream.</p>
+                            </li>
+                        </ol>
+
+                    </div>
+                    <div class="tab-pane" id="rest">
+                        <p>You can create a PDF file from either client or server using REST calls to Hummus Services:<p>
+                        <ol>
+                            <li><p>First, acquire either a public or private API keys  You can do this through users settings api keys tab - <a ui-sref='console.userSettings' target="_blank">here</a>.</p></li>
+                            <li><p>Then, start a PDF creation job with the following REST call:</p>
+                                <ul>
+                                    <li><strong>METHOD:</strong> POST</li>
+                                    <li><strong>URL:</strong> __apiURL__/generation-jobs</li>
+                                    <li><strong>HEADERS:</strong> <br>Authorization: Bearer {{(privateKey || publicKey) ? (privateKey || publicKey) : '/* Your API key */'}}
+                                                                  <br>Content-type: application/json; charset=utf-8
+                                    </li>
+                                    <li><strong>BODY:</strong> /* The Ticket */
+                                </ul>
+                                <p>The response body will contain the new job data. For example:</p>
+                                <p><pre>
+{
+    _id:"The Job ID"
+    status:1
+    /* other items of lesser importance */
+}</pre></p>
+                                <p>
+                                    The Job ID can be used to track this job later. Status of 1 marks that job is still in progress.
+                                </p>
+                            </li>
+                            <li><p>Check the job status on occasion with this REST call:</p>
+                                <ul>
+                                    <li><strong>METHOD:</strong> GET</li>
+                                    <li><strong>URL:</strong> __apiURL__/generation-jobs/:id?full=true</li>
+                                    <li><strong>HEADERS:</strong> <br>Authorization: Bearer {{(privateKey || publicKey) ? (privateKey || publicKey) : '/* Your API key */'}}
+                                    </li>
+                                </ul>
+                                <p>For ":id" use the job ID that you recieved as response from the initial creation call.</p>
+                                <p>The response body will contain the current job data. For example:<p>
+<p><pre>
+{
+    _id:"The Job ID"
+    status:0
+    generatedFile : {
+        _id: "The File ID", 
+        publicDownloadId: "The Public Download ID"
+    }
+    /* other items of lesser importance */
+}</pre></p>              
+                                <p>Status can be either 1 (in progress), 2 (done) or 3 (error). If the status is 2, then an additional property
+                                    is added - <code>generatedFile</code>. This object _id property is the file ID that can be used for downloading with another rest call.
+                                    publicDownloadId, if exists can be used with public download url, that does not require a Bearer token.</p>
+                            
+                            </li>
+                            <li><p>Finally, download the file with this REST call:</p>
+                                <ul>
+                                    <li><strong>METHOD:</strong> GET</li>
+                                    <li><strong>URL:</strong> __apiURL__/generated-files/:id/download</li>
+                                    <li><strong>HEADERS:</strong> <br>Authorization: Bearer {{(privateKey || publicKey) ? (privateKey || publicKey) : '/* Your API key */'}}
+                                    </li>
+                                </ul>      
+                                <p>For ":id" use the file ID that you recieved as response from the job status call.</p>
+                                <p>The response would be the PDF content.</p>
+                                <p>Alternatively, use the publicDownloadId with the public download URL like this:</p>
+                                <p><pre>__apiURL__/public/:publicDownloadId</pre></p>
+                                <p>This form is useful if you want to send the PDF file as a download link to someone.</p>
+                            </li>
+                        </ol>
+                        
+                    </div>
                 </div>
+                
             </div>
         </div>
     </div>

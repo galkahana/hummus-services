@@ -6,9 +6,19 @@ require('../../../scss/playground-page.scss');
 var moment = require('moment'),
     hummusService = require('exports?hummusService!../../lib/hummus/hummusservice');
 
-playgroundController.$inject = ['$scope','$filter','authentication'];
+playgroundController.$inject = ['$scope','$filter','authentication','Token'];
 
-function playgroundController($scope,$filter,authentication) {
+function playgroundController($scope,$filter,authentication,Token) {
+
+    function loadData() {
+        Token.get().then(function(response) {
+            var result = response.data;
+            $scope.publicKey = result.public;
+            $scope.privateKey = result.private;
+        });
+    }
+    
+    loadData();
 
     var kDefaultJobTicket = {
         "title": "Sample.pdf",

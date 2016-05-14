@@ -1,10 +1,3 @@
-(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
-
-ga('create', 'UA-54473292-1', 'auto');
-
 var DEFAULT_SERVICE_URL = '__apiURL__';
 
 var hummusService = {
@@ -16,14 +9,11 @@ var hummusService = {
         inAccessToken - a token to identify the user. either the publicAPI token, or a private API token.
         inJobTicket - a job ticket object defining the PDF
         [inOptions] - options object (can omit)
-        [inSuccessCB] - success callback. function(downloadURL){} where downloadURL is a downlod url for the file
+        [inSuccessCB] - success callback. function(downloadURL,embedURL){} where downloadURL is a download url for the file, and embedURL is for embedding
         [inFailureCB] - failure callback. function(response){} where response is the error response
         
         inOptions can have the following properties:
         1. serviceURL - an alternative url to get hummus service from. defaults to __apiURL__
-        2. forEmbed - boolean flag. false means that the pdf is intended for download. Otherwise for "embed", which would 
-            either fit browser embed solution or window/tab opening. in other words - download adds attachment header, and embed
-            does not
         
          
     */
@@ -54,7 +44,6 @@ var hummusService = {
 		{
 			if(inData.status == 0)
 			{
-				ga('send', 'pageview',{'page':'/generated-files/id'}); // send tracking when done
                 var baseURL = serviceURL + 
                             '/public/' + 
                             encodeURIComponent(inData.generatedFile.publicDownloadId);
@@ -101,7 +90,6 @@ var hummusService = {
             xhr.send(options.data);
         }
 		
-		ga('send', 'pageview',{'page':'/generation-jobs/'}); // send tracking when starting
         sendXHR( {
                     method:'POST',
                     url:serviceURL + '/generation-jobs',

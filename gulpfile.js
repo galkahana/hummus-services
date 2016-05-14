@@ -24,6 +24,7 @@ var gulp = require('gulp'),
     open = require('gulp-open'),
     cp = require('child_process'),
     chromeApp = require('./chromeapp'),
+    uglify = require('gulp-uglify'),
     gutil = require('gulp-util'),
     WebpackDevServer = require('webpack-dev-server'),
     webpack = require('webpack'),
@@ -84,7 +85,7 @@ function setupWebpackConfig() {
     var stringReplaceParams = {
         multiple: _.map(kReplaces,
             function(value) {
-                return {search: value[0], replace: value[1]};
+                return {search: value[0], replace: value[1], flags: 'g'};
             })
     };
 
@@ -138,6 +139,13 @@ gulp.task('dist-images', function() {
         .pipe(gulp.dest('./dist'));
 });
 
+// hummusservice client copy
+gulp.task('dist-client-lib',function() {
+    return gulp.src(['./src/public/js/lib/hummus*/**/*'])
+        .pipe(uglify())
+        .pipe(gulp.dest('./dist'));    
+});
+
 // html copy for the base htmls (+ replaces) [templates are handled by webpack]
 function gulpTaskHTML(inTaskName, inSourcePath, inTarget) {
     gulp.task(inTaskName, function() {
@@ -169,7 +177,7 @@ gulp.task('prepare-for-dist',function(callback) {
 });
 
 // full dist-spree (component) preparation
-gulp.task('dist', gulpSequence('prepare-for-dist',['dist-images', 'dist-html'], 'dist-app'));
+gulp.task('dist', gulpSequence('prepare-for-dist',['dist-images', 'dist-html','dist-client-lib'], 'dist-app'));
 
 
 // default
@@ -187,6 +195,7 @@ gulp.task('watch', [], function() {
     // anything handled outside of webpack
     gulp.watch(['src/public/images/**/*', 'src/public/*/*/images/**/*'], ['dist-images']);
     gulp.watch('src/public/*.html', ['dist-html']);
+    gulp.watch('src/public/lib/hummus/**/*',['dist-client-lib']);
 
     // IMPORTANT! since using webpack, than watching the main file running works
     // through the webpack server!

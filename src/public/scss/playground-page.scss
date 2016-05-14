@@ -11,7 +11,11 @@
         }
     }
     
-    .row {
+    .section {
+        margin-bottom:20px;
+    }
+    
+    .editor-controls {
         margin-bottom:10px;
     }
 
@@ -19,5 +23,19 @@
     {
         @extend .position-base;
         height:500px;
+    }
+    
+    .tab-pane {
+        margin: 20px auto;    
+    }
+    
+    .section.examples {
+        pre {
+            white-space: pre-wrap;       
+            white-space: -moz-pre-wrap; 
+            white-space: -pre-wrap;
+            white-space: -o-pre-wrap;
+            word-wrap: break-word;
+        }
     }
 }
