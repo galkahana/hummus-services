@@ -5,4 +5,4 @@ skip_files:
   - ^(.*/)?.*/node_modules/.*$
   
 manual_scaling:
-  instances: 2
+  instances: 1
