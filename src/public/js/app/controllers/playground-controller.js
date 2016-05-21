@@ -70,10 +70,17 @@ function playgroundController($scope,$filter,authentication,Token) {
         hummusService.generatePDFDocument(
             authentication.getToken(),
             $scope.ticket,
-            function(urlDownload,urlEmbed){
+            function(urlDownload,urlEmbed,options){
                 $scope.waitingForComplete = false;
-                $scope.downloadLink = urlDownload;
-                $scope.embedLink = urlEmbed;
+                if(options && options.generatedFileId) {
+                    $scope.downloadLink = authentication.idUrl('__apiURL__/generated-files/' + options.generatedFileId + '/download');
+                    $scope.embedLink = authentication.idUrl('__apiURL__/generated-files/' + options.generatedFileId + '/embed');
+                } 
+                else 
+                {
+                    $scope.downloadLink = urlDownload;
+                    $scope.embedLink = urlEmbed;
+                }
                 $scope.$apply();
             },
             function(){

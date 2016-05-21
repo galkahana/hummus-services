@@ -12,10 +12,11 @@ module.exports = angular.module('job-item.directives',[
     require('../filters/pretty-stringify').name,
     require('../services/constants').name,
     require('../services/generated-files').name,
-    require('../services/modal-alert').name
+    require('../services/modal-alert').name,
+    require('../services/authentication').name
 ])
-    .directive('jobItem', ['$filter','Constants','GeneratedFiles','ModalAlert','AuthenticationInterceptor',
-       function($filter,Constants,GeneratedFiles,ModalAlert,AuthenticationInterceptor) {
+    .directive('jobItem', ['$filter','Constants','GeneratedFiles','ModalAlert','authentication',
+       function($filter,Constants,GeneratedFiles,ModalAlert,authentication) {
            return {
              restrict: 'E',
              scope: {
@@ -64,7 +65,7 @@ module.exports = angular.module('job-item.directives',[
                     }
                     
                     $scope.downloadURL = function() {
-                        return AuthenticationInterceptor.idUrl('__apiURL__/generated-files/' + $scope.item.generatedFile.toString() + '/download');
+                        return authentication.idUrl('__apiURL__/generated-files/' + $scope.item.generatedFile.toString() + '/download');
                     }
                     
                     $scope.statusText = function() {

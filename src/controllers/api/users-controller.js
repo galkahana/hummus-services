@@ -2,7 +2,12 @@
 
 var _ = require('lodash'),
     users = require('../../services/users'),
-    authentication = require('../../services/authentication');
+    authentication = require('../../services/authentication'),
+    remoteStorageService = require('../../services/remote-storage-service'),
+    fileDownloadedAccountingEvents = require('../../services/file-downloaded-accounting-events'),
+    jobRanAccountingEvents = require('../../services/job-ran-accounting-events'),
+    async = require('async'),
+    moment = require('moment');
 
 function UsersController() {
      /**
@@ -42,6 +47,47 @@ function UsersController() {
         });
     }
     
+    this.getPlanUsage = function(req,res,next) {
+        var user = req.user;
+        if (!user) {
+            return res.badRequest('Missing user. shouldnt get here');
+        }
+        
+        var endOfToday = moment().endOf('day');
+        var endOfTodayAsDate = endOfToday.toDate();
+        var monthAgo = moment(endOfToday).subtract(1,'month'); 
+        var monthAgoAsDate = monthAgo.toDate();   
+
+
+        async.auto({
+            'totalGenerationSize': function(cb) {
+                jobRanAccountingEvents.getAccumulatedSizeFor(user._id,monthAgoAsDate,endOfTodayAsDate,cb);
+            },
+            'totalDownloadSize': function(cb) {
+                fileDownloadedAccountingEvents.getAccumulatedSizeFor(user._id,monthAgoAsDate,endOfTodayAsDate,cb);
+            },
+            'totalStorageSize': function(cb) {
+                remoteStorageService.getTotalUserFolderSize(user,cb);
+            }
+        },function(err,results) {
+            if (err) { 
+                return next(err); 
+            }
+            res.status(200).json({
+                generation: {
+                    count: results.totalGenerationSize.count,
+                    size: results.totalGenerationSize.size
+                },
+                download: {
+                    count: results.totalDownloadSize.count,
+                    size: results.totalDownloadSize.size                    
+                },
+                totalStorageSize: results.totalStorageSize,
+                from: monthAgoAsDate,
+                to: endOfTodayAsDate
+            });
+        });
+    }
     
     this.actions = function(req,res,next) {
         var user = req.user;

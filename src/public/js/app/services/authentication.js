@@ -49,7 +49,11 @@ module.exports = angular.module('authentication.services', [
                         clearToken();
                         cb(null);
                     }, cb);           
-        }
+        },
+        idUrl: function(url) {
+            var accessToken = localAuth || $cookies.get(HUMMUS_SERVICES_ACCESS_TOKEN);
+            return url + (accessToken ? ('?b=' + accessToken):'');
+        }        
     };
   }
 ])

@@ -82,13 +82,13 @@ function AuthenticationController() {
     this.signOut = function(req,res,next) {        
         if(req.info && 
             req.info.provider == 'bearer' && 
-            !!req.info.accessToken) {
+            !!req.info.token) {
                 var user = req.user;
                 if (!user) {
                     return res.badRequest('Missing user. should have user for identifying whose jobs are being manipulated');
                 }
                 
-                var clientId = req.info ? req.info.accessClientId:null;
+                var clientId = req.info.token.clientId;
                 if(!clientId) {
                     return res.badRequest('No clientId, cant identify client');
                 }

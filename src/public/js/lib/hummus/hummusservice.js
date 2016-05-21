@@ -47,7 +47,7 @@ var hummusService = {
                 var baseURL = serviceURL + 
                             '/public/' + 
                             encodeURIComponent(inData.generatedFile.publicDownloadId);
-                successCB(baseURL + '/download',baseURL + '/embed');
+                successCB(baseURL + '/download',baseURL + '/embed',{generatedFileId:inData.generatedFile._id});
 			}
 			else if(inData.status == 2 && failureCB)
 			{

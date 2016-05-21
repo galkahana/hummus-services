@@ -1,0 +1,36 @@
+<div class="container">
+    <div class="section">
+        <div class="section-title">
+            Between {{planUsage.from | momentFormatter : dateFormatter}} and {{planUsage.to | momentFormatter : dateFormatter}}
+        </div>    
+        <div class="section-title">
+            <h3>Jobs</h3>
+        </div>    
+        <div class="section-content">
+            <div>
+                Generated: {{planUsage.generation.count}}
+            </div>
+            <div>
+                Total Size: {{planUsage.generation.size | bytes}}
+            </div>
+        <div class="section-title">
+            <h3>Downloads</h3>
+        </div>    
+        <div class="section-content">
+            <div>
+                Requests: {{planUsage.download.count}}
+            </div>
+            <div>
+                Total Size: {{planUsage.download.size | bytes}}
+            </div>
+        </div>
+        <div class="section-title">
+            <h3>Storage</h3>
+        </div>    
+        <div class="section-content">
+            <div>
+                Total Used Space: {{planUsage.totalStorageSize | bytes}}
+            </div>
+        </div>
+    </div>
+</div>

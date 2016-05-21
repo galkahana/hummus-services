@@ -25,6 +25,7 @@ var generationJobSchema = new Schema({
 
 generationJobSchema.index({status: 1});
 generationJobSchema.index({user: 1});
+generationJobSchema.index({generatedFile: 1});
 generationJobSchema.plugin(timestamps, {index: true});
 
 // limit fields when going public

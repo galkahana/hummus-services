@@ -11,7 +11,7 @@ function TokensController() {
             return res.badRequest('Missing user. should have user for identifying tokens');
         }
         
-        var clientId = req.info ? req.info.accessClientId:null;
+        var clientId = req.info && req.info.token ? req.info.token.clientId:null;
         if(!clientId) {
             return res.badRequest('No clientId, cant identify client');
         }
@@ -59,7 +59,7 @@ function TokensController() {
             return res.badRequest('Missing type. should be revoke or create');
         }
         
-        var clientId = req.info ? req.info.accessClientId:null;
+        var clientId = req.info && req.info.token ? req.info.token.clientId:null;
         if(!clientId) {
             return res.badRequest('No clientId, cant identify client');
         }

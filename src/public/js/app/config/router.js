@@ -98,10 +98,10 @@ function router($ocLazyLoadProvider,
             template: require('../../../templates/jobs-page.html'),
             controller: require('../controllers/jobs-controller'),            
         })
-        .state('console.userSettings', {
-            url: '/user-settings',
-            template: require('../../../templates/user-settings-page.html'),
-            controller: require('../controllers/user-settings-controller'),            
+        .state('console.user', {
+            url: '/user',
+            template: require('../../../templates/user-page.html'),
+            controller: require('../controllers/user-controller'),            
         })
 }
 

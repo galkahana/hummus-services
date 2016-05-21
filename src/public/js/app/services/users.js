@@ -41,6 +41,9 @@ module.exports = angular.module('users.services', [
                 },
                 updatePassword: function(oldPassword,newPassword) {
                     return usersActions.post({type:'changePassword',oldPassword:oldPassword,newPassword:newPassword});
+                },
+                getPlanUsageData: function() {
+                    return users.one('me').customGET('plan-usage');
                 }
             };
         }

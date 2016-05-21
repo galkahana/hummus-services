@@ -41,7 +41,7 @@ function userFromAccessToken(accessToken,done) {
                             return done(null, false);
                         }
 
-                        done(null, user, {provider: 'bearer', accessToken : accessToken, accessTokenType: token.tokenType, accessClientId: token.clientId});
+                        done(null, user, {provider: 'bearer', token:token /*accessToken : accessToken, accessTokenType: token.tokenType, accessClientId: token.clientId*/});
                     });
             });    
 }

@@ -3,6 +3,7 @@
 var jobPipeline = require('../../services/job-pipeline'),
     generationJobsService = require('../../services/generation-jobs'),
     generatedFilesService = require('../../services/generated-files'),
+    accounting = require('../../services/accounting'),
     constants = require('../../models/constants'),
     async = require('async'),
     remoteStorageService = require('../../services/remote-storage-service'),
@@ -52,7 +53,7 @@ function hashMe(value) {
     return crypto.createHash('sha256').update(value).digest('base64');
 }
 
-function startGenerationJob(inJobTicket,user,creatorId,callback)
+function startGenerationJob(inJobTicket,user,token,callback)
 {
     // create job entry
     generationJobsService.create({
@@ -71,6 +72,7 @@ function startGenerationJob(inJobTicket,user,creatorId,callback)
                 
                 job.status = constants.eJobFailed;
                 generationJobsService.update(job._id,job,function(){});
+                accounting.logJobRanAccountingEvent(job,token);
             } else {
                 // succeeded. 
                 
@@ -95,7 +97,7 @@ function startGenerationJob(inJobTicket,user,creatorId,callback)
                            
                            fileEntry.publicDownloadId = hashMe(fileEntry._id.toString()) + 
                                                         hashMe(moment().format()) + 
-                                                        hashMe(creatorId);
+                                                        hashMe(token.value);
                             fileEntry.save(function(err) {
                                callback(err,fileEntry); 
                             });
@@ -105,13 +107,17 @@ function startGenerationJob(inJobTicket,user,creatorId,callback)
                     function(err,results) {
                         if(err) {
                             logger.error('Job failed in file entry creation and upload stage',job._id);
+                            job.status = constants.eJobFailed;
+                            generationJobsService.update(job._id,job,function(){});
+                            accounting.logJobRanAccountingEvent(job,token);                      
                             return;
                         }
                         
                         // on success, finally set the job status to done
                         logger.error('Job succeeded, finished OK',job._id);
                         job.status = constants.eJobDone;
-                        generationJobsService.update(job._id,job);                            
+                        generationJobsService.update(job._id,job);  
+                        accounting.logJobRanAccountingEvent(job,token,generationResult.outputPath);
                     }
                 );
             }
@@ -264,16 +270,20 @@ function GenerationJobsController() {
      * Post /generation-jobs
      */
     this.create = function(req, res, next) {
-        var ticket = req.body;
-        var user = req.user;
+        var ticket = req.body,
+            user = req.user,
+            token = req.info.token;
         if (!ticket) {
             return res.badRequest('Missing job data');
         }
         if (!user) {
             return res.badRequest('Missing user. should have user for identifying whose job it is');
         }
+        if (!token) {
+            return res.badRequest('Missing token. cant bill job. no billing, no job');
+        }
         
-        startGenerationJob(ticket,user,req.info && req.info.accessToken ? req.info.accessToken:user._id,function(err,job) {
+        startGenerationJob(ticket,user,token,function(err,job) {
             if (err) { return res.unprocessable(err); }    
             
             res.status(200).json(job);        

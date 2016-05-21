@@ -50,9 +50,9 @@ function Authorization() {
         return function(req, res, next) {
             if (!action) { next(new Error('Action params is missing')); }
             if (!req.user) { return res.unauthenticated(null); }
-            if (!req.info || !req.info.accessTokenType)  { return res.unauthenticated(null); }
+            if (!req.info || !req.info.token)  { return res.unauthenticated(null); }
 
-            req.user.roles = [req.info.accessTokenType]; // for now user roles are entirely derived from the token
+            req.user.roles = [req.info.token.tokenType]; // for now user roles are entirely derived from the token
             check(req.user, action, req.params, function(err, authorized) {
 
                 if (err) { return res.serverError(err); }

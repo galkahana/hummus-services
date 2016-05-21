@@ -2,7 +2,8 @@ var fs = require('fs'),
     _ = require('lodash'),
     generatedFilesService = require('../../services/generated-files'),
     remoteStorageService = require('../../services/remote-storage-service'),
-    logger = require('../../services/logger');
+    logger = require('../../services/logger'),
+    accounting = require('../../services/accounting');
 
 function setupDownloadHeader(res,inMime,inWithFileName) {
 	inMime = inMime || 'application/octet-stream';
@@ -28,9 +29,9 @@ function serveFile(res,filePath,inMime,inWithFileName) {
 	});
 };
 
-function downloadAndServe(res,remoteSourceData,inMime,inWithFileName) {
+function downloadAndServe(res,remoteSourceData,inMime,inWithFileName,cb) {
     setupDownloadHeader(res,inMime,inWithFileName);
-    remoteStorageService.downloadFileToStream(remoteSourceData,res);
+    remoteStorageService.downloadFileToStream(remoteSourceData,res,cb);
 }
 
 function removeRemoteAndDeleteEntry(res,entry) {
@@ -51,22 +52,28 @@ function removeRemoteAndDeleteEntry(res,entry) {
     });
 }
 
-function serveFileEntry(res,fileEntry,localPath,shouldDownload) {
+function serveFileEntry(req,res,fileEntry,localPath,shouldDownload) {
     var targetFilename = shouldDownload ? (fileEntry.downloadTitle || fileEntry._id.toString()):null;
+    var token = req.info ? req.info.token:null;
     if(localPath) {
         fs.exists(localPath,function(result) {
             if(result) {
                 logger.log('Serving file entry',fileEntry._id,' from local source',fileEntry.localSource.data.path)
                 serveFile(res,fileEntry.localSource.data.path,'application/pdf',targetFilename);
+                accounting.logFileDownloadedAccountingEvent(fileEntry,{sourceFileName:fileEntry.localSource.data.path,token:token});
             } else {   
                 logger.log('Cant find file, so serving file entry',fileEntry._id,' from remote source');
-                downloadAndServe(res,fileEntry.remoteSource,'application/pdf',targetFilename);
+                downloadAndServe(res,fileEntry.remoteSource,'application/pdf',targetFilename,function(err,downloadSize) {
+                    accounting.logFileDownloadedAccountingEvent(fileEntry,{sourceFileSize:downloadSize,token:token});
+                });
             }
         });
     }
     else {
         logger.log('File is not local, so serving file entry',fileEntry._id,' from remote source');
-        downloadAndServe(res,fileEntry.remoteSource,'application/pdf',targetFilename);
+        downloadAndServe(res,fileEntry.remoteSource,'application/pdf',targetFilename,function(err,downloadSize) {
+            accounting.logFileDownloadedAccountingEvent(fileEntry,{sourceFileSize:downloadSize,token:token});
+        });
     }
 }
 
@@ -79,13 +86,16 @@ function serve(req,res,next,shouldDownload) {
         return res.badRequest('Missing user. should have user for identifying whose job it is');
     }
 
+    if (!req.info || !req.info.token) {
+        return res.badRequest('Missing token. cant bill properly. no download');
+    }
     
     generatedFilesService.get(req.params.id, function(err, fileEntry, localPath) {
         if (err) { return next(err); }
         if(!fileEntry || !fileEntry.user.equals(req.user._id))
             return res.notFound();
             
-        serveFileEntry(res,fileEntry,localPath,shouldDownload);
+        serveFileEntry(req,res,fileEntry,localPath,shouldDownload);
     });
 }
 
@@ -100,7 +110,7 @@ function servePublic(req,res,next,shouldDownload) {
         if(!fileEntry)
             return res.notFound();
             
-        serveFileEntry(res,fileEntry,localPath,shouldDownload);
+        serveFileEntry(req,res,fileEntry,localPath,shouldDownload);
     });        
 }
 

@@ -4,9 +4,14 @@ var config = require('../config/settings'),
     uuid = require('uuid'),
     aws = require('aws-sdk'),
     s3c = require('s3'),
-    _ = require('lodash');
+    _ = require('lodash'),
+    S3Sizer = require('aws-s3-size');
 
 aws.config.loadFromPath(__dirname + '/aws.json');
+
+function getTotalUserFolderSize(user,callback) {
+    new S3Sizer({configFile:__dirname + '/aws.json'}).getFolderSize(config.getConfig().s3BucketName, user._id.toString(),callback);           
+}
 
 function uploadFile(localPath,user,callback) {
     var client = s3c.createClient(
@@ -41,14 +46,26 @@ function uploadFile(localPath,user,callback) {
     });    
 }
 
-function downloadFileToStream(remoteData,targetStream) {
+function downloadFileToStream(remoteData,targetStream,cb) {
+    var downloadSize = 0;
  
     var s3 = new aws.S3({
         params: {
             Bucket: config.getConfig().s3BucketName,
         }
        });
-    s3.getObject({Key:remoteData.data.remoteKey}).createReadStream().pipe(targetStream);
+    s3.getObject({Key:remoteData.data.remoteKey}).createReadStream()
+    .on('error', function(err) {
+        console.log('err');
+        cb(err);
+    })
+    .on('data', function(chunk){
+        downloadSize+=chunk.length;
+    })    
+    .on('end', function(){
+        cb(null,downloadSize);
+    })
+    .pipe(targetStream);
 }
 
 function removeFile(remoteData,cb) {
@@ -85,5 +102,6 @@ module.exports = {
 	uploadFile:uploadFile,
     downloadFileToStream:downloadFileToStream,
     removeFile:removeFile,
-    removeFiles:removeFiles
+    removeFiles:removeFiles,
+    getTotalUserFolderSize:getTotalUserFolderSize
 };
