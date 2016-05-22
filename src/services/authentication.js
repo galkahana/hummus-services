@@ -7,7 +7,8 @@ var User = require('../models/users'),
     crypto = require('crypto'),
     randomSeconds = require('./random-seconds'),
     CustomStrategy = require('passport-custom');
-    moment = require('moment');
+    moment = require('moment'),
+    logger = require('./logger');
 
 
 // configure strategies
@@ -26,9 +27,12 @@ function userFromAccessToken(accessToken,done) {
                     return done(null, false);
                 }
                 
-                // for site tokens, check also expiration.
+                // for site tokens, check also expiration (i'm giving it 5 minutes. while site is up
+                // it should extend the token every two minutes. this will serve better when trying to avoid
+                // peuple reusing the site token instead of the API
                 if(token.tokenType == constants.eTokenRoleSiteUser &&
-                    moment().subtract(1, 'hour').isAfter(moment(token.createdAt))) {
+                    moment().subtract(5, 'minutes').isAfter(moment(token.createdAt))) {
+                    logger.error('Site user token used when expired',token.value);
                     return done(null, false);
                 }
                 User.findOne({_id: token.userId})

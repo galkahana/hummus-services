@@ -117,6 +117,23 @@ function TokensController() {
                         });
                         break;
                     }
+                    case 'refreshMe': {
+                        // site token updte
+                        oauth2.generateTokens(user, 
+                                            client,
+                                            {tokenType:constants.eTokenRoleSiteUser}, 
+                                            function (err, refreshToken, accessToken) {
+                            if (err) {
+                                return res.unprocessable(err); 
+                            } else {
+                                return res.status(201).json({
+                                        refreshToken: refreshToken, 
+                                        accessToken: accessToken 
+                                    });
+                            }
+                        });
+                        break;                        
+                    }
                     default: {
                         res.badRequest('Unknown type. should be deleteAll');
                     }

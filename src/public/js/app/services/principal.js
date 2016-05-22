@@ -53,6 +53,8 @@ module.exports = angular.module('principal.services', [
         if(authentication.hasToken()) {
             // attempt grabbing users data with cached info from previous session
             Users.me().then(function(response) {
+                // worked! remain in site
+                authentication.autoLoginDone();
                 self.authenticate(response.data);
                 deferred.resolve(_identity);
             },

@@ -20,6 +20,9 @@ module.exports = angular.module('tokens.services', [
                 },
                 revokeKey: function(type) {
                     return tokensActions.post({type:'revoke',tokenType:type});
+                },
+                updateSiteToken: function() {
+                    return tokensActions.post({type:'refreshMe'});
                 }
             };
         }
