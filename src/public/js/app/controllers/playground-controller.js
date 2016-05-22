@@ -62,6 +62,21 @@ function playgroundController($scope,$filter,authentication,Token) {
     $scope.initTicket = $filter('prettyStringify')(kDefaultJobTicket);
     $scope.ticket = '';
 
+    $scope.downloadLink = function() {
+        if($scope._generatedFileId)
+            return authentication.idUrl('__apiURL__/generated-files/' + $scope._generatedFileId + '/download');
+        else
+            return $scope._downloadLink;
+    }
+
+    $scope.embedLink = function() {
+        if($scope._generatedFileId)
+            return authentication.idUrl('__apiURL__/generated-files/' + $scope._generatedFileId + '/embed');
+        else
+            return $scope._embedLink;
+    }
+
+
     $scope.submitTicket = function() {
         $scope.waitingForComplete = true;
         $scope.downloadLink = null;
@@ -73,13 +88,15 @@ function playgroundController($scope,$filter,authentication,Token) {
             function(urlDownload,urlEmbed,options){
                 $scope.waitingForComplete = false;
                 if(options && options.generatedFileId) {
-                    $scope.downloadLink = authentication.idUrl('__apiURL__/generated-files/' + options.generatedFileId + '/download');
-                    $scope.embedLink = authentication.idUrl('__apiURL__/generated-files/' + options.generatedFileId + '/embed');
+                    $scope._generatedFileId = options.generatedFileId;
+                    $scope._downloadLink = null;
+                    $scope._embedLink = null;
                 } 
                 else 
                 {
-                    $scope.downloadLink = urlDownload;
-                    $scope.embedLink = urlEmbed;
+                    $scope._generatedFileId = null;
+                    $scope._downloadLink = urlDownload;
+                    $scope._embedLink = urlEmbed;
                 }
                 $scope.$apply();
             },
