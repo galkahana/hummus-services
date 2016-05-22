@@ -53,18 +53,18 @@ function UsersController() {
             return res.badRequest('Missing user. shouldnt get here');
         }
         
-        var endOfToday = moment().endOf('day');
-        var endOfTodayAsDate = endOfToday.toDate();
-        var monthAgo = moment(endOfToday).subtract(1,'month'); 
-        var monthAgoAsDate = monthAgo.toDate();   
+        var to = req.query.to ? moment(req.query.to):moment().endOf('day');
+        var toAsDate = to.toDate();
+        var from = req.query.from ?  moment(req.query.to):moment(to).subtract(1,'month'); 
+        var fromAsDate = from.toDate();   
 
 
         async.auto({
             'totalGenerationSize': function(cb) {
-                jobRanAccountingEvents.getAccumulatedSizeFor(user._id,monthAgoAsDate,endOfTodayAsDate,cb);
+                jobRanAccountingEvents.getAccumulatedSizeFor(user._id,fromAsDate,toAsDate,cb);
             },
             'totalDownloadSize': function(cb) {
-                fileDownloadedAccountingEvents.getAccumulatedSizeFor(user._id,monthAgoAsDate,endOfTodayAsDate,cb);
+                fileDownloadedAccountingEvents.getAccumulatedSizeFor(user._id,fromAsDate,toAsDate,cb);
             },
             'totalStorageSize': function(cb) {
                 remoteStorageService.getTotalUserFolderSize(user,cb);
@@ -83,8 +83,8 @@ function UsersController() {
                     size: results.totalDownloadSize.size                    
                 },
                 totalStorageSize: results.totalStorageSize,
-                from: monthAgoAsDate,
-                to: endOfTodayAsDate
+                from: fromAsDate,
+                to: toAsDate
             });
         });
     }

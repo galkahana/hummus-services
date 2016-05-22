@@ -1,6 +1,7 @@
 'use strict';
 
-var angular = require('angular');
+var angular = require('angular'),
+    moment = require('moment');
         
 module.exports = angular.module('plan-panel.directives',[
     require('../services/users').name,
@@ -19,7 +20,9 @@ module.exports = angular.module('plan-panel.directives',[
                  scope.dateFormatter = Constants.DEFAULT_DATE_FILTER;
                  
                  function loadData() {
-                     Users.getPlanUsageData().then(function(response) {
+                     var toDate = moment().endOf('day').toDate();
+                     
+                     Users.getPlanUsageData(toDate).then(function(response) {
                          scope.planUsage = response.data;
                      },function(err) {
                          console.log(err);
