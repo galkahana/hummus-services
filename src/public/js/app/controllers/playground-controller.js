@@ -79,8 +79,9 @@ function playgroundController($scope,$filter,authentication,Token) {
 
     $scope.submitTicket = function() {
         $scope.waitingForComplete = true;
-        $scope.downloadLink = null;
-        $scope.embedLink = null;
+        $scope._generatedFileId = null;
+        $scope._downloadLink = null;
+        $scope._embedLink = null;
 
         hummusService.generatePDFDocument(
             authentication.getToken(),
@@ -89,12 +90,9 @@ function playgroundController($scope,$filter,authentication,Token) {
                 $scope.waitingForComplete = false;
                 if(options && options.generatedFileId) {
                     $scope._generatedFileId = options.generatedFileId;
-                    $scope._downloadLink = null;
-                    $scope._embedLink = null;
                 } 
                 else 
                 {
-                    $scope._generatedFileId = null;
                     $scope._downloadLink = urlDownload;
                     $scope._embedLink = urlEmbed;
                 }
