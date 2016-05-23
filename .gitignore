@@ -37,3 +37,6 @@ config.json
 
 // temp yaml
 _app.yaml
+
+// local scripts
+local-setup.sh
