@@ -222,7 +222,12 @@ gulp.task('run', ['run-sequance'], function(cb) {
         stats: {
             colors: true
         },
-        historyApiFallback: true,
+        historyApiFallback: {
+            rewrites: [
+                { from: /\/console/, to: '/console.html'},
+                { from: /\/login/, to: '/console.html'}
+            ]
+        },
         hot: true
     }).listen(kBasePort, function() {
             cb();
@@ -231,7 +236,7 @@ gulp.task('run', ['run-sequance'], function(cb) {
     // load sample web page (using 127.0.0.1 so cookies will work. localhost will not have cookies updated)
     gulp.src(__filename)
         .pipe(open({
-            uri: 'http://127.0.0.1:' + kBasePort + '/index.html',
+            uri: 'http://127.0.0.1:' + kBasePort + '/',
             app: chromeApp
         }));
 

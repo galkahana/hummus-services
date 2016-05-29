@@ -1,5 +1,6 @@
 'use strict';
 
+require('../../../scss/public-base.scss');
 require('../../../scss/login-page.scss'); 
 
 

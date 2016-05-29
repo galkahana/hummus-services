@@ -9,8 +9,8 @@ module.exports = angular.module('console-header.directives',[
     require('../services/authentication').name,
     require('./avatar').name
 ])
-    .directive('consoleHeader', ['$state','principal','authentication',
-       function($state,principal,authentication) {
+    .directive('consoleHeader', ['$state','$window','principal','authentication',
+       function($state,$window,principal,authentication) {
            return {
              restrict: 'E',
              template: require('../../../templates/console-header.html'),
@@ -19,15 +19,18 @@ module.exports = angular.module('console-header.directives',[
                     $scope.me = value;
                 });
                 
-                $scope.signOut = function() {
+                $scope.signOut = function($event) {
+                    $event.preventDefault();
                     authentication.logout(function(err) {
                         if(err) {
                             console.log('logout error',err);
                             return;
                         }
                         
-                        principal.authenticate(null);            
-                        $state.go('public.welcome');
+                        principal.authenticate(null);
+                        // have to be violent here to go outside of uirouter            
+                        $window.location = '/';
+                        
                     })
                 }
              }  

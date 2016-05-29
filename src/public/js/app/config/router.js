@@ -34,18 +34,8 @@ function router($ocLazyLoadProvider,
     $urlRouterProvider.otherwise('/');
 
     $stateProvider
-        // public areas
-        .state('public', { 
-            url: '',
-            abstract:true,
-            controller: require('../controllers/public-base-controller'),
-            template: require('../../../templates/public-base.html')
-        })
-        .state('public.welcome', { 
-            url: '/',
-            template: '<div class="welcome container">Welcome to PDFHummus Services! <i>Currently under construction</i></div>'
-        })
-        .state('public.login', { 
+        // login entry point (no uiview)
+        .state('login', { 
             url: '/login',
             data: {pageTitle: 'Log in to Console'},
             template: require('../../../templates/login-page.html'),

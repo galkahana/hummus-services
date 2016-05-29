@@ -6,7 +6,8 @@ module.exports = {
 
     context: path.join(__dirname, "./src/public"),
     entry: {
-        default: "./js/app/default-app.js"
+        app: "./js/app/default-app.js",
+        site: "./js/app/default-site.js"
     },
     output: {
         path: path.join(__dirname, "/dist/assets"),

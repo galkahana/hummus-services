@@ -12,18 +12,27 @@
     
     <link rel="shortcut icon" type="image/png" href="/images/favicon.ico"/>
     <link rel="shortcut icon" type="image/png" href="__websiteURL__/images/favicon.ico"/>    
+    <style>
+        [ng\:cloak], [ng-cloak], [data-ng-cloak], [x-ng-cloak], .ng-cloak, .x-ng-cloak {
+            display: none !important;
+        }
+    </style>
 </head>
-<body ng-app="pdfhummus-web" ng-controller="appController">
-    <ui-view autoscroll="false" class="base"></ui-view>
-    
-    <div class="general-waiting" ng-show="waiting">
-        <div class="spinner">
-            <div class="bounce1"></div>
-            <div class="bounce2"></div>
-            <div class="bounce3"></div>
+<body ng-app="pdfhummus-web" ng-controller="welcomeController" ng-cloak>
+    <div class="public-base wrapper">
+        <div class="header">
+            <public-header></public-header>
+        </div>
+        <div class="content">
+            <page-title></page-title>
+            <div class="welcome container">Welcome to PDFHummus Services! <i>Currently under construction</i></div>
+        </div>
+        <div class="footer">
+            <public-footer></public-footer>
         </div>
     </div>
+
     <script src="__webpackRoot__/commons.js"></script>
-    <script src="__webpackRoot__/default.js"></script>
+    <script src="__webpackRoot__/site.js"></script>
 </body>
 </html>

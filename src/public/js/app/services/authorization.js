@@ -32,7 +32,7 @@ module.exports = angular.module('authorization.services', [
               else {
                 $rootScope.returnToState = $rootScope.toState;
                 $rootScope.returnToStateParams = $rootScope.toStateParams;
-                $state.go('public.login');
+                $state.go('login');
               }
 
 
