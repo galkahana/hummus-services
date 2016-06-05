@@ -7,7 +7,7 @@ var express = require('express'),
 // Root - any: route to index file (angular web app, to support deep linking without #)
 
 function consoleApp(req, res) {
-    sendSiteFile('console.html')(req,res);
+    sendSiteFileFunc('console.html')(req,res);
 }
 
 function sendSiteFileFunc(pathToPage) {
