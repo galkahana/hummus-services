@@ -6,7 +6,6 @@ var express = require('express'),
     authorization = require('../services/authorization'),
     authorize = authorization.authorize,
     permissions = authorization.getPermissions(),
-
 	path = require('path');
 
 
@@ -15,7 +14,8 @@ var controllersPath = path.resolve(__dirname,'../controllers/api/') + '/',
     generatedFilesController = require(controllersPath + 'generated-files-controller'),
     usersController = require(controllersPath + 'users-controller'),
     authenticationController = require(controllersPath + 'authentication-controller'),
-    tokensController = require(controllersPath + 'tokens-controller');
+    tokensController = require(controllersPath + 'tokens-controller'),
+    accountingController = require(controllersPath + 'accounting-controller');
 
 router.route('/generation-jobs')
     .post(authentication.authenticateOrDie,authorize(permissions.createPDF),generationJobsController.create)
@@ -59,6 +59,8 @@ router.route('/public/:publicDownloadId/download')
 router.route('/public/:publicDownloadId/embed')
     .get(generatedFilesController.embedPublic);
 
+router.route('/public/accounting/ran')
+    .get(accountingController.getTotalJobsCount);
 
 // get this before it gets to web...so we're clear that there's an API error
 router.get('/*', function (req, res) {

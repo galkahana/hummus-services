@@ -1,0 +1,39 @@
+@import "app";
+@import "public-base";
+
+.welcome-page {
+    
+    .section {
+        text-align:center;
+        padding:30px 0;
+    }        
+    
+    .section.title {
+        background-color:$hummus-color;
+        color:#EAEAEA;
+        h1 {
+            margin-top:0;
+        }
+    }
+    
+    .section.features {
+        ul li {
+            font-size:20px;
+            margin: 0 10px;
+            
+            i {
+                font-size:40px;
+            }
+        }
+    }
+    
+    .section.signup {
+        
+        button.btn {
+            color:#EAEAEA;
+            font-size:30px;
+            background-color:$hummus-color;
+        }
+    }
+}
+

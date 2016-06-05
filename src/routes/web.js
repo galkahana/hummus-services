@@ -6,13 +6,27 @@ var express = require('express'),
 
 // Root - any: route to index file (angular web app, to support deep linking without #)
 
-function loginApp(req, res) {
-    res.sendFile('console.html', {root: path.join(__dirname, '../../dist')});
+function consoleApp(req, res) {
+    sendSiteFile('console.html')(req,res);
 }
 
-router.get('/login', loginApp);
-router.get('/console', loginApp);
-router.get('/console/*', loginApp);
+function sendSiteFileFunc(pathToPage) {
+    return function(req,res) {
+            res.sendFile(pathToPage, {root: path.join(__dirname, '../../dist')});
+    }
+}
+
+// application
+router.get('/login', consoleApp);
+router.get('/console', consoleApp);
+router.get('/console/*', consoleApp);
+
+// site pages
+['about','contact','documentation'].forEach(function(value) {
+    router.get('/' + value, sendSiteFileFunc(value + '.html'));
+});
+
+// index
 router.get('/*', function (req, res) {
     res.sendFile('index.html', {root: path.join(__dirname, '../../dist')});
 });

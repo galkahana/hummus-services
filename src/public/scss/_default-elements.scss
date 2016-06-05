@@ -1,3 +1,5 @@
+@import "mixins";
+
 .default-item-container {
     border: 1px solid $default-gray-border;
     background-color:$default-gray-background;
@@ -7,4 +9,39 @@
   position: relative;
   top: 0;
   left: 0;
+}
+
+.nice-red-badge {
+  position: absolute;
+  top: -14px;
+  right: -14px;
+  width: 40px;
+  font: 14px/40px Helvetica, Arial, sans-serif;
+  color: white;
+  text-align: center;
+  text-shadow: 0 -1px 1px rgba(black, .3);
+  text-indent: -1px;
+  letter-spacing: -1px;
+  background: #e54930;
+  border: 1px solid;
+  border-color: #b33323 #ab3123 #982b1f;
+  border-radius: 50%;
+  @include user-select(none);
+  @include linear-gradient(top, #f75a3b, #d63b29);
+  @include box-shadow(inset 0 1px 1px rgba(white, .3),
+                      0 1px 2px rgba(black, .2));
+
+  &:before {
+    content: '';
+    position: absolute;
+    top: 3px;
+    bottom: 3px;
+    left: 3px;
+    right: 3px;
+    border: 2px solid #f5f8fb;
+    border-radius: 18px;
+    @include box-shadow(inset 0 1px 1px rgba(white, .2),
+                        inset 0 -1px 1px rgba(black, .25),
+                        0 -1px 1px rgba(black, .25));
+  }
 }

@@ -7,6 +7,7 @@ public-header {
     padding-bottom:5px;
     
     .site-title {
+        @extend .position-base;
         @include no-underline-ever;
         
         img {
@@ -26,10 +27,14 @@ public-header {
                 color: black;
             }
         }
+        
+        .nice-red-badge {
+            top:10px;
+        }
     }
     
     .header-tools {
-        float:left;
+        float:right;
         margin: 18px 30px 0 0;
         
         button {

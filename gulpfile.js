@@ -69,7 +69,8 @@ var defaultPreProcessData;
 function calculatePreProcessData() {
     defaultPreProcessData = {
         context: {
-            DEBUG: (config.forDebug) ? true : undefined
+            DEBUG: (config.forDebug) ? true : undefined,
+            PUBLISH: (config.forPublish) ? true : undefined
         }
     };
 }
@@ -215,6 +216,18 @@ var kBasePort = 8000;
 gulp.task('run', ['run-sequance'], function(cb) {
 
     // change so hot replacement will work [make sure to also run webpack-replace-update]
+    
+    var rewrites = [
+                { from: /\/console/, to: '/console.html'},
+                { from: /\/login/, to: '/console.html'}
+            ];
+            
+    ['about','contact','documentation'].forEach(function(value) {
+        rewrites.push({
+            from: new RegExp('\/' + value),
+            to: '/' + value + '.html'
+        })
+    });
 
     // Start a webpack-dev-server
     new WebpackDevServer(webpack(activeWebpackConfig), {
@@ -223,10 +236,7 @@ gulp.task('run', ['run-sequance'], function(cb) {
             colors: true
         },
         historyApiFallback: {
-            rewrites: [
-                { from: /\/console/, to: '/console.html'},
-                { from: /\/login/, to: '/console.html'}
-            ]
+            rewrites: rewrites
         },
         hot: true
     }).listen(kBasePort, function() {
@@ -245,6 +255,7 @@ gulp.task('run', ['run-sequance'], function(cb) {
 gulp.task('prepare-for-publish',function(callback) {
     config.apiURL = config.publishApiURL;
     config.websiteURL = config.publishWebsiteURL;
+    config.forPublish = true;
     callback();
 });
 

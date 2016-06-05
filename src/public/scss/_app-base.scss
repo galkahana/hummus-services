@@ -1,6 +1,7 @@
 @import "colors";
 @import "default-elements";
 @import "default-media";
+@import "~font-awesome/css/font-awesome.css";
 
 
 @mixin border-radius($radius) {
@@ -38,9 +39,15 @@
     cursor: pointer;
 
     color: $default-black-transparent;
-    &:hover {
+    &:hover,
+    &:focus {
         color: $default-black;
     }
+    
+    &:visited {
+        color: $default-black-transparent;
+    }
+
 }
 
 a.im-a-pretty-clickable {

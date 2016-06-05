@@ -6,6 +6,11 @@ function JobRanAccountingEvents() {
     
 }
 
+JobRanAccountingEvents.prototype.getTotalJobsCount = function(callback) {
+    jobRanAccountingEventModel
+        .count({})
+        .exec(callback);
+}
 
 JobRanAccountingEvents.prototype.getAccumulatedSizeFor = function(userId,startDate,endDate,callback) {
     jobRanAccountingEventModel
