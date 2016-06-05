@@ -13,11 +13,16 @@ jobsController.$inject = ['$scope','$timeout','$document','GenerationJob','Modal
 
 function jobsController($scope,$timeout,$document,GenerationJob,ModalAlert,Constants) {
     
+    
     $scope.searchTerm = null;
     $scope.searchActive = false;
-    $scope.dateFilter = moment().startOf('month').format(Constants.DEFAULT_DATE_FILTER) + 
+
+    var to = moment().endOf('day');
+    var from = moment(to).subtract(1,'month'); 
+
+    $scope.dateFilter = from.format(Constants.DEFAULT_DATE_FILTER) + 
                             ' - ' +  
-                            moment().endOf('month').format(Constants.DEFAULT_DATE_FILTER);
+                            to.format(Constants.DEFAULT_DATE_FILTER);
     
     function loadData(cb) {
     
