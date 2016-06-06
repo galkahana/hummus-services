@@ -86,9 +86,16 @@
                             <button type="button" class="btn btn-default">Sign Up</button>
                         </a>
                     </div>
+                    <!-- @ifdef PUBLISH -->                    
                     <h2 ng-if="count>10000">
                         <odometer count="count"></odometer> Documnets Created With PDFHummus Services
                     </h2>
+                    <!-- @endif -->                    
+                    <!-- @ifndef PUBLISH -->                    
+                    <h2>
+                        <odometer count="count"></odometer> Documnets Created With PDFHummus Services
+                    </h2>
+                    <!-- @endif -->                    
                 </div>                 
             </div>
         

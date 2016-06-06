@@ -26,6 +26,7 @@ var gulp = require('gulp'),
     chromeApp = require('./chromeapp'),
     uglify = require('gulp-uglify'),
     gutil = require('gulp-util'),
+    preprocess = require('gulp-preprocess'),
     WebpackDevServer = require('webpack-dev-server'),
     webpack = require('webpack'),
     webpackConfig = require('./webpack.config.js'),
@@ -143,20 +144,19 @@ gulp.task('dist-images', function() {
 // hummusservice client copy
 gulp.task('dist-client-lib',function() {
     return gulp.src(['./src/public/js/lib/hummus*/**/*'])
+        .pipe(replace(kReplaces))
+        .pipe(preprocess(defaultPreProcessData))
         .pipe(uglify())
         .pipe(gulp.dest('./dist'));    
 });
 
 // html copy for the base htmls (+ replaces) [templates are handled by webpack]
-function gulpTaskHTML(inTaskName, inSourcePath, inTarget) {
-    gulp.task(inTaskName, function() {
-        return gulp.src(inSourcePath)
+gulp.task('dist-html',function() {
+        return gulp.src('./src/public/*.html')
+            .pipe(preprocess(defaultPreProcessData))
             .pipe(replace(kReplaces))
-            .pipe(gulp.dest(inTarget));
-    });
-}
-
-gulpTaskHTML('dist-html', './src/public/*.html', './dist');
+            .pipe(gulp.dest('./dist'));
+    }); 
 
 // js+sass+templates (with webpack)
 gulp.task('dist-app', function(callback) {
@@ -177,7 +177,7 @@ gulp.task('prepare-for-dist',function(callback) {
     callback();
 });
 
-// full dist-spree (component) preparation
+// full dist (component) preparation
 gulp.task('dist', gulpSequence('prepare-for-dist',['dist-images', 'dist-html','dist-client-lib'], 'dist-app'));
 
 
