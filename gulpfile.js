@@ -277,9 +277,11 @@ gulp.task('prepare-env-vars-for-deploy',function(callback) {
     });
 });
 
+gulp.task('prepare-for-deploy', gulpSequence('prepare-for-publish','prepare-env-vars-for-deploy','default'));
+
 gulp.task('google-deploy',function(callback) {
     // deploy to default environment
-    cp.execSync('gcloud preview app deploy ' + TEMP_DEPLOY_FILE + ' --quiet --stop-previous-version ',{stdio:[0,1,2]});
+    cp.execSync('gcloud app deploy ' + TEMP_DEPLOY_FILE + ' --quiet',{stdio:[0,1,2]});
     callback();
 });
 
@@ -288,4 +290,4 @@ gulp.task('cleanup-deploy',function(cb) {
     del([TEMP_DEPLOY_FILE]).then(function(){cb();});
 })
 
-gulp.task('publish', gulpSequence('prepare-for-publish','prepare-env-vars-for-deploy','default','google-deploy','cleanup-deploy'));
+gulp.task('publish', gulpSequence('prepare-for-deploy','google-deploy','cleanup-deploy'));
