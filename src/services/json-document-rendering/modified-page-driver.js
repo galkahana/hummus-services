@@ -3,7 +3,7 @@ var hummus = require('hummus');
 function ModifiedPageDriver(inPDFWriter,inPageIndex)
 {
 	this.pdfWriter = inPDFWriter;
-	this.pageModifier = new hummus.PDFPageModifier(inPDFWriter,inPageIndex);
+	this.pageModifier = new hummus.PDFPageModifier(inPDFWriter,inPageIndex,true);
 }
 
 ModifiedPageDriver.prototype.startContentContext = function()

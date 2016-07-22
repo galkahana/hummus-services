@@ -224,7 +224,7 @@ gulp.task('run', ['run-sequance'], function(cb) {
             
     ['about','contact','documentation'].forEach(function(value) {
         rewrites.push({
-            from: new RegExp('\/' + value),
+            from: new RegExp('\/' + value + '\/?$'),
             to: '/' + value + '.html'
         })
     });

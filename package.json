@@ -21,7 +21,7 @@
     "crypto": "0.0.3",
     "express": "^4.13.3",
     "font-awesome": "^4.6.3",
-    "hummus": "^1.0.45",
+    "hummus": "^1.0.58",
     "icu-bidi": "^0.1.5",
     "lodash": "^3.10.1",
     "moment": "^2.10.6",

@@ -285,7 +285,7 @@ Measurements.prototype.getImageItemMeasures = function(inItem,inPDFWriter)
 		{
 			if(imagePath)
 			{
-				var imageDimensions = inPDFWriter.getImageDimensions(imagePath);
+				var imageDimensions = inPDFWriter.getImageDimensions(imagePath,0,{password:inItem.password});
 				var bbox = [0,0,imageDimensions.width,imageDimensions.height];
 				var transformedBox = VectorMath.transformBox(bbox,inItem.transformation);
 				result = {width:transformedBox[2],height:transformedBox[3]};
@@ -298,7 +298,7 @@ Measurements.prototype.getImageItemMeasures = function(inItem,inPDFWriter)
 						height:inItem.transformation.height};
 	}
 	else if(imagePath)
-		result = inPDFWriter.getImageDimensions(this.filesMap.get(inItem.source)); 
+		result = inPDFWriter.getImageDimensions(this.filesMap.get(inItem.source),0),{password:inItem.password}; 
 	else
 		result = {width:0,height:0}; 
 

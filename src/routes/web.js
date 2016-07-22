@@ -27,8 +27,6 @@ router.get('/console/*', consoleApp);
 });
 
 // index
-router.get('/*', function (req, res) {
-    res.sendFile('index.html', {root: path.join(__dirname, '../../dist')});
-});
+router.get('/*', sendSiteFileFunc('index.html'));
 
 module.exports = router;

@@ -44,7 +44,8 @@ module.exports.render = function(inDocument,inExternals,inTargetStream,inOptions
 	try
 	{
 		var writer;
-		var pdfWriterOptions = inOptions ? inOptions.pdfWriter : undefined;
+		// create pdfwriter options as a combination between input options and engine decided options per features defined in the document json
+		var pdfWriterOptions = _.assign({}, createEngineOptions(inDocument),inOptions ? (inOptions.pdfWriter || {}) : {}); 
 
 		if(inDocument.source)
 		{
@@ -68,6 +69,40 @@ module.exports.render = function(inDocument,inExternals,inTargetStream,inOptions
 	{
         logger.error('error in PDF generation',err);
 		inCallback(err);
+	}
+}
+
+var kKnownProtectionValues = {
+	"allowPrint" : 1<<2,
+	"allowModification": 1<<3,
+	"allowCopy" : 1<<4,
+	"allowAnnotations" : 1<<5,
+	"allowFilling" : 1<<8,
+	"allowAccessibility": 1<<9,
+	"allowAssemble": 1<<10,
+	"allowPrintHighRes": 1<<11 
+};
+
+function createEngineOptions(inDocument) {
+	if(inDocument && inDocument.protection) {
+		var params = _.pick(inDocument.protection, ['userPassword','ownerPassword','userProtectionFlag']);
+
+		// allow using "enums" for known protection values
+		if(params.userProtectionFlag) {
+			if(_.isString(params.userProtectionFlag)) {
+				params.userProtectionFlag = kKnownProtectionValues[params.userProtectionFlag];
+			} else if(_.isArray(params.userProtectionFlag)) {
+				params.userProtectionFlag = _.reduce(params.userProtectionFlag,function(accumulated,flag) {
+					return accumulated | (kKnownProtectionValues[flag] || 0);
+				},0);
+			}
+		}
+
+		console.log(params);
+
+		return params;
+	} else {
+		return {};
 	}
 }
 
@@ -106,7 +141,7 @@ function appendPage(inPageAppendData,inPDFWriter,inRenderingHelpers,cb) {
 		Allow appending pages of PDF files or of TIFF images
 	*/
 	if(originType === 'PDF') {
-		var copyContext = inRenderingHelpers.pdfCopyingContexts.getContext(originPath);
+		var copyContext = inRenderingHelpers.pdfCopyingContexts.getContext(originPath,inPageAppendData.password ? {password:inPageAppendData.password} : null);
 		if(!copyContext) {
             return cb(new Error('Unable to create copying context for appended page'),inPageAppendData);
         }
@@ -237,6 +272,7 @@ function renderImageItem(inBox,inItem,inPDFPage,inPDFWriter,inRenderingHelpers)
 		opts.transformation.width = inBox.width;
 		opts.transformation.height = inBox.height;
 	}
+	opts.password = inItem.password;
 
 	var imageItemMeasures = inRenderingHelpers.measurements.getImageItemMeasures(inItem,inPDFWriter);
 
