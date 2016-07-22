@@ -69,6 +69,7 @@ function startGenerationJob(inJobTicket,user,token,callback)
             if(err) {
                 // failed, update job entry
                 logger.error('Job failed in file creation stage',job._id);
+                logger.error(err);
                 
                 job.status = constants.eJobFailed;
                 generationJobsService.update(job._id,job,function(){});
