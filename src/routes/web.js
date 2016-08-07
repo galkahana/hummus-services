@@ -10,6 +10,10 @@ function consoleApp(req, res) {
     sendSiteFileFunc('console.html')(req,res);
 }
 
+function documentationApp(req, res) {
+    sendSiteFileFunc('documentation.html')(req,res);
+}
+
 function sendSiteFileFunc(pathToPage) {
     return function(req,res) {
             res.sendFile(pathToPage, {root: path.join(__dirname, '../../dist')});
@@ -20,9 +24,11 @@ function sendSiteFileFunc(pathToPage) {
 router.get('/login', consoleApp);
 router.get('/console', consoleApp);
 router.get('/console/*', consoleApp);
+router.get('/documentation', documentationApp);
+router.get('/documentation/*', documentationApp);
 
 // site pages
-['about','contact','documentation'].forEach(function(value) {
+['about','contact'].forEach(function(value) {
     router.get('/' + value, sendSiteFileFunc(value + '.html'));
 });
 

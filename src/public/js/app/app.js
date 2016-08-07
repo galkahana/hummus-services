@@ -27,7 +27,7 @@ angular.module('pdfhummus-web', [
     require('./services/authentication').name,
     require('./services/authentication-interceptor').name
 ])
-    .config(require('./config/router'))
+    .config(require('./config/app-router'))
     .config(require('./config/authenticated-requests'))
     .controller('appController', require('./controllers/app-controller'))
     .run(require('./config/login-setup'));

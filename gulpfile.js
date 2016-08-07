@@ -229,6 +229,13 @@ gulp.task('run', ['run-sequance'], function(cb) {
         })
     });
 
+    ['documentation'].forEach(function(value) {
+        rewrites.push({
+            from: new RegExp('\/' + value + '\/?'),
+            to: '/' + value + '.html'
+        })
+    });
+
     // Start a webpack-dev-server
     new WebpackDevServer(webpack(activeWebpackConfig), {
         contentBase: __dirname + '/dist/',

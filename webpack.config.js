@@ -6,8 +6,9 @@ module.exports = {
 
     context: path.join(__dirname, "./src/public"),
     entry: {
-        app: "./js/app/default-app.js",
-        site: "./js/app/default-site.js"
+        app: "./js/app/app.js",
+        site: "./js/app/site.js",
+        documentation: "./js/app/documentation.js"
     },
     output: {
         path: path.join(__dirname, "/dist/assets"),
@@ -42,8 +43,7 @@ module.exports = {
             {test: /\.eot(\?v=\d+\.\d+\.\d+)?$/, loader: 'file'},
             {test: /\.svg(\?v=\d+\.\d+\.\d+)?$/, loader: 'url?limit=10000&mimetype=image/svg+xml'},
 
-            // JS and html loaders is provided in gulp to allow optional minimification, replacement and preprocessing
-        
+            // images
             {
                 test: /\.(jpe?g|png|gif|svg)$/i,
                 exclude: /(node_modules)\//,
@@ -51,7 +51,12 @@ module.exports = {
                     'file?hash=sha512&digest=hex&name=[hash].[ext]',
                     'image-webpack?bypassOnDebug&optimizationLevel=7&interlaced=false'
                 ]
-            }
+            },
+
+            // mds
+            { test: /\.md$/, loader: "html!markdown" }
+
+            // JS and html loaders is provided in gulp to allow optional minimification, replacement and preprocessing
         ]
     }
 };

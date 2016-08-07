@@ -48,13 +48,36 @@
     <meta itemprop="image" content="https://s3-us-west-2.amazonaws.com/hummus-services/assets/logo-transparent-120X120.gif">
     
 </head>
-<body ng-app="pdfhummus-web" ng-controller="defaultController" ng-cloak>
-    <div class="public-base wrapper">
+<body ng-app="pdfhummus-web" ng-controller="documentationController" ng-cloak>
+    <div class="public-base wrapper documentation-page">
         <div class="header">
             <public-header></public-header>
         </div>
         <div class="content">
-            <div class="container">Welcome to PDFHummus Services Documentation! <i>Currently under construction</i></div>
+            <div class="container">
+                <nav class="navbar navbar-default" role="navigation">
+
+                    <div class="navbar-header">
+                        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                            <span class="sr-only">Toggle navigation</span>
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                        </button>
+                        <a class="navbar-brand">Table Of Contents</a>
+                    </div>
+
+                    <div class="collapse navbar-collapse navbar-ex1-collapse">
+                        <ul class="nav navbar-nav">
+                            <li><a ui-sref="documentation.home">Introduction</a></li>
+                            <li><a ui-sref="documentation.home1">Getting Started</a></li>
+                        </ul>
+                    </div>
+                </nav>
+                <div class="documentation-content">
+                    <ui-view autoscroll="false"></ui-view>
+                </div>
+            </div>
         </div>
         <div class="footer">
             <public-footer></public-footer>
@@ -62,6 +85,6 @@
     </div>
 
     <script src="__webpackRoot__/commons.js"></script>
-    <script src="__webpackRoot__/site.js"></script>
+    <script src="__webpackRoot__/documentation.js"></script>
 </body>
 </html>
