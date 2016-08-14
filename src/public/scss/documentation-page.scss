@@ -5,8 +5,20 @@
     @include media(">=sm") {
         // Navbar + Documentation Content
         .container {
+            white-space: nowrap;
+
             >* {
-                float:left;
+                white-space: normal;
+                display:inline-block;
+                vertical-align:top;
+            }
+
+            .navbar {
+                width:20%
+            }
+
+            .documentation-content {
+                width:80%
             }
         }
 

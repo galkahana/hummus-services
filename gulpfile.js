@@ -119,6 +119,18 @@ function setupWebpackConfig() {
             '!preprocess?' + JSON.stringify(defaultPreProcessData.context)
         }
     );
+
+    // md
+    activeWebpackConfig.module.loaders.push(
+        {
+            test: /\.md$/,
+            exclude: /(node_modules)\//,
+            loader:
+            'html!markdown' +
+            '!string-replace?' + JSON.stringify(stringReplaceParams) +
+            '!preprocess?' + JSON.stringify(defaultPreProcessData.context)
+        }
+    );
 }
 
 // gulp tasks!

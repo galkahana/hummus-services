@@ -53,10 +53,8 @@ module.exports = {
                 ]
             },
 
-            // mds
-            { test: /\.md$/, loader: "html!markdown" }
 
-            // JS and html loaders is provided in gulp to allow optional minimification, replacement and preprocessing
+            // JS, md and html loaders is provided in gulp to allow optional minimification, replacement and preprocessing
         ]
     }
 };

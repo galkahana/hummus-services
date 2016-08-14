@@ -36,11 +36,11 @@ function router($ocLazyLoadProvider,
         })
         .state('documentation.home', {
             url: '',
-            template: '<strong>hello world</strong>'
+            template: require('../../../mds/introduction.md')
         })
-        .state('documentation.home1', {
-            url: '/home1',
-            template: require('../../../mds/home1.md'),
+        .state('documentation.gattingstarted', {
+            url: '/getting-started',
+            template: require('../../../mds/getting-started.md'),
         })
 }
 
