@@ -1,6 +1,10 @@
 @import "app-base";
 
 .documentation-page .content{
+    .navbar-nav>li>.navbar-nav {
+        margin-left:20px;
+    }
+
 
     @include media(">=sm") {
         // Navbar + Documentation Content
@@ -15,6 +19,8 @@
 
             .navbar {
                 width:20%
+
+
             }
 
             .documentation-content {

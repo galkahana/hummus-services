@@ -1,4 +1,4 @@
-## PDFHummus Services Documentation
+# PDFHummus Services Documentation
 
 Welcome To PDFHummus Services!
 

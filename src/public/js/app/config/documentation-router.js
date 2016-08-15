@@ -42,6 +42,31 @@ function router($ocLazyLoadProvider,
             url: '/getting-started',
             template: require('../../../mds/getting-started.md'),
         })
+        .state('documentation.api', {
+            url: '/api',
+            abstract:true,
+            template: '<ui-view autoscroll="false"></ui-view>'
+        })
+        .state('documentation.api.home', {
+            url: '',
+            template: require('../../../mds/api-reference.md')
+        })
+        .state('documentation.api.browser', {
+            url: '/browser',
+            template: require('../../../mds/api-reference-browser.md'),
+        })
+        .state('documentation.api.nodejs', {
+            url: '/nodejs',
+            template: require('../../../mds/api-reference-nodejs.md'),
+        })
+        .state('documentation.api.rest', {
+            url: '/rest',
+            template: require('../../../mds/api-reference-rest.md'),
+        })
+        .state('documentation.jobticket', {
+            url: '/job-ticket',
+            template: require('../../../mds/job-ticket.md'),
+        })
 }
 
 module.exports = router;

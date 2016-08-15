@@ -1,4 +1,4 @@
-## Getting Started
+# Getting Started
 
 Generating a PDF with the services requires:
 
