@@ -32,7 +32,7 @@ that were created.
 
 ## Jobs management
 
-To create a PDF file with PDFHummus services you create and object. Once created you can check its status over time, and when the status
+To create a PDF file with PDFHummus services you create a job object. Once created you can check its status over time, and when the status
 is done, this would mean the PDF file is created and you can download its based on the file ID (private or public, we'll get to that later).
 
 
@@ -44,7 +44,7 @@ The job object has the following members:
 - `status` : Job status, 0 for done (good, has a PDF available). 1 for in progress. 2 for finished with failure.
 - `label` : Job label. It is set by the job ticket meta.label member.
 - `ticket`  : Job ticket string used to create this job.
-- `generatedFile` : ID of generated file. using this ID you can access the file via the files management API
+- `generatedFile` : ID of generated file. using this ID you can access the file via the files management API.
 
 ### `hc.jobs` methods
 
