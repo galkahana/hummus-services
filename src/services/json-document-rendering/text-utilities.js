@@ -14,6 +14,9 @@ module.exports = {
 	getFont : function(inPDFWriter,inItem,inFilesMap)
 	{
 		var result; 
+		if(!inItem.options)
+			return null;
+
 		var fontPaths = inFilesMap.get(inItem.options.fontSource);
 		if(fontPaths)
 		{

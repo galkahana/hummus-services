@@ -2,11 +2,16 @@ function NewPageDriver(inPDFWriter,inWidth,inHeight)
 {
 	this.pdfWriter = inPDFWriter;
 	this.pdfPage = inPDFWriter.createPage(0,0,inWidth,inHeight);
+	this.height = inHeight;
 }
 
 NewPageDriver.prototype.startContentContext = function()
 {
 	return this.pdfWriter.startPageContentContext(this.pdfPage);
+}
+
+NewPageDriver.prototype.getPageHeight = function() {
+	return this.height;
 }
 
 NewPageDriver.prototype.writePage = function(inLinks)

@@ -178,12 +178,16 @@ function composeLine(inLine,inState)
 	else
 	{
 		// empty line, just increase yOffset per the newline height.
-		var lineHeight = TextUtilities
+		var font = TextUtilities
 							.getFont(inState.pdfWriter,
 									inLine.styles[0],
-									inState.filesMap)
-									.calculateTextDimensions('d',inLine.styles[0].options.size)
-									.yMax;
+									inState.filesMap);
+		if(!font) {
+			return false;
+		}
+		var lineHeight = font
+							.calculateTextDimensions('d',inLine.styles[0].options.size)
+							.yMax;
 		if(inState.box.height !== undefined && inState.yOffset-lineHeight*inState.lineSpacingModifier() < inState.box.bottom)
 		{
 			return false;

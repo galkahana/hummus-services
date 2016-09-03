@@ -97,9 +97,6 @@ function createEngineOptions(inDocument) {
 				},0);
 			}
 		}
-
-		console.log(params);
-
 		return params;
 	} else {
 		return {};
@@ -196,13 +193,14 @@ function createPage(inPage,inAccumulatedDims,inPDFWriter,inRenderingHelpers,call
     async.eachSeries(inPage.boxes,
         function(inBox,cb)
         {
+			setupPageBoxPositions(inBox,thePageDriver);
+
             renderBox(inBox,thePageDriver,inPDFWriter,inRenderingHelpers);
             cb();
         },
         function(err) {
             if(err)
                 return callback(err);
-                
 			try {
 	            thePageDriver.writePage(thePageDriver.links);
 			}
@@ -212,6 +210,16 @@ function createPage(inPage,inAccumulatedDims,inPDFWriter,inRenderingHelpers,call
             callback();
         }
     );
+}
+
+function setupPageBoxPositions(inBox,pageDriver) {
+	// for box level pages, allow setting top per page top. convert here
+	if(inBox.origin && inBox.origin == 'pageTop') {
+		if(inBox.top)
+			inBox.top = pageDriver.getPageHeight()-inBox.top;
+		if(inBox.bottom)
+			inBox.bottom = pageDriver.getPageHeight()-inBox.bottom;
+	}
 }
 
 function renderBox(inBox,inPDFPage,inPDFWriter,inRenderingHelpers)
