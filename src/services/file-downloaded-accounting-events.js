@@ -18,7 +18,7 @@ FileDownloadedAccountingEvents.prototype.getAccumulatedSizeFor = function(userId
                             {createdAt: {$gte: startDate}},
                             {createdAt: {$lte: endDate}}
                         ],
-                        tokenType: {$nin:[constants.eTokenRoleSiteUser,null]}                        
+                        tokenType: {$nin:[constants.eTokenRoleSiteUser]}                        
                     }
                 },
                 {
