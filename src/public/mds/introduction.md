@@ -40,4 +40,4 @@ PDFHummus Services  tickets supports many features of PDF creation . Mainly:
 7. Encryption - You can create PDF files that require password entry to view or print, or edit.
 8. Variable Information - You can provide a template document and data. This allows you to plan a document one time, and create many. 
 
-To learn how to construct a Job ticket for generating PDFs with those features go to <a ui-sref="documentation.jobticket">Job Ticket</a>.
+To learn how to construct a Job ticket for generating PDFs with those features go to <a ui-sref="documentation.jobticket.home">Job Ticket</a>.

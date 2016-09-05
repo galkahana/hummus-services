@@ -65,7 +65,16 @@ function router($ocLazyLoadProvider,
         })
         .state('documentation.jobticket', {
             url: '/job-ticket',
+            abstract:true,
+            template: '<ui-view autoscroll="false"></ui-view>'
+        })        
+        .state('documentation.jobticket.home', {
+            url: '',
             template: require('../../../mds/job-ticket.md'),
+        })
+        .state('documentation.jobticket.document', {
+            url: '/document',
+            template: require('../../../mds/job-ticket-document.md'),
         })
 }
 

@@ -51,7 +51,7 @@ Authorization: Bearer /\* The Private/Public Key \*/
 Content-type: application/json; charset=utf-8
 - **BODY**: /\* The Ticket \*/
 
-The Job ticket described the PDF to be created. To learn about how it should look like read about the <a ui-sref="documentation.jobticket">Job Ticket</a>.
+The Job ticket described the PDF to be created. To learn about how it should look like read about the <a ui-sref="documentation.jobticket.home">Job Ticket</a>.
 The response body will contain the new job object.
 
 ### GET /generation-jobs 

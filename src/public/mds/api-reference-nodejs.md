@@ -61,7 +61,7 @@ Get job object.
 Start a job. 
 
 **parameters**
-- *jobTicket* - Job ticket string. To learn about the job ticket look in <a ui-sref="documentation.jobticket">Job Ticket</a>.
+- *jobTicket* - Job ticket string. To learn about the job ticket look in <a ui-sref="documentation.jobticket.home">Job Ticket</a>.
 - *cb* - callback method of the signature `function(err,job)`, accepting error and job object.It is possible that already at this point the job is already at finished state.
 
 #### list(queryObject,cb)

@@ -24,7 +24,7 @@ The library creates a single object named `hummusService` that has a single meth
 It allows for the following arguments:
 
 1. key - your public key.
-2. job ticket - a job ticket object or string defining the PDF that you wish to create. To learn about the job ticket look in <a ui-sref="documentation.jobticket">Job Ticket</a>.
+2. job ticket - a job ticket object or string defining the PDF that you wish to create. To learn about the job ticket look in <a ui-sref="documentation.jobticket.home">Job Ticket</a>.
 3. [options] - options object. optional (can be omitted). see below for details. 
 4. [success callback] - success callback. optional. `function(downloadURL,embedURL){}` where downloadURL is a download url for the file, and embedURL is for embedding.
 5. [failure callback] - failure callback. optional. `function(response){}` where response is the error response.
