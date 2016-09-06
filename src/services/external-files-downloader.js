@@ -3,9 +3,10 @@ var tmp = require('temporary'),
 	https = require('https'),
 	async = require('async'),
 	fs = require('fs'),
+	gm = require('gm').subClass({imageMagick: true})
 	logger = require('./logger');
 
-function downloadFile(inFileURL,inTargetFilePath,inCallback)
+function downloadFileAndPossiblyConvert(inFileURL,inTargetFilePath,inCallback)
 {
 
 	var file = fs.createWriteStream(inTargetFilePath);
@@ -13,7 +14,27 @@ function downloadFile(inFileURL,inTargetFilePath,inCallback)
 	theDownloadService.get(inFileURL, function(response) {
   		response.pipe(file);
 		file.on('finish', function() {
-		      file.close(inCallback(null,inTargetFilePath));
+		      file.close(function() {
+				  var theGM = gm(inTargetFilePath);
+					theGM.format(function(err, value){
+						if(err) {
+							return inCallback(null,inTargetFilePath);
+						}
+
+						// convert gif and png images to tiff, which is what hummus can handle
+						if(value == 'GIF' || value == 'PNG') {
+							// use rgb cause i don't support transparency and it will break everything
+							theGM.colorspace('rgb').write(inTargetFilePath + '.tiff', function (err) {
+  								if(err)
+								  return inCallback(null,inTargetFilePath);
+								fs.unlink(inTargetFilePath);
+								return inCallback(null,inTargetFilePath + '.tiff');
+							});
+						}
+						else
+							inCallback(null,inTargetFilePath);
+					});				  
+			  });
 		    });  		
 	}).on('error', inCallback);	
 }
@@ -36,7 +57,7 @@ module.exports = {
 		async.forEachOf(inExternals,
 						function(inValue, inKey, cb) {
 							if(typeof inValue == 'string') {
-								downloadFile(inValue,
+								downloadFileAndPossiblyConvert(inValue,
 											new tmp.File().path,
 											function(err,inTargetFilePath)
 											{
@@ -50,7 +71,7 @@ module.exports = {
 							} else if(_.isArray(value)) {
 								var results = [];
 								async.each(value,function(file,done) {
-										downloadFile(file,
+										downloadFileAndPossiblyConvert(file,
 											new tmp.File().path,
 											function(err,inTargetFilePath)
 											{

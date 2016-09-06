@@ -8,7 +8,7 @@ RUN /usr/local/bin/install_node '~0.12'
 
 # install phantom
 RUN apt-get -q update
-RUN apt-get -y install build-essential chrpath git-core libssl-dev libfontconfig1-dev libxft-dev git wget    
+RUN apt-get -y install build-essential chrpath git-core libssl-dev libfontconfig1-dev libxft-dev git wget imagemagick
 ENV PHANTOM_JS phantomjs-2.1.1-linux-x86_64
 RUN wget https://github.com/paladox/phantomjs/releases/download/2.1.7/$PHANTOM_JS.tar.bz2
 RUN tar xvjf $PHANTOM_JS.tar.bz2
