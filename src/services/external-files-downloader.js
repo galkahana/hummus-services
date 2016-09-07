@@ -23,8 +23,8 @@ function downloadFileAndPossiblyConvert(inFileURL,inTargetFilePath,inCallback)
 
 						// convert gif and png images to jpf, which is what hummus can handle [tiff later when hummus support transparency]
 						if(value == 'GIF' || value == 'PNG') {
-							// use rgb cause i don't support transparency and it will break everything
-							theGM.colorspace('rgb').write(inTargetFilePath + '.jpg', function (err) {
+							// flatten to remove transparency
+							theGM.flatten().write(inTargetFilePath + '.jpg', function (err) {
   								if(err)
 								  return inCallback(null,inTargetFilePath);
 								fs.unlink(inTargetFilePath);
