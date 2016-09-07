@@ -21,14 +21,14 @@ function downloadFileAndPossiblyConvert(inFileURL,inTargetFilePath,inCallback)
 							return inCallback(null,inTargetFilePath);
 						}
 
-						// convert gif and png images to tiff, which is what hummus can handle
+						// convert gif and png images to jpf, which is what hummus can handle [tiff later when hummus support transparency]
 						if(value == 'GIF' || value == 'PNG') {
 							// use rgb cause i don't support transparency and it will break everything
-							theGM.colorspace('rgb').write(inTargetFilePath + '.tiff', function (err) {
+							theGM.colorspace('rgb').write(inTargetFilePath + '.jpg', function (err) {
   								if(err)
 								  return inCallback(null,inTargetFilePath);
 								fs.unlink(inTargetFilePath);
-								return inCallback(null,inTargetFilePath + '.tiff');
+								return inCallback(null,inTargetFilePath + '.jpg');
 							});
 						}
 						else
