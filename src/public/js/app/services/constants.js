@@ -16,7 +16,7 @@ constants.eTokenRolePublicAPI = 'publicAPI';
 
 // others
 
-constants.DEFAULT_DATE_TIME_FILTER  = 'MMM d, y hh:mm:ss:sss\'ms\'';
+constants.DEFAULT_DATE_TIME_FILTER  = 'MMM d, y HH:mm:ss:sss\'ms\'';
 constants.DEFAULT_DATE_FILTER  = 'MMM DD, YYYY';
 
 module.exports = angular.module('constants.services', [])
