@@ -11,3 +11,6 @@ handlers:
 - url: /tasks/delete-timedout-files
   script: ./src/app.js
   login: admin
+
+- url: /.*
+  script: ./src/app.js
