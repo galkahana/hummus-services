@@ -53,7 +53,8 @@ to provide it for download via PDFHummus services.
 ````
 "meta" : {
     "private": true/false,
-    "label": "some label"
+    "label": "some label",
+    "deleteFileAfter": time in milliseconds
 }
 ```` 
 
@@ -61,6 +62,9 @@ The `private` key should be used in the case that you **dont** want the file to 
 and you will not be able to send the public download url to a 3rd party. It's a good option to use if you don't need this feature, keeping your PDFs safe and private. By default, the value is `false`.
 
 The `label` key is useful for defining a label which can be searched by via the API or the console management search bar. Provide a description of the job, or just the date it was created on, so it is easy to look it up.
+
+`deleteFileAfter` is a mechanism for saving your used disk space. If you want to have the file deleted some time after its 
+creation, you can use this parameter with the number of milliseconds after which you want the file to be deleted.
 
 ## document
 

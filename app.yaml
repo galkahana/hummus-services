@@ -7,4 +7,7 @@ skip_files:
 manual_scaling:
   instances: 1
   
-  
+handlers:
+- url: /tasks/delete-timedout-files
+  script: ./src/app.js
+  login: admin

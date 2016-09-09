@@ -3,6 +3,7 @@ var tmp = require('temporary'),
 	https = require('https'),
 	async = require('async'),
 	fs = require('fs'),
+	_ = require('lodash'),
 	gm = require('gm').subClass({imageMagick: true})
 	logger = require('./logger');
 
@@ -68,9 +69,9 @@ module.exports = {
 												logger.log('downloaded',inKey,'from',inValue,'to',inTargetFilePath);
 												cb();
 											});
-							} else if(_.isArray(value)) {
+							} else if(_.isArray(inValue)) {
 								var results = [];
-								async.each(value,function(file,done) {
+								async.each(inValue,function(file,done) {
 										downloadFileAndPossiblyConvert(file,
 											new tmp.File().path,
 											function(err,inTargetFilePath)

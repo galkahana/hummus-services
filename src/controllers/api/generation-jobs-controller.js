@@ -60,7 +60,8 @@ function startGenerationJob(inJobTicket,user,token,callback)
         status:constants.eJobInProgress,
         label:(inJobTicket.meta && inJobTicket.meta.label) ? inJobTicket.meta.label:undefined,
         ticket:inJobTicket,
-        user:user._id
+        user:user._id,
+        deleteFileAfter: (inJobTicket.meta && inJobTicket.meta.deleteFileAfter) ? inJobTicket.meta.deleteFileAfter:undefined
     },function(err,job) {
         if(err) return callback(err);
         
@@ -117,6 +118,12 @@ function startGenerationJob(inJobTicket,user,token,callback)
                         // on success, finally set the job status to done
                         logger.error('Job succeeded, finished OK',job._id);
                         job.status = constants.eJobDone;
+
+                        // add killer date for file when done, if required
+                        if(job.deleteFileAfter) {
+                            job.deleteFileAt = moment().add({ms:job.deleteFileAfter});
+                        }
+
                         generationJobsService.update(job._id,job);  
                         accounting.logJobRanAccountingEvent(job,token,generationResult.outputPath);
                     }
@@ -128,105 +135,6 @@ function startGenerationJob(inJobTicket,user,token,callback)
         callback(null,job);        
         
     });
-}
-
-function deleteFilesForGeneratedFileIDs(generatedFilesIDs,callback) {
-    /*
-        Important! this one does not null gneerated file entries
-    */
-    generatedFilesService.getAllIn(generatedFilesIDs,function(err,items) {
-        if(err)
-            return callback(err);
-        
-        // remove files from remote storage
-        remoteStorageService.removeFiles(
-            _.filter(
-                _.map(items,function(value){return value.remoteSource;}),
-                function(value){return !!value;}),function(err) {
-                    logger.info('Removed multiple files from remote storage');
-                    
-                    // remove generated files entries
-                    generatedFilesService.destroyIn(generatedFilesIDs,callback);
-                });
-    });
-}
-
-function deleteAllWithFiles(items,callback) {
-    async.series(
-        [
-            function(cb) {
-                deleteFilesForJobIDsNoUpdate(items,cb);
-            },
-            function(cb) {
-                logger.info('Deleting jobs');
-                generationJobsService.destroyIn(items,
-                    function(err) {
-                        if(err) {
-                            logger.error('Error in deleting jobs',err);
-                        }
-                        else 
-                            logger.info('Succeeded Deleting multiple jobs');
-                        cb(err);
-                    });
-            }
-        ],callback
-    );
-}
-
-function deleteFilesForJobIDsNoUpdate(items,callback) {
-    var jobItems;
-    
-    async.series(
-        [
-            function(cb) {
-                logger.info('Fetching job items for IDs');
-                generationJobsService.getAllIn(items,function(err, generationJobs){
-                   if(err) {
-                        logger.error('Error in fetching jobs for files delete',err);
-                        return cb(err);
-                   }
-                   jobItems = generationJobs;
-                   cb(); 
-                });
-            },
-            function(cb) {
-                logger.info('Deleting files for jobs');
-                deleteFilesForGeneratedFileIDs(
-                    _.filter(_.map(jobItems,function(value){return value.generatedFile;}),function(value){return !!value;}),
-                    function(err) {
-                        if(err) {
-                            logger.error('Error in deleting files for jobs',err);
-                        }
-                        else 
-                            logger.info('Succeeded Deleting files for jobs');
-                        cb(err);
-                    });
-            }
-        ],callback
-    );       
-}
-
-function deleteFilesForJobs(items,callback) {
-    async.series(
-        [
-            function(cb) {
-                deleteFilesForJobIDsNoUpdate(items,cb);
-            },
-            function(cb) {
-                logger.info('Updating jobs with null files');
-                generationJobsService.updateIn(items,
-                    {generatedFile:null},
-                    function(err) {
-                        if(err) {
-                            logger.error('Error in updating jobs',err);
-                        }
-                        else 
-                            logger.info('Succeeded Updating multiple jobs by removing their files');
-                        cb(err);
-                    });
-            }
-        ],callback
-    );    
 }
 
 function limitToUserJobs(items,userId,callback) {
@@ -389,7 +297,7 @@ function GenerationJobsController() {
                 limitToUserJobs(req.body.items,user._id,function(err,items) {
                     if (err) { return next(err); }
 
-                    deleteAllWithFiles(items,function(err) {
+                    generationJobsService.deleteAllWithFiles(items,function(err) {
                         if (err) { return next(err); }
                         res.status(200).json({ok:true});
                     });
@@ -399,7 +307,7 @@ function GenerationJobsController() {
             case 'deleteFiles': {
                 limitToUserJobs(req.body.items,user._id,function(err,items) {
                     if (err) { return next(err); }
-                    deleteFilesForJobs(items,function(err) {
+                    generationJobsService.deleteFilesForJobs(items,function(err) {
                         if (err) { return next(err); }
                         res.status(200).json({ok:true});
                     });

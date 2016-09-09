@@ -1,7 +1,8 @@
 'use strict';
 
 var api = require('./api.js'),
-    web = require('./web.js');
+    web = require('./web.js'),
+    tasks = require('./tasks.js');
 
 
 var routes = function(app) {
@@ -15,6 +16,7 @@ var routes = function(app) {
     });
 
     app.use('/api', api);
+    app.use('/tasks', tasks);
     app.use('/', web);
 };
 

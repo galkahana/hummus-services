@@ -1,0 +1,4 @@
+cron:
+- description: delete timedout files
+  url: /tasks/delete-timedout-files
+  schedule: every 1 hours

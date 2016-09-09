@@ -20,12 +20,15 @@ var generationJobSchema = new Schema({
     generatedFile: {
         type: Schema.ObjectId,
         ref: 'GeneratedFile'
-    }
+    },
+    deleteFileAfter: Number,
+    deleteFileAt: Date
 });
 
 generationJobSchema.index({status: 1});
 generationJobSchema.index({user: 1});
 generationJobSchema.index({generatedFile: 1});
+generationJobSchema.index({deleteFileAt: -1});
 generationJobSchema.plugin(timestamps, {index: true});
 
 // limit fields when going public
