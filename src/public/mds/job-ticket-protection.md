@@ -1,38 +1,16 @@
-# Document
+# Password Protection
 
-The top leve object of the document description has the following schema:
+PDF files may be encrypted, and require a password for opening them.
+PDFHummus Services supports RC4 passwords in the following elements:
 
-````
-{
-    pages : [/* Array of page objects */]
-    [protection] : {
-        userPassword : "user password"
-        [ownerPassword] : "owner password"
-        [userProtectionFlag] : [/* array of permission keys */] 
-    }
-    [source] : "modified file label"
-}
-````
+1. You can create PDF files with passwords
+2. You can modify PDF files with passwords
+3. You can copy pages from PDF files that are password protected
+4. You can use PDF pages that are password protected as images
 
-## pages
+## Creating a PDF that is password protected
 
-The `pages` array holds pages objects, each defining the content of a single page or describing how to append pages form another pdf. More on pages in <a ui-sref="documentation.jobticket.pages">Pages</a>.
-A very simple document that contains a single page looks like this:
-
-````
-    {
-        "pages": [
-            {
-                "width": 595,
-                "height": 842
-            }
-        ]
-    }
-````
-
-## protection
-
-If you want to require an opening user to provide a password before they can view the file add a `protection` object.
+If you want to require an opening user to provide a password before they can view the file add a `protection` object to the `document` object.
 the `protection` object should have at least a `userPassword` key which states the password that the user should provide in order to open the document.
 In addition you can define that there's only a limited set of actions that the user can carry with this PDF. For this you must provide an `ownerPassword` key and a `userProtectionFlag` key.
 The `ownerPassword` key describes an admin password that if existing and different from the user password allows for limitation in actions.
@@ -64,12 +42,16 @@ You can alternatively place a number as `userProtectionFalg` which will be a bit
 }
 ````
 
-## source
+## Modifying a PDF that is protected by a password
 
-If instead of creating a new PDF you would like to modify an existing PDF, provide a `source` key where its value should be a label. 
-That label should be a key in the job ticket externals dictionary which value is a url to a PDF file - the PDF that you wish to modify.
+Creating a modified version of an existing PDF is carried out by providing a `source` entry in the `document` object.  
+If the PDF is protected with a password, you should provide that password, so that it can be opened. Use the `protection` object describe in the previous entry, with just a `userPassword` entry which should hold the password.
 
-Modification allows you to add new pages to the document by describing them in the `pages` array. Any page object will create a page that will be appended o the document.
-You can also modify existing pages, adding content on top of their existing content. More on this in <a ui-sref="documentation.jobticket.pages">Pages</a>.
+## Copying pages from password protected PDFs
 
-If the source document requires a password for opening it, use a `protection` object, as you would with a new object. Provide only `userPassword` in this case.
+When defining a `page` object you can state that you'd like to append pages from another PDF. use the `appendedFrom` entry for that. If that PDF requires a password for opening, Provide a `password`
+entry with that password.
+
+## Using password proected PDF files as images
+
+You can create Image boxes from PDFs that have password protection. In this case in the item definition, next to `source` provide another `password` entry with the password.

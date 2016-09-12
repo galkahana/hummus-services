@@ -6,7 +6,7 @@ Generating a PDF with the services requires:
 - Make API call to the service via REST or via a language specific libs with the job ticket.
 - User other API calls to track the job progress and end. Specific libs may build on top of this and provide convenience methods for async callbacks for job end state.
 
-## Build a job ticket <a name="build-job-ticket"></a>
+## <a name="build-job-ticket"></a> Build a job ticket 
 
 The most basic job ticket contains a description of a document. Here is an example:
 
@@ -50,11 +50,11 @@ The single page has a single box which shows the text "hello world!" in pink, wi
 You would normally pass this object to the service generation APIs as a string, and not an object, so you'll call `JSON.stringify(myObject)` in the case
 that you build this as an object.
 
-## Make API Calls <a name="api"></a>
+## <a name="api"></a> Make API Calls 
 
 You can always use REST to work with the services. We created specialized libs for browser based Javascript (client) and NodeJS. 
 
-### Browser <a name="browser"></a>
+### <a name="browser"></a> Browser 
 
 Create A PDF file directly in browser client code by following these steps:
 
@@ -83,7 +83,7 @@ The success callback accepts two parameters.
 urlDownload can be used for downloading the PDF file. 
 urlEmbed can be used for opening the PDF in a window or embedding in a page.
 
-### NodeJS <a name="nodejs"></a>
+### <a name="nodejs"></a> NodeJS 
 
 Create A PDF file with NodeJS by following these steps:
 
@@ -124,7 +124,7 @@ allowing you to write the PDF result to wherever you want. In this example the r
 
 Note that with the private key, and with the NodeJS client you can also manage jobs and file. For full API reference go to <a ui-sref="documentation.api.nodejs">NodeJS API</a>
 
-### REST <a name="rest"></a>
+### <a name="rest"></a> REST
 
 You can create a PDF file from either client or server using REST calls to Hummus Services:
 

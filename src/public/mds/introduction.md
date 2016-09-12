@@ -31,13 +31,14 @@ To setup an account with PDFHummus services, mail us at [join@pdfhummus.com](mai
 
 PDFHummus Services  tickets supports many features of PDF creation . Mainly:
 
-1. Generating PDFs from scratch or modified versions of existing ones. You can also append pages from existing PDF files.
-2. Usign images - jpgs, tiffs, and embedded PDFs. Images can be transformed to fit or fill a define area.
-3. Text - using True type, Open type or Type 1 fonts. Right to left and Left to right writing directions supported.
-4. Shapes - add polygons, circles, rectangles.
-5. Streams - combine text, shapes and images and flow them in a defined area.  
-6. Links - URL links can be placed on images and text
-7. Encryption - You can create PDF files that require password entry to view or print, or edit.
-8. Variable Information - You can provide a template document and data. This allows you to plan a document one time, and create many. 
+1. Generating PDFs from scratch.
+2. Modifying existing documents by adding pages to them, or adding content to their existing pages.
+3. Usign images - jpgs, tiffs, and embedded PDFs. Images can be transformed to fit or fill a define area.
+4. Text - using True type, Open type or Type 1 fonts. Right to left and Left to right writing directions supported.
+5. Shapes - add polygons, circles, rectangles.
+6. Streams - combine text, shapes and images and flow them in a defined area.  
+7. Links - URL links can be placed on images and text
+8. Encryption - You can create PDF files that require password entry to view or print, or edit.
+9. Variable Information - You can provide a template document and data. This allows you to plan a document one time, and create many. 
 
 To learn how to construct a Job ticket for generating PDFs with those features go to <a ui-sref="documentation.jobticket.home">Job Ticket</a>.

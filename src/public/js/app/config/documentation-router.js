@@ -76,6 +76,38 @@ function router($ocLazyLoadProvider,
             url: '/document',
             template: require('../../../mds/job-ticket-document.md'),
         })
+        .state('documentation.jobticket.pages', {
+            url: '/pages',
+            template: require('../../../mds/job-ticket-pages.md'),
+        })
+        .state('documentation.jobticket.boxes', {
+            url: '/boxes',
+            template: require('../../../mds/job-ticket-boxes.md'),
+        })
+        .state('documentation.jobticket.text', {
+            url: '/text',
+            template: require('../../../mds/job-ticket-text.md'),
+        })
+        .state('documentation.jobticket.shapes', {
+            url: '/shapes',
+            template: require('../../../mds/job-ticket-shapes.md'),
+        })
+        .state('documentation.jobticket.images', {
+            url: '/images',
+            template: require('../../../mds/job-ticket-images.md'),
+        })
+        .state('documentation.jobticket.streams', {
+            url: '/streams',
+            template: require('../../../mds/job-ticket-streams.md'),
+        })
+        .state('documentation.jobticket.protection', {
+            url: '/protection',
+            template: require('../../../mds/job-ticket-protection.md'),
+        })
+        .state('documentation.jobticket.modification', {
+            url: '/modification',
+            template: require('../../../mds/job-ticket-modification.md'),
+        })
 }
 
 module.exports = router;
