@@ -103,6 +103,12 @@ When using the PDF Rendering service you will normally have to provide URLs for 
 
 the labels (e.g. 'arial') denotes the value for `name`.
 
+## Unicode, Ligature and OTF special effects  support
+
+You can place any unicode text, if the font that you are using has unicode mapping. Most fonts do.
+Ligatures at this point are not supported.
+Right to left writing and Bidirectional text is supported, though position-aware glyph changing (like in Arabic) is not supported. 
+
 ## Defining color
 
 The `options` object allows also the definition of the text color through two properties:
