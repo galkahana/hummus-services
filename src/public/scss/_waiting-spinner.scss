@@ -40,6 +40,30 @@
   }
 }
 
+.btn-spinner,
+.btn-spinner-viz {
+  position:relative;
+
+    &.btn {
+        .spinner {
+            margin:0;
+            >div {
+                width: 12px;
+                height: 12px;
+            }
+        }
+    }
+
+    &.btn-primary {
+        .spinner {
+            >div {
+                background-color:white;
+            }
+        }
+
+    }  
+}
+
 
 .btn-spinner {
     .spinner {
@@ -55,17 +79,27 @@
             display:none;
         }                
     }
-    
-    &.btn-primary {
-        .spinner {
-            margin:0;
-          
-            >div {
-                background-color:white;
-                width: 12px;
-                height: 12px;
-            }
-        }
+}
 
+.btn-spinner-viz {
+    .spinner {
+        visibility:hidden;
+        height:0;
+        overflow:hidden;
+    }
+    
+    &.spinner-active {
+        .spinner {
+          visibility:visible;
+          height: auto;
+          margin: 0 auto;  
+          overflow:visible;      
+        }
+        
+        .default {
+          visibility:hidden;
+          height:0;
+          overflow:hidden;
+        }                
     }
 }

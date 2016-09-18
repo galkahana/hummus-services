@@ -2,6 +2,8 @@ var mongoose = require('mongoose'),
     Schema = mongoose.Schema,
     timestamps = require('./plugins/timestamps');
 
+var USER_STATUSES = ['trial','full'],
+    USER_STATUSES_TRIAL = USER_STATUSES[0];
 
 var userSchema = new Schema({
     username: {
@@ -19,6 +21,13 @@ var userSchema = new Schema({
     password: {
         type:String,
         required:true
+    },
+    status: {
+        type:String,
+        enum: USER_STATUSES,
+        required:true,
+        default: USER_STATUSES_TRIAL
+
     }
 });
 
@@ -38,5 +47,7 @@ userSchema.set('toJSON', {
         
     }
 });
+
+userSchema.statics.USER_STATUSES_TRIAL = USER_STATUSES_TRIAL;
 
 module.exports = mongoose.model('User', userSchema);

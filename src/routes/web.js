@@ -22,6 +22,7 @@ function sendSiteFileFunc(pathToPage) {
 
 // application
 router.get('/login', consoleApp);
+router.get('/signup', consoleApp);
 router.get('/console', consoleApp);
 router.get('/console/*', consoleApp);
 router.get('/documentation', documentationApp);

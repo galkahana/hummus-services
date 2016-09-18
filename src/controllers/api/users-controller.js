@@ -46,7 +46,49 @@ function UsersController() {
             res.status(200).json(user);
         });
     }
-    
+
+    function filterValidCreateFields(payload) {
+        return _.pick(payload,['email','password','username']);
+    } 
+
+    this.create = function(req, res, next) {
+
+        var userData = filterValidCreateFields(req.body);
+
+        if (!userData.email) {
+            return res.badRequest('Missing email. Please provide email for user creation');
+        }
+
+        if (!userData.username) {
+            return res.badRequest('Missing username. Please provide username for user creation');
+        }
+
+        if (!userData.password) {
+            return res.badRequest('Missing password. Please provide password for user creation');
+        }
+        
+        // encrypt password
+        userData.password = authentication.encryptPassword(userData.password); 
+
+        users.create(userData, function(err, user) {
+            if(err) {
+                if(err.code == '11000') {
+                    var newError = new Error("A user with this username already exists");
+                    if(!newError.info)
+                        newError.info = {};
+                    newError.info.duplicateUsername = true;
+                    return res.unprocessable(newError);
+                }
+
+                return res.unprocessable(err);
+            }
+            // setup relevant "login" emulators so that later stage can generate tokens
+            req.user = user;
+            req.info = {provider: 'basic'};
+            next();
+        });
+    }
+
     this.getPlanUsage = function(req,res,next) {
         var user = req.user;
         if (!user) {

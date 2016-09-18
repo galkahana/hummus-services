@@ -4,6 +4,7 @@ var express = require('express'),
     router = express.Router(),
     authentication = require('../services/authentication'),
     authorization = require('../services/authorization'),
+    capcha = require('../services/google-capcha'),
     authorize = authorization.authorize,
     permissions = authorization.getPermissions(),
 	path = require('path');
@@ -53,6 +54,8 @@ router.route('/authenticate/sign-in')
     .post(authentication.login,authenticationController.signIn)
 router.route('/authenticate/sign-out')
     .delete(authentication.authenticateOrDie,authorize(permissions.siteGeneric),authenticationController.signOut)
+router.route('/authenticate/sign-up')
+    .post(capcha.checkcapcha ,usersController.create, authenticationController.signIn);
 
 router.route('/public/:publicDownloadId/download')
     .get(generatedFilesController.downloadPublic);

@@ -37,6 +37,7 @@
     "passport-local": "^1.0.0",
     "phantom": "^0.8.4",
     "rbac2": "^1.0.7",
+    "request": "^2.75.0",
     "s3": "^4.4.0",
     "temporary": "0.0.8",
     "uuid": "^2.0.1"

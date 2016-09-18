@@ -1,8 +1,14 @@
 
 var oauth2 = require('../../services/oauth2'),
     Client = require('../../models/clients'),
+    User = require('../../models/users'),
     constants = require('../../models/constants'),
     _ = require('lodash');
+
+function isEligibleForTokensCreation(user) {
+    return user.status !== User.USER_STATUSES_TRIAL;
+}
+
 
 function TokensController() {
     this.show = function(req,res,next) {
@@ -96,6 +102,15 @@ function TokensController() {
                         break;
                     }
                     case 'create': {
+                        if(!isEligibleForTokensCreation(user)) {
+                            var newError = new Error("User cannot create API tokens");
+                            if(!newError.info)
+                                newError.info = {};
+                            newError.info.notEligible = true;
+                            return res.unprocessable(newError);
+
+                        }
+
                         if(!req.body.tokenType ||
                             (req.body.tokenType !== constants.eTokenRolePrivateAPI &&
                                 req.body.tokenType !== constants.eTokenRolePublicAPI)) {

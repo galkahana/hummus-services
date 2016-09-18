@@ -71,7 +71,7 @@ function encryptPassword(password) {
 
 passport.use('login', new LocalStrategy(
     function(username, password, done) {
-        User.findOne({$or: [{email: username}, {username: username}]})
+        User.findOne({username: username})
             .select('password')
             .exec(function(err, user) {
                 if (err) {

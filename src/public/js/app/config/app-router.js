@@ -41,6 +41,12 @@ function router($ocLazyLoadProvider,
             template: require('../../../templates/login-page.html'),
             controller: require('../controllers/login-controller')
         })
+        .state('signup', { 
+            url: '/signup',
+            data: {pageTitle: 'Sign Up'},
+            template: require('../../../templates/signup-page.html'),
+            controller: require('../controllers/signup-controller')
+        })
         // restricted areas
         .state('console', { 
             url: '/console',

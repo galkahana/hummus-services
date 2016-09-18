@@ -231,7 +231,8 @@ gulp.task('run', ['run-sequance'], function(cb) {
     
     var rewrites = [
                 { from: /\/console/, to: '/console.html'},
-                { from: /\/login/, to: '/console.html'}
+                { from: /\/login/, to: '/console.html'},
+                { from: /\/signup/, to: '/console.html'}
             ];
             
     ['about','contact','documentation'].forEach(function(value) {

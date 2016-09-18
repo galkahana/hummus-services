@@ -18,7 +18,7 @@ module.exports = angular.module('api-keys-panel.directives',[
              },
              template: require('../../../templates/api-keys-panel.html'),
              link: function(scope) {
-                 
+
                  function loadData() {
                      Token.get().then(function(response) {
                          var result = response.data;
@@ -34,11 +34,13 @@ module.exports = angular.module('api-keys-panel.directives',[
                  
                  
                  scope.createPublicKey = function() {
+                     scope.error = null;
                      scope.creatingPublic = true;
                      Token.createKey(Constants.eTokenRolePublicAPI).then(function(response) {
                          scope.creatingPublic = false;
                          scope.publicKey = response.data.accessToken;                         
                      }, function(err) {
+                         scope.error = err.data.info;
                          scope.creatingPublic = false;
                          console.log(err);
                          toastr.error('Failed create API key');                         
@@ -46,6 +48,7 @@ module.exports = angular.module('api-keys-panel.directives',[
                  }
 
                  scope.deletePublicKey = function() {
+                     scope.error = null;
                      scope.deletingPublic = true;
                      Token.revokeKey(Constants.eTokenRolePublicAPI).then(function(response) {
                          scope.deletingPublic = false;
@@ -58,11 +61,13 @@ module.exports = angular.module('api-keys-panel.directives',[
                  }
 
                  scope.createPrivateKey = function() {
+                     scope.error = null;
                      scope.creatingPrivate = true;
                      Token.createKey(Constants.eTokenRolePrivateAPI).then(function(response) {
                          scope.creatingPrivate = false;
                          scope.privateKey = response.data.accessToken;                         
                      }, function(err) {
+                         scope.error = err.data.info;
                          scope.creatingPrivate = false;
                          console.log(err);
                          toastr.error('Failed create API key');                         
@@ -70,6 +75,7 @@ module.exports = angular.module('api-keys-panel.directives',[
                  }
 
                  scope.deletePrivateKey = function() {
+                     scope.error = null;
                      scope.deletingPrivate = true;
                      Token.revokeKey(Constants.eTokenRolePrivateAPI).then(function(response) {
                          scope.deletingPrivate = false;

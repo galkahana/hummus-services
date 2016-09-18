@@ -36,6 +36,14 @@ module.exports = angular.module('users.services', [
                 logout: function() {
                     return Restangular.all('authenticate').customDELETE('sign-out');
                 },
+                signup: function(data,options) {
+                    return Restangular.all('authenticate').customPOST(_.extend(data,
+                            {
+                                clientId: accessCreds.client.id,
+                                clientSecret: accessCreds.client.secret
+                            }
+                        ),'sign-up',null,{hmscpa:options.capcha});
+                },                
                 updateUsername: function(username) {
                     return usersActions.post({type:'changeUsername',username:username});
                 },

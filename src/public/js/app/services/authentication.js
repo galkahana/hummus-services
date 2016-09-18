@@ -82,6 +82,15 @@ module.exports = angular.module('authentication.services', [
                         cb(null);
                     }, cb);           
         },
+        signup: function(data,options,cb) {
+            Users.signup(data,options)
+                    .then(function(response) {
+                        saveToken(response.data.accessToken);
+                        restartUpdateInterval();
+                        cb(null);
+                    }, cb);           
+            
+        },
         logout: function(cb) {
             Users.logout()
                     .then(function(response) {

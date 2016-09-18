@@ -1,0 +1,24 @@
+@import "app-base";
+
+.signup-page {
+    .signup-form {
+        @extend .default-item-container;
+
+        padding:10px;
+        width: 440px;
+        
+        margin: 20px auto;
+
+        .for-error {
+            display:none;
+        }
+
+        .has-error .for-error {
+            display:block;
+        }
+
+        form {
+            margin-bottom:20px;
+        }
+    }
+}
