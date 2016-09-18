@@ -47,7 +47,7 @@ var config = {
     websiteURL: 'http://localhost:3000',
     publishApiURL: 'http://services.pdfhummus.com/api',
     publishWebsiteURL: 'http://services.pdfhummus.com',
-    publishEnvVars: ['MONGODB_URI'],
+    publishEnvVars: ['MONGODB_URI','SENDGRID_API'],
     webpackRoot: '/assets'
 };
 
