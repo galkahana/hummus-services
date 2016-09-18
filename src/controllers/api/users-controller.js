@@ -6,8 +6,10 @@ var _ = require('lodash'),
     remoteStorageService = require('../../services/remote-storage-service'),
     fileDownloadedAccountingEvents = require('../../services/file-downloaded-accounting-events'),
     jobRanAccountingEvents = require('../../services/job-ran-accounting-events'),
+    logger = require('../../services/logger'),
     async = require('async'),
-    moment = require('moment');
+    moment = require('moment'),
+    emails = require('../../services/emails');
 
 function UsersController() {
      /**
@@ -82,6 +84,23 @@ function UsersController() {
 
                 return res.unprocessable(err);
             }
+
+            // send email (using a simple direct mechanism for now...sometimes a cron jobs and digest)
+            emails.sendUserJoinedAdminEmail(user,function(err){
+                if(err) {
+                    logger.error('error sending admin user joined email for user',user._id,'error:',err);
+                }
+                else
+                    logger.log('success sending admin email about user',user._id,'joining');
+            });
+            emails.sendUserJoinedWelcomeEmail(user,function(err){
+                if(err) {
+                    logger.error('error sending user joined email to user',user._id,'error:',err);
+                }
+                else
+                    logger.log('success sending user welcome email to user',user._id);
+            });
+
             // setup relevant "login" emulators so that later stage can generate tokens
             req.user = user;
             req.info = {provider: 'basic'};
@@ -162,6 +181,7 @@ function UsersController() {
                         }
                         return next(err); 
                     }
+
                     res.status(200).json(user);
                 });                
                 break;
