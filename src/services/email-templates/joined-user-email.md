@@ -1,6 +1,6 @@
 Hello {{name || username}},   
 
-Welcome to PDFHummus Services, your PDF Cloud generation service.      
+Welcome to PDFHummus Services, the Cloud PDF generation service.      
 
 This email is automated response, letting you know that your registration request was accepted.  
 
