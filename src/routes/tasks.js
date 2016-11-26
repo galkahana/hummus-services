@@ -11,8 +11,6 @@ var tasksPath = path.resolve(__dirname,'../tasks/') + '/',
 
 // general middleware to verify request is coming from cloud cron
 router.use(function (req, res, next) {
-    console.log(req.headers);
-
   if(req.get('X-Appengine-Cron') === 'true') {
     return next();
   } else {
