@@ -8,6 +8,18 @@ var express = require('express'),
 var tasksPath = path.resolve(__dirname,'../tasks/') + '/',
     deleteTimeoutTask = require(tasksPath + 'delete-timedout-files');
 
+
+// general middleware to verify request is coming from cloud cron
+router.use(function (req, res, next) {
+    console.log(req.headers);
+
+  if(req.get('X-Appengine-Cron') === 'true') {
+    return next();
+  } else {
+    return res.forbidden();
+  }
+});
+
 router.route('/delete-timedout-files')
     .get(deleteTimeoutTask.run)
 
