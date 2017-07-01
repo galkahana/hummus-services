@@ -45,8 +45,8 @@ var config = {
     forDebug: false || argv.d,
     apiURL: 'http://localhost:3000/api',
     websiteURL: 'http://localhost:3000',
-    publishApiURL: 'http://services.pdfhummus.com/api',
-    publishWebsiteURL: 'http://services.pdfhummus.com',
+    publishApiURL: 'https://services.pdfhummus.com/api',
+    publishWebsiteURL: 'https://services.pdfhummus.com',
     publishEnvVars: ['MONGODB_URI','SENDGRID_API'],
     webpackRoot: '/assets'
 };
