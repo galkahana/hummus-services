@@ -22,8 +22,8 @@ function downloadFileAndPossiblyConvert(inFileURL,inTargetFilePath,inCallback)
 							return inCallback(null,inTargetFilePath);
 						}
 
-						// convert gif and png images to jpf, which is what hummus can handle [tiff later when hummus support transparency]
-						if(value == 'GIF' || value == 'PNG') {
+						// convert gif images to jpg, which is what hummus can handle
+						if(value == 'GIF') {
 							// remove transparency, if exists
 							theGM.background('white').flatten().write(inTargetFilePath + '.jpg', function (err) {
   								if(err)

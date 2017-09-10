@@ -1,7 +1,7 @@
 # Images
 
 You can use images hosted on some web server via their URL. Images may be just for display, but may also be clickable links.  
-Supported image types are: JPG, TIFF, PDF, PNG, GIF. Note that transparency is not supported at this point for PNG, GIF and TIFF. 
+Supported image types are: JPG, TIFF, PDF, PNG, GIF. Transparent PNG images are supported, but note that transparency is not supported at this point for GIF and TIFF images. 
 If you have means of creating a PDF from these images, you can import the PDF as an image and its transparency will be respected.
 
 Here is an example of using an image from a remote URL:    
