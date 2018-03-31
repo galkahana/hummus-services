@@ -77,7 +77,9 @@ function calculatePreProcessData() {
 }
 
 function takeReplacesSnapshot() {
-    kReplaces = _.map(config,function(value,key) {return ['__' + key + '__',value];});
+    kReplaces = _.map(config,function(value,key) {return [
+        '__' + key + '__',
+        typeof value === 'string' ? value : JSON.stringify(value,null,2)];});
 }
 
 // webpack setup. takes care of JS, Sass, angular templates etc. whatever is required
@@ -90,6 +92,8 @@ function setupWebpackConfig() {
                 return {search: value[0], replace: value[1], flags: 'g'};
             })
     };
+
+    console.log(stringReplaceParams)
 
     // setup modules, as this is based on determined decisions
     if (!activeWebpackConfig.module) {
