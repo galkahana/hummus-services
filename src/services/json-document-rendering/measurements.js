@@ -198,6 +198,8 @@ function getShapeItemMeasures(inItem)
 	return result;				
 }
 
+Measurements.prototype.getShapeItemMeasures = getShapeItemMeasures
+
 Measurements.prototype.getItemMeasures = function(inItem,inBox,inPDFWriter) {
 	var result;
 	var itemType = inItem.type ? inItem.type:getBoxItemType(inBox);
