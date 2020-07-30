@@ -66,7 +66,7 @@ class DocumentMeasurements {
                     height:item.transformation.height}
         }
         else if(imagePath)
-            result = this.writer.getImageDimensions(this.filesMap.get(item.source),0),{password:item.password} 
+            result = this.writer.getImageDimensions(this.externalsMap.getExternalPath(item.source),0),{password:item.password} 
         else
             result = {width:0,height:0} 
 

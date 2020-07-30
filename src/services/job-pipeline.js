@@ -1,8 +1,8 @@
-var logger = require('./logger'),
-	jDocDocumentRendering = require('./json-document-rendering/document-rendering'),
+var logger = require('./logger');
+const ExternalsMap = require('./pdf-engine/externals-map');
+const PDFEngine = require('./pdf-engine/pdf-engine'),
     htmlDocumentRendering = require('./html-document-rendering'),
 	externalFilesDownloader = require('./external-files-downloader'),
-	FilesMap = require('./files-map'),
 	fs = require('fs'),
 	async = require('async'),
 	path = require('path'),
@@ -12,6 +12,27 @@ var logger = require('./logger'),
 
 
 var localResourcesPath = path.resolve(__dirname,'../local-resources/');
+
+var localResources = {
+	'arial': path.resolve(localResourcesPath,'./fonts/arial.ttf'),
+	'arial bold': path.resolve(localResourcesPath,'./fonts/arialb.ttf'),
+	'arial bold italic': path.resolve(localResourcesPath,'./fonts/arialbi.ttf'),
+	'arial black': path.resolve(localResourcesPath,'./fonts/arialbl.ttf'),
+	'arial black bold': path.resolve(localResourcesPath,'./fonts/arialblb.ttf'),
+	'arial black italic': path.resolve(localResourcesPath,'./fonts/arialbli.ttf'),
+	'arial italic': path.resolve(localResourcesPath,'./fonts/ariali.ttf'),
+	'comic sans': path.resolve(localResourcesPath,'./fonts/comicms.ttf'),
+	'comic sans bold': path.resolve(localResourcesPath,'./fonts/comicmsb.ttf'),
+	'courier': path.resolve(localResourcesPath,'./fonts/courier.ttf'),
+	'courier bold': path.resolve(localResourcesPath,'./fonts/courierb.ttf'),
+	'courier bold italic':  path.resolve(localResourcesPath,'./fonts/courierbi.ttf'),
+	'courier italic': path.resolve(localResourcesPath,'./fonts/courieri.ttf'),
+	'georgia': path.resolve(localResourcesPath,'./fonts/georgia.ttf'),
+	'georgia bold': path.resolve(localResourcesPath,'./fonts/georgiab.ttf'),
+	'georgia bold italic': path.resolve(localResourcesPath,'./fonts/georgiabi.ttf'),
+	'georgia italic': path.resolve(localResourcesPath,'./fonts/georgiai.ttf'),
+	'impact': path.resolve(localResourcesPath,'./fonts/impact.ttf')
+};
 
 // production modules
 function downloadExternals(jobDescriptor,callback) {
@@ -26,8 +47,8 @@ function getDocument(jobDescriptor,callback,results) {
 		return callback(null,jobDescriptor.document.embedded)
 	
     if(jobDescriptor.document.referenced) {
-        var filesMap = new FilesMap(localResourcesPath,results.download_externals);
-        var filePath = filesMap.get(jobDescriptor.document.referenced);
+        var filesMap = new ExternalsMap(results.download_externals);
+        var filePath = filesMap.getExternalPath(jobDescriptor.document.referenced);
         
         if(filePath) {
             fs.readFile(filePath,'utf8',function(err,data) {
@@ -69,14 +90,15 @@ function computeDocument(jobDescriptor,callback,results) {
 }
 
 function renderJDocToPDF(jobDescriptor,callback,results) {
+	var writerOptions = jobDescriptor.document.engine ? jobDescriptor.document.engine.options:null
 	var options = 	{ 
-					pwd:path.resolve(localResourcesPath),
-					pdfWriter: jobDescriptor.document.engine ? jobDescriptor.document.engine.options:null
+					pwd: path.resolve(localResourcesPath),
+					pdfWriter: writerOptions
 				},
 		resultPath = new tmp.File().path,
-		outputStream = new PDFWStreamForFile(resultPath);								
-	
-	jDocDocumentRendering.render(
+		outputStream = new PDFWStreamForFile(resultPath);
+
+	/*jDocDocumentRendering.render(
 		results.compute_document,
 		results.download_externals,
 		outputStream,
@@ -86,7 +108,25 @@ function renderJDocToPDF(jobDescriptor,callback,results) {
 				callback(err,resultPath);
 			});
 		}
-	);	    
+	);*/		
+	
+	const paths = {
+		...localResources,
+		...results.download_externals
+	}
+	const engine = new PDFEngine(paths)
+	const document = results.compute_document
+	try {
+		engine.generatePDF(document, outputStream, writerOptions)
+		outputStream.close(function(){
+			callback(null, resultPath);
+		});		
+		
+	} catch(ex) {
+		outputStream.close(function(){
+			callback(ex);
+		});		
+	}
 }
 
 function renderHTMLToPDF(jobDescriptor,callback,results) {
