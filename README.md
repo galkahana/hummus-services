@@ -1,3 +1,5 @@
+This repo has a modern version here - [galkahana/hummus-services-redux](https://github.com/galkahana/hummus-services-redux).
+
 Making it public: 26.5.2022. 
 so 7 yrs ago (apparently) i figured that maybe i should try to make some $$$ on hummus. idea is simple - sas for pdf generation. use the service api to send a json and get back a pdf file (either a file, or link to download or public link to share). implemented all the backend and neat frontend (in angular 1)...even deployed the thing on the then fresh google cloud service. had cron jobs for autodelete, automated emails when somebody signs up. and when it got to making this a business i got scared and left it. guess on my own i'm only good for open source...and maybe even that not so much...cause i can't seem to find happiness in that.
 
