@@ -19,7 +19,7 @@
     "base64url": "^1.0.6",
     "body-parser": "^1.15.0",
     "crypto": "0.0.3",
-    "express": "^4.13.3",
+    "express": "^4.21.0",
     "font-awesome": "^4.6.3",
     "gm": "^1.23.0",
     "hummus": "^1.0.108",
